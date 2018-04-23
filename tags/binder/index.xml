@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Binder on xuanliang blog</title>
+    <link>https://xuanliangdev.github.io/tags/binder/</link>
+    <description>Recent content in Binder on xuanliang blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 23 Apr 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://xuanliangdev.github.io/tags/binder/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>图解Binder</title>
+      <link>https://xuanliangdev.github.io/post/%E5%9B%BE%E8%A7%A3binder%E7%B1%BB%E5%9B%BE%E6%97%B6%E5%BA%8F%E5%9B%BE/</link>
+      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://xuanliangdev.github.io/post/%E5%9B%BE%E8%A7%A3binder%E7%B1%BB%E5%9B%BE%E6%97%B6%E5%BA%8F%E5%9B%BE/</guid>
+      <description>Binder是用在Android系统中的一个进程间通信(IPC)机制，使用C/S架构，服务端和客户端通过Binder进行跨进程的数据交换，B</description>
+    </item>
+    
+  </channel>
+</rss>

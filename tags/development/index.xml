@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Development on xuanliang blog</title>
+    <link>https://xuanliangdev.github.io/tags/development/</link>
+    <description>Recent content in Development on xuanliang blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 23 Apr 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://xuanliangdev.github.io/tags/development/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>ActivityManagerService流程总结</title>
+      <link>https://xuanliangdev.github.io/post/activitymanagerservice%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93/</link>
+      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://xuanliangdev.github.io/post/activitymanagerservice%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93/</guid>
+      <description>ActivityManagerService是一个Binder服务，用来负责系统中四大组件的管理和调度。 1.ActivityManagerS</description>
+    </item>
+    
+  </channel>
+</rss>
