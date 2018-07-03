@@ -84,7 +84,7 @@
 
 <meta itemprop="datePublished" content="2018-04-23T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2018-04-23T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="6423">
+<meta itemprop="wordCount" content="6352">
 
 
 
@@ -220,7 +220,7 @@
               <a href="/categories/design-pattern/"> Design Pattern </a>
             
           </div>
-        <span class="more-meta"> 6423 words </span>
+        <span class="more-meta"> 6352 words </span>
         <span class="more-meta"> 13 min read </span>
       </div>
     </header>
@@ -671,6 +671,8 @@ public Object clone() {
 
 <h4 id="6-adapter-适配器">6、Adapter（适配器）</h4>
 
+<p><img src="https://i.imgur.com/79y6BUu.png" alt="" /></p>
+
 <p>实际应用：ListView中的Adapter</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -732,11 +734,11 @@ class Adapter implements Target {
 </div>
 <h4 id="7-bridge-桥接">7、Bridge（桥接）</h4>
 
+<p><img src="https://i.imgur.com/7hWqaOJ.png" alt="" /></p>
+
 <p>实际应用：经常用在一些imp类中，比如WindowManagerImp（感觉其实没必要设计WindowManager接口）</p>
 
 <p>*这个设计模式对于理解android framework的很多设计相当有帮助，可以扩展到其他一些框架的接口类和相关的Imp类进行分析。 用于多维度变化类或者多个树状类之间的耦合的解耦。一个类存在两个独立变化的维度，并且两个维度都需要扩展。</p>
-
-<p>（想到了一个问题，只被一个类继承的接口到底有没有必要把接口抽象出来，比如WindowManagerImpl和WindowManager，有没有必要把WindowManager接口提取出来）</p>
 
 <p>这个模式诠释了（多用组合，少用继承）的好处</p>
 <div class="highlight"><div class="chroma">
@@ -843,6 +845,8 @@ class LargeCoffee extends Coffee {
 </div>
 <h4 id="8-composite-组成">8、Composite（组成）</h4>
 
+<p><img src="https://i.imgur.com/xCnYlrw.png" alt="" /></p>
+
 <p>实际应用：View和ViewGroup</p>
 
 <p>ViewGrop继承于View，并且已聚合的方式包含View</p>
@@ -885,6 +889,8 @@ abstract class ViewGroup extends View {
 </div>
 </div>
 <h4 id="9-decorator-装饰">9、Decorator（装饰）</h4>
+
+<p><img src="https://i.imgur.com/CPaLmU1.png" alt="" /></p>
 
 <p>实际应用：Context和ContextWrapper，java中的各种输入输出流</p>
 
@@ -1056,6 +1062,8 @@ class PKMS {
 
 <h4 id="12-proxy-代理">12、Proxy（代理）</h4>
 
+<p><img src="https://i.imgur.com/Qzvj41v.png" alt="" /></p>
+
 <p>实际应用：Binder</p>
 
 <p>对于理解Binder机制很有帮助。</p>
@@ -1134,6 +1142,8 @@ class ProxySub extends Sub {
 <h3 id="三-行为模式">三、行为模式</h3>
 
 <h4 id="13-chain-of-responsibility-责任链-对象行为">13、chain of responsibility（责任链）（对象行为）</h4>
+
+<p><img src="https://i.imgur.com/Vb1eYBL.png" alt="" /></p>
 
 <p>实际应用：事件分发机制，比如屏幕的触摸事件</p>
 
@@ -1309,6 +1319,8 @@ Handler2 handle</pre></td></tr></table>
 </div>
 </div>
 <h4 id="14-command-命令-对象行为">14、command（命令）（对象行为）</h4>
+
+<p><img src="https://i.imgur.com/XoAViu0.png" alt="" /></p>
 
 <p>实际应用：PackageManagerService中的MeasureParams、InstallParams和MoveParams</p>
 
@@ -1717,9 +1729,11 @@ toForward</pre></td></tr></table>
 
 <h4 id="16-iterator-迭代器-对象行为">16、iterator（迭代器）（对象行为）</h4>
 
-<p>实际应用：容器对象的遍历</p>
+<p>实际应用：容器对象的遍历，提供一种方法顺序访问集合各个元素，又不暴露集合的内部表示</p>
 
 <h4 id="17-mediator-中介者-对象行为">17、mediator（中介者）（对象行为）</h4>
+
+<p><img src="https://i.imgur.com/I9vOrQt.png" alt="" /></p>
 
 <p>实际应用：KeyguardViewMediator</p>
 
@@ -1898,6 +1912,8 @@ mediator has money : 0</pre></td></tr></table>
 
 <h4 id="19-observer-观察者-对象行为">19、observer（观察者）（对象行为）</h4>
 
+<p><img src="https://i.imgur.com/l4vSWS1.png" alt="" /></p>
+
 <p>实际应用：ListView</p>
 
 <p>BaseAdapter创建的时候会同时创建一个DataSetObservable（被观察者），当listview调用setAdapter时会创建一个AdapterDataSetObserver（观察者），当Adapter调用notifyDataSetChanged时，被观察者调用notifyChanged遍历通知所有观察者执行onChanged方法，然后观察者会执行重新布局的操作。</p>
@@ -2028,6 +2044,8 @@ osr2 receive: new content!</pre></td></tr></table>
 </div>
 </div>
 <h4 id="20-state-状态-对象行为">20、state（状态）（对象行为）</h4>
+
+<p><img src="https://i.imgur.com/4xNqeSN.png" alt="" /></p>
 
 <p>实际应用：WifiStateMachine</p>
 
@@ -2212,7 +2230,7 @@ class PowerOnState implements TvState{
     }
 }
 
-class TvController implements TvState{
+class TvController{
     TvState tvState = new PowerOffState();;
     public void powerOn(){
         tvState = new PowerOnState();
@@ -2224,22 +2242,22 @@ class TvController implements TvState{
         System.out.println(&#34;PowerOff TV!&#34;);
     }
 
-    @Override
+
     public void upVolume() {
         tvState.upVolume();
     }
 
-    @Override
+
     public void downVolme() {
         tvState.downVolme();
     }
 
-    @Override
+
     public void nextChannel() {
         tvState.nextChannel();
     }
 
-    @Override
+
     public void preChannel() {
         tvState.preChannel();
     }
@@ -2269,6 +2287,8 @@ nextChannel</pre></td></tr></table>
 <p>定义一个算法框架，让其实现延迟到子类。</p>
 
 <h4 id="23-visitor-访问者-对象行为">23、visitor（访问者）（对象行为）</h4>
+
+<p><img src="https://i.imgur.com/WPhL7iD.png" alt="" /></p>
 
 <p>实际应用：注解框架的实现（ButterKnife）</p>
 
