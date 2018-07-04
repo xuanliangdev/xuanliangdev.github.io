@@ -84,7 +84,7 @@
 
 <meta itemprop="datePublished" content="2018-04-23T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2018-04-23T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="6352">
+<meta itemprop="wordCount" content="6344">
 
 
 
@@ -220,7 +220,7 @@
               <a href="/categories/design-pattern/"> Design Pattern </a>
             
           </div>
-        <span class="more-meta"> 6352 words </span>
+        <span class="more-meta"> 6344 words </span>
         <span class="more-meta"> 13 min read </span>
       </div>
     </header>
@@ -1320,7 +1320,7 @@ Handler2 handle</pre></td></tr></table>
 </div>
 <h4 id="14-command-命令-对象行为">14、command（命令）（对象行为）</h4>
 
-<p><img src="https://i.imgur.com/XoAViu0.png" alt="" /></p>
+<p><img src="https://i.imgur.com/4F7RUzM.png" alt="" /></p>
 
 <p>实际应用：PackageManagerService中的MeasureParams、InstallParams和MoveParams</p>
 
@@ -1521,8 +1521,6 @@ Handler2 handle</pre></td></tr></table>
 </span><span class="lnt">190
 </span><span class="lnt">191
 </span><span class="lnt">192
-</span><span class="lnt">193
-</span><span class="lnt">194
 </span></pre></td>
 <td class="lntd">
 <pre class="chroma">public class CommandPattern {
@@ -1534,7 +1532,7 @@ Handler2 handle</pre></td></tr></table>
         BackCommand back = new BackCommand(car);
         ForwardCommand forward = new ForwardCommand(car);
 
-        Handler h = new Handler(car);
+        Handler h = new Handler();
         h.setBack(back);
         h.setForward(forward);
         h.setLeft(left);
@@ -1657,14 +1655,12 @@ class BackCommand implements Command {
 }
 
 class Handler {
-    Car car;
     LeftCommand left;
     RightCommand right;
     BackCommand back;
     ForwardCommand forward;
     ArrayList&lt;Command&gt; commandList = new ArrayList&lt;&gt;();
-    Handler(Car car) {
-        this.car = car;
+    Handler() {
     }
 
     public void setLeft(LeftCommand left) {
