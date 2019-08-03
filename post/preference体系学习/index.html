@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>preference体系学习总结 - xuanliang</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="xuanliang" />
+  <meta name="description" content="1.preference体系学习总结 类图 第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分） 1.1 数据结构描述 1.1.1 pref" />
+
+  <meta name="keywords" content="Hugo, theme, jane" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.55.5" />
+
+
+<link rel="canonical" href="https://xuanliangdev.github.io/post/preference%E4%BD%93%E7%B3%BB%E5%AD%A6%E4%B9%A0/" />
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.31c4b7729c8d71cc152f8de4203d90bfd8a04f7eab69372de7234ebf55b7701b.css" integrity="sha256-McS3cpyNccwVL43kID2Qv9igT36raTct5yNOv1W3cBs=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="preference体系学习总结" />
+<meta property="og:description" content="1.preference体系学习总结 类图 第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分） 1.1 数据结构描述 1.1.1 pref" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://xuanliangdev.github.io/post/preference%E4%BD%93%E7%B3%BB%E5%AD%A6%E4%B9%A0/" />
+<meta property="article:published_time" content="2019-08-03T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2019-08-03T00:00:00&#43;00:00"/>
+
+<meta itemprop="name" content="preference体系学习总结">
+<meta itemprop="description" content="1.preference体系学习总结 类图 第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分） 1.1 数据结构描述 1.1.1 pref">
+
+
+<meta itemprop="datePublished" content="2019-08-03T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2019-08-03T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="11468">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="preference体系学习总结"/>
+<meta name="twitter:description" content="1.preference体系学习总结 类图 第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分） 1.1 数据结构描述 1.1.1 pref"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">XuanLiang</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/">This is Home</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/post/">Archives</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/tags/">Tags</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/categories/">Categories</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+          
+        
+      </li>
+    
+
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      XuanLiang
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/">This is Home</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/post/">Archives</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/tags/">Tags</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/categories/">Categories</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+          
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">preference体系学习总结</h1>
+      
+      <div class="post-meta">
+        <time datetime="2019-08-03" class="post-time">
+          2019-08-03
+        </time>
+        
+        
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#1-preference体系学习总结">1.preference体系学习总结</a>
+<ul>
+<li><a href="#1-1-数据结构描述">1.1 数据结构描述</a></li>
+<li><a href="#1-2-preferencefragment加载xml源码分析-旧">1.2 PreferenceFragment加载xml源码分析（旧）</a></li>
+<li><a href="#1-3-preferencefragment点击事件触发流程-旧">1.3  PreferenceFragment点击事件触发流程（旧）</a></li>
+<li><a href="#1-4-preferenceactivity加载xml源码分析">1.4 PreferenceActivity加载xml源码分析</a></li>
+<li><a href="#1-5-preferenceactivity点击事件触发流程">1.5. PreferenceActivity点击事件触发流程</a></li>
+</ul></li>
+<li><a href="#2-aosp中setting模块学习总结">2.aosp中Setting模块学习总结</a>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#2-1-settings主页面的显示分析">2.1 Settings主页面的显示分析：</a>
+<ul>
+<li><a href="#1-settingsactivity的oncreate流程">1. SettingsActivity的onCreate流程</a></li>
+<li><a href="#2-settingsactivity的onresume流程">2. SettingsActivity的onResume流程</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#2-2-securitysettings页面的显示流程分析">2.2 SecuritySettings页面的显示流程分析：</a>
+<ul>
+<li><a href="#2-2-1-dashboardfragmenet的onattach流程">2.2.1.DashboardFragmenet的onAttach流程</a></li>
+<li><a href="#2-2-1-dashboardfragmenet的oncreate流程">2.2.1.DashboardFragmenet的onCreate流程</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><a href="#3-aosp-8-0-settingssearch分析">3.aosp 8.0 SettingsSearch分析</a>
+<ul>
+<li><a href="#3-1搜索的数据源">3.1搜索的数据源</a></li>
+<li><a href="#3-2数据库构建过程">3.2数据库构建过程</a></li>
+</ul></li>
+<li><a href="#3-3数据搜索以及显示过程">3.3数据搜索以及显示过程</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      
+
+<h1 id="1-preference体系学习总结">1.preference体系学习总结</h1>
+
+<p>类图</p>
+
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx3akmgz13j31cg133k17.jpg" alt="preferenceclass" /></p>
+
+<p>第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分）</p>
+
+<h2 id="1-1-数据结构描述">1.1 数据结构描述</h2>
+
+<p><strong>1.1.1</strong> <strong>preference</strong>：</p>
+
+<p>设置的基石，简单来讲可以认为是设置列表中的每一个项目。</p>
+
+<p>其中有个重要的方法getView，这个方法返回的View将会被添加到PreferenceFragment或PreferenceActivity里</p>
+
+<p>作用：提供一个view给即将被展示的activity并且关联一个sharepreferences来保存或取出preference数据，其他常用的preference子类都继承于该类从而进行view样式的改变。</p>
+
+<p><strong>1.1.2（v7包的Preference）</strong></p>
+
+<p>去除了getView方法，增加了继承于RecycleView.ViewHolder的PreferenceViewHolder类</p>
+
+<hr />
+
+<p><strong>1.1.3</strong> <strong>PreferenceGroup</strong>:</p>
+
+<p>继承于PreferenceGroup，内部维护了一个元素为Preference的List，和Preference的关系类似于View和ViewGroup一样，采用了组合模式进行组织。</p>
+
+<p><strong>1.1.4（v7包的PreferenceGroup）</strong></p>
+
+<p>与旧实现类似，改动不大</p>
+
+<hr />
+
+<p><strong>1.1.5</strong> <strong>PreferenceScreen</strong>：</p>
+
+<p>继承于PreferenceGroup，是一个界面的root节点。当一个PreferenceScreen嵌套在另一个PreferenceScreen内部时会以Dialog的形式开启一个新的界面进行显示。</p>
+
+<p>内部持有一个listView，一个listAdapter（PreferenceGroupAdapter），持有一个layout文件&rdquo;com.android.internal.R.layout.preference_list_fragment&rdquo;的id，还有一个Dialog，用于展示嵌套的preferenceScreen</p>
+
+<p><strong>1.1.6 （v7包的PreferenceScreen）</strong></p>
+
+<p>与旧实现对比解耦了关联的View体系的东西，更加简洁。</p>
+
+<hr />
+
+<p><strong>1.1.7 PreferenceManager</strong> ：</p>
+
+<p>管理类，用XmlPullParser遍历解析xml文件来创建preference。</p>
+
+<p>1.重要的属性</p>
+
+<p>activity，fragment，sharepreference，preferenceDataStore，preferenceScreen；</p>
+
+<p>关联了一个根布局“PreferenceScreen”，和SharedPreference进行交互。</p>
+
+<p>2.重要的方法</p>
+
+<p>inflateFromResource：通过PreferenceInflater（继承于GenericInflater）递归地扫描xml文件取出所有节点信息来构建出PreferenceScreen对象。</p>
+
+<p><strong>1.1.8 （v14包的PreferenceManager）</strong></p>
+
+<p>增加了一些接口OnDisplayPreferenceDialogListener、OnNavigateToScreenListener</p>
+
+<hr />
+
+<p><strong>1.1.9 PreferenceFragment：</strong></p>
+
+<p>用于显示preference对象列表</p>
+
+<p>持有一个listView，最终会关联到PreferenceScreen的listView，实现了onPreferenceTreeClick接口，这个接口会在ListView的项被点击时回调。</p>
+
+<p><strong>1.1.10（v14包的PreferenceFragment）</strong></p>
+
+<p>与旧实现相比改动较大。主要是采用了RecyclerView并且实现了一些Dialog的接口。</p>
+
+<p>关联了recycleView和preferenceManager</p>
+
+<hr />
+
+<p><strong>1.1.11 PreferenceActivity</strong></p>
+
+<p>继承于ListActivity，重要的内部类</p>
+
+<p>Header：</p>
+
+<p>Header包含的属性：</p>
+
+<p>1.title； 2.summary；3.icon；4.fragment；5.intent；6.bundle；</p>
+
+<p>HeaderAdapter</p>
+
+<p>HeaderAdapter包含的属性：1.icon；2.title；3.summary</p>
+
+<p>从这个adapter和layout布局(preference_header_item.xml)可以看出一个header只有这三项。</p>
+
+<hr />
+
+<h2 id="1-2-preferencefragment加载xml源码分析-旧">1.2 PreferenceFragment加载xml源码分析（旧）</h2>
+
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwgy1fwwaqbe99dj30ul14l76u.jpg" alt="PreferenceFragmentBuild" /></p>
+
+<p>重要流程说明：</p>
+
+<p>第8步：PreferenceInflater是一个xml解析器，通过解析xml取出节点，然后反射生成PreferenceScreen对象</p>
+
+<h2 id="1-3-preferencefragment点击事件触发流程-旧">1.3  PreferenceFragment点击事件触发流程（旧）</h2>
+
+<pre><code>AbsListView里的onKeyUp
+    AdapterView里的performItemClick
+        OnItemClickListener的onItemClick
+            Preference的performClick
+                PreferenceManager.OnPreferenceTreeClickListener的onPreferenceTreeClick
+</code></pre>
+
+<h2 id="1-4-preferenceactivity加载xml源码分析">1.4 PreferenceActivity加载xml源码分析</h2>
+
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fwgb5lgqgfj30ol0ktab8.jpg" alt="preferenceActivityonCreate" /></p>
+
+<p>重要流程说明：</p>
+
+<p>第4步：生成Header的方式也是通过xml解析器解析xml的header节点然后反射生成Header对象。</p>
+
+<hr />
+
+<p>无论是新的loadHeadersFromResource还是旧的addPreferencesFromResource，底层解析xml都用的XmlPullParser类。</p>
+
+<h2 id="1-5-preferenceactivity点击事件触发流程">1.5. PreferenceActivity点击事件触发流程</h2>
+
+<pre><code>AbsListView里的onKeyUp    
+    AdapterView里的performItemClick
+        OnItemClickListener的onItemClick
+            ListActivity里的onListItemClick
+                PreferenceAcitvity里的onHeaderClick
+                    然后根据fragment是否为空来执行switchToHeader或者startActivity
+</code></pre>
+
+<hr />
+
+<h1 id="2-aosp中setting模块学习总结">2.aosp中Setting模块学习总结</h1>
+
+<p>类图</p>
+
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx3akmgz13j31cg133k17.jpg" alt="preferenceclass" /></p>
+
+<p>主要分析只在系统Settings中使用的部分（除去上面分析过的蓝色和绿色部分）</p>
+
+<h4 id="2-1-settings主页面的显示分析">2.1 Settings主页面的显示分析：</h4>
+
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fwv0gkkantj309c0ibmz4.jpg" alt="pscreen" /></p>
+
+<p>aosp中P版本设置界面如上图所示，除去没显示的，主界面中一共展示了12个列表项，先分析列表项，后面再分析搜索和suggestion项。</p>
+
+<p>主Activity为Settings，继承于SettingsActivity，内部包含一个DashboardSummary的Fragment，从类图上看出DashboardSummary并没有用到preference的那一套东西。布局也相对简单，只有一个FocusRecyclerView，页面的布局由DashboardAdapter负责，DashboardAdapter用到的所有数据由DashboardData进行描述。这里只分析DashboardData中的DashboardCategory，也就是12个列表项所属的DashboardCategory，对于设置主界面来说只有一个DashboardCategory，如下：</p>
+
+<pre><code>&lt;meta-data android:name=&quot;com.android.settings.category&quot;
+    android:value=&quot;com.android.settings.category.ia.homepage&quot;/&gt;
+</code></pre>
+
+<p>从android manifest中也可以看到12个这样的数据，代表主界面的12个列表项。</p>
+
+<p>从类图中可以看出一个列表项由<strong>Tile</strong>这样一个数据结构进行描述：</p>
+
+<pre><code>public class Tile implements Parcelable {
+    public CharSequence title;
+    public CharSequence summary;
+    public Icon icon;
+</code></pre>
+
+<p><strong>DashboardCategory</strong>表示一个类别，持有一个元素为Tile的List表；</p>
+
+<p>可以发现Dashboard和Preference有很多相似的地方</p>
+
+<pre><code>/**
+ * Base fragment for dashboard style UI containing a list of static and dynamic setting items.
+ */
+</code></pre>
+
+<p>从注释可以看出DashboardFragment是为了动态加载而设计的，相对于Preference是静态地从xml文件中解析读取的。</p>
+
+<p><strong>CategoryManager</strong>主要是对DashboardCategory进行管理，内部会借助于<strong>TileUtils</strong>来生成DashboardCategory对象，在生成DashboardCategory对象时会借助PackageManager来查询手机中的安装包信息来进行分析，来动态决定是否展示一些项。</p>
+
+<p><strong>DashboardFeatureProviderImpl</strong>实现了<strong>DashboardFeatureProvider</strong>接口，持有CategoryManager对象，通过CategoryManager对象进行Category的获取</p>
+
+<p><strong>SuggestionFeatureProviderImpl</strong>实现了<strong>SuggestionFeatureProvider</strong>接口，应该是用于获取推荐信息，后面再分析。</p>
+
+<p><strong>FeatureFactoryImpl</strong>实现了<strong>FeatureFactory</strong>接口，通过反射生成，用于生成DashboardFeatureProviderImpl和SuggestionFeatureProviderImpl等一些FeatureProvider对象。</p>
+
+<p>整个设置主界面加载流程大致如图所示</p>
+
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwgy1fww0pjn6xtj31kw1oewmo.jpg" alt="dashboardsummary" /></p>
+
+<p>图中绿色为主线程，其他线程为后台线程。</p>
+
+<p>对于流程做个简单的分析。</p>
+
+<h5 id="1-settingsactivity的oncreate流程">1. SettingsActivity的onCreate流程</h5>
+
+<p>在这个过程中会进行FeatureFactory、DashboardFeatureProvider、CategoryManager的初始化，并且如果判断是主界面，则启动DashboardSummary这个Fragment。</p>
+
+<ul>
+<li><p>1.1 DashboardSummary在onAttach中会创建SuggestionFeatureProvider，使之来进行推荐功能的实现。</p></li>
+
+<li><p>1.2 DashboardSummary在onCreate中会成创建DashboardFeatureProvider，以及新建一个SummaryLoader，用&rdquo;om.android.settings.category.ia.homepage&rdquo;来作为CategoryKey，SummaryLoader构造时会启动一个HandlerThread来在后台运行，以便随时接受主线程发过来的消息从而触发SummaryProvider的setListening方法进行Summary的更新，比如更新存储空间或者电量的百分比，或者根据不同的手机特性显示不同的Summary，比如在安全设置Fragment中对于支持指纹的手机显示&rdquo;屏幕锁定、指纹&rdquo;，不支持指纹的手机仅显示&rdquo;屏幕锁定&rdquo;。</p></li>
+
+<li><p>1.3  DashboardSummary在onCreateView中会进行view相关的处理，rootview为R.layout.dashboard，这个view中只有一个简单的RecycleView，创建DashboardAdapter，执行rebuildUI方法，该方法启动一个后台线程调用updateCategory来进行Category的更新，更新完毕通过notifyDashboardDataChanged通知主线程进行view的更新，如果需要加载推荐项，推荐项没加载，则向主线程发送一个延迟更新view的消息，通过Handler的postDelayed方法实现。</p></li>
+</ul>
+
+<h5 id="2-settingsactivity的onresume流程">2. SettingsActivity的onResume流程</h5>
+
+<ul>
+<li><p>2.1 这个方法首先会在父类SettingsDrawerActivity的onResume中执行CategoriesUpdateTask，来在后台更新所有的Categories，调用完毕后回主线程调用CategoryListener接口的onCategoriesChanged方法，DashboardFrament和DashboardSummary实现了该接口来进行Category的刷新。</p></li>
+
+<li><p>2.2 SettingsAcitvity在重写onResume后再次向AsyncTask中post一个doUpdateTilesList的方法，这个方法会排在CategoriesUpdateTask之后执行，也是用来更新Categories的。</p></li>
+
+<li><p>2.3 在DashboardSummary的onResume中，会调用SummaryLoader的setListening方法，这个方法会向HandlerThread中post消息，分析这个消息类型MSG_GET_CATEGORY_TILES_AND_SET_LISTENING，对应时序图的47步，在后台线程获取到category后，遍历所有的tile，调用makeProviderW方法，因为所有该category下的Fragment都实现了SummaryProvider以及SummaryLoader.SummaryProviderFactory，SummaryProvider实现了SummaryLoader.SummaryProvider接口，因此通过tile找到相关的factory后，再通过反射生成SummaryProvider对象，如时序图的52步。紧接着在setListeningW中遍历调用所有的SummaryProvider的setListening方法，这个方法进一步触发SummaryLoader的setSummary方法来进行各个列表项summary的动态变化，比如电量的更新等。</p>
+
+<pre><code>public void setSummary(SummaryProvider provider, final CharSequence summary) {
+  final ComponentName component = mSummaryProviderMap.get(provider);
+  ThreadUtils.postOnMainThread(() -&gt; {
+  
+      final Tile tile = getTileFromCategory(
+              mDashboardFeatureProvider.getTilesForCategory(mCategoryKey), component);
+  
+      if (tile == null) {
+          if (DEBUG) {
+              Log.d(TAG, &quot;Can't find tile for &quot; + component);
+          }
+          return;
+      }
+      if (DEBUG) {
+          Log.d(TAG, &quot;setSummary &quot; + tile.title + &quot; - &quot; + summary);
+      }
+  
+      updateSummaryIfNeeded(tile, summary);
+  });
+}
+  
+@VisibleForTesting
+void updateSummaryIfNeeded(Tile tile, CharSequence summary) {
+  if (TextUtils.equals(tile.summary, summary)) {
+      if (DEBUG) {
+          Log.d(TAG, &quot;Summary doesn't change, skipping summary update for &quot; + tile.title);
+      }
+      return;
+  }
+  mSummaryTextMap.put(mDashboardFeatureProvider.getDashboardKeyForTile(tile), summary);
+  tile.summary = summary;
+  if (mSummaryConsumer != null) {
+      mSummaryConsumer.notifySummaryChanged(tile);
+  } else {
+      if (DEBUG) {
+          Log.d(TAG, &quot;SummaryConsumer is null, skipping summary update for &quot;
+                  + tile.title);
+      }
+  }
+}
+</code></pre></li>
+</ul>
+
+<p>而在SummaryLoader的setSummary方法中再通过SummaryConsumer接口的notifySummaryChanged方法进行界面的更新，对于主界面来说是DashboardAdapter实现了SummaryConsumer接口，会直接触发notifyItemChanged来进行view的更新（对于其他DashboardFragment的子类来说则是父类DashboardFragment实现了SummaryConsumer接口，会触发Preference的setSummary方法，这个方法会调用notifyChanged方法，进而触发OnPreferenceChangeInternalListener的onPreferenceChange方法，而PreferenceGroupAdapter实现了该接口，因而也会触发notifyItemChanged来进行view的更新）。</p>
+
+<h3 id="2-2-securitysettings页面的显示流程分析">2.2 SecuritySettings页面的显示流程分析：</h3>
+
+<p>Settings主界面的显示完全是动态的，而除去主界面其他的Fragment的显示则是动态和静态相结合，以要分析的SecuritySettings来说明。SecuritySettings的继承于DashboardFragment，而DashboardFragment主要就是用来加载动态和静态的item。DashboardFragment最终继承于PreferenceFragment，因此可以解析xml中配置的preference来进行显示，而且持有DashboardFeatureProviderImpl对象，因此也可以加载DashboardCategory中的Tile进行显示。</p>
+
+<p>SecuritySettings界面显示是这个样子的：</p>
+
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwgy1fww1moiavmj30990icwgc.jpg" alt="securitysettings" /></p>
+
+<p>layout文件R.xml.security_dashboard_settings如下所示：</p>
+
+<pre><code>&lt;PreferenceScreen
+    xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:settings=&quot;http://schemas.android.com/apk/res-auto&quot;
+    android:key=&quot;security_dashboard_page&quot;
+    android:title=&quot;@string/security_settings_title&quot;
+    settings:initialExpandedChildrenCount=&quot;9&quot;&gt;
+
+    &lt;!-- security_settings_status.xml --&gt;
+    &lt;PreferenceCategory
+        android:order=&quot;-10&quot;
+        android:key=&quot;security_status&quot;
+        android:title=&quot;@string/security_status_title&quot; /&gt;
+
+    &lt;PreferenceCategory
+        android:order=&quot;1&quot;
+        android:key=&quot;dashboard_tile_placeholder&quot; /&gt;
+
+    &lt;!-- security section --&gt;
+    &lt;PreferenceCategory
+        android:order=&quot;10&quot;
+        android:key=&quot;security_category&quot;
+        android:title=&quot;@string/lock_settings_title&quot;&gt;  &lt;!-- 设备安全性--&gt;
+
+        &lt;com.android.settings.widget.GearPreference
+            android:key=&quot;unlock_set_or_change&quot;
+            android:title=&quot;@string/unlock_set_unlock_launch_picker_title&quot;
+            android:summary=&quot;@string/summary_placeholder&quot;
+            settings:keywords=&quot;@string/keywords_lockscreen&quot; /&gt; &lt;!-- 屏幕锁定--&gt;
+
+        &lt;Preference
+            android:key=&quot;lockscreen_preferences&quot;
+            android:title=&quot;@string/lockscreen_settings_title&quot; &lt;!-- 锁屏时的偏好设置--&gt;
+            android:summary=&quot;@string/summary_placeholder&quot;
+            android:fragment=&quot;com.android.settings.security.LockscreenDashboardFragment&quot; /&gt;
+
+        &lt;Preference
+            android:key=&quot;fingerprint_settings&quot;
+            android:title=&quot;@string/security_settings_fingerprint_preference_title&quot; &lt;!-- 指纹--&gt;
+            android:summary=&quot;@string/summary_placeholder&quot;
+            settings:keywords=&quot;@string/keywords_fingerprint_settings&quot;/&gt;
+
+    &lt;/PreferenceCategory&gt;
+....
+
+&lt;/PreferenceScreen&gt;
+</code></pre>
+
+<p>代码里会解析这个xml文件来构造PreferenceScreen对象。</p>
+
+<p>从图里看到并没有显示锁屏时的偏好设置这一个Preference的条目，从源码分析是LockScreenPreferenceController这个类动态的改变了这一个Preference的显示状态。</p>
+
+<pre><code>    @Override
+    public int getAvailabilityStatus() {
+        if (!mLockPatternUtils.isSecure(MY_USER_ID)) {
+            return mLockPatternUtils.isLockScreenDisabled(MY_USER_ID)
+                    ? DISABLED_FOR_USER : AVAILABLE;
+        } else {
+            return mLockPatternUtils.getKeyguardStoredPasswordQuality(MY_USER_ID)
+                    == PASSWORD_QUALITY_UNSPECIFIED
+                    ? DISABLED_FOR_USER : AVAILABLE;
+        }
+    }
+
+    @Override
+    public void updateState(Preference preference) {
+        preference.setSummary(
+                LockScreenNotificationPreferenceController.getSummaryResource(mContext));
+    }
+
+    @Override
+    public void onResume() {
+        mPreference.setVisible(isAvailable());
+    }
+</code></pre>
+
+<p>而这三个item其实是通过动态从DashboardTiles中取出来的。下面简单分析SecuritySettings的显示过程，主要是DashboardFragment的流程分析。</p>
+
+<h4 id="2-2-1-dashboardfragmenet的onattach流程">2.2.1.DashboardFragmenet的onAttach流程</h4>
+
+<pre><code>@Override
+public void onAttach(Context context) {
+    super.onAttach(context);
+    mDashboardFeatureProvider = FeatureFactory.getFactory(context).
+            getDashboardFeatureProvider(context);
+    final List&lt;AbstractPreferenceController&gt; controllers = new ArrayList&lt;&gt;();
+    // Load preference controllers from code
+    final List&lt;AbstractPreferenceController&gt; controllersFromCode =
+            createPreferenceControllers(context);
+    // Load preference controllers from xml definition
+    final List&lt;BasePreferenceController&gt; controllersFromXml = PreferenceControllerListHelper
+            .getPreferenceControllersFromXml(context, getPreferenceScreenResId());
+    // Filter xml-based controllers in case a similar controller is created from code already.
+    final List&lt;BasePreferenceController&gt; uniqueControllerFromXml =
+            PreferenceControllerListHelper.filterControllers(
+                    controllersFromXml, controllersFromCode);
+
+    // Add unique controllers to list.
+    if (controllersFromCode != null) {
+        controllers.addAll(controllersFromCode);
+    }
+    controllers.addAll(uniqueControllerFromXml);
+...
+
+    mPlaceholderPreferenceController =
+            new DashboardTilePlaceholderPreferenceController(context);
+    controllers.add(mPlaceholderPreferenceController);
+    for (AbstractPreferenceController controller : controllers) {
+        addPreferenceController(controller);
+    }
+}
+</code></pre>
+
+<p>方法里主要是一些controllers的创建，这些controller可以从代码创建，也可以从xml解析获取，</p>
+
+<p>在SecuritySettings里通过代码创建了一些controller，如：</p>
+
+<pre><code>    private static List&lt;AbstractPreferenceController&gt; buildPreferenceControllers(Context context,
+            Lifecycle lifecycle, SecuritySettings host) {
+        final List&lt;AbstractPreferenceController&gt; controllers = new ArrayList&lt;&gt;();
+        controllers.add(new LocationPreferenceController(context, lifecycle));
+        controllers.add(new ManageDeviceAdminPreferenceController(context));
+        controllers.add(new EnterprisePrivacyPreferenceController(context));
+        controllers.add(new ManageTrustAgentsPreferenceController(context));
+        ...
+
+        return controllers;
+    }
+</code></pre>
+
+<p>在xml中是通过声明settings:controller属性来创建的，如</p>
+
+<pre><code>&lt;SwitchPreference
+    android:key=&quot;visiblepattern_profile&quot;
+    android:summary=&quot;@string/summary_placeholder&quot;
+    android:title=&quot;@string/lockpattern_settings_enable_visible_pattern_title_profile&quot;
+    settings:controller=&quot;com.android.settings.security.VisiblePatternProfilePreferenceController&quot;/&gt;
+</code></pre>
+
+<h4 id="2-2-1-dashboardfragmenet的oncreate流程">2.2.1.DashboardFragmenet的onCreate流程</h4>
+
+<p>DashboardFragmenet最终继承于v14包里的PreferenceFragment的onCreate方法，里面会调用onCreatePreferences方法，DashboardFragmenet重写了onCreatePreferences方法，进而调用refreshAllPreferences方法。</p>
+
+<pre><code>/**
+ * Refresh all preference items, including both static prefs from xml, and dynamic items from
+ * DashboardCategory.
+ */
+private void refreshAllPreferences(final String TAG) {
+    // First remove old preferences.
+    if (getPreferenceScreen() != null) {
+        // Intentionally do not cache PreferenceScreen because it will be recreated later.
+        getPreferenceScreen().removeAll();
+    }
+
+    // Add resource based tiles.
+    displayResourceTiles();
+
+    refreshDashboardTiles(TAG);
+}
+</code></pre>
+
+<p>从注释可以看出这个方法是这个Fragment显示流程的核心。</p>
+
+<pre><code>/**
+ * Displays resource based tiles.
+ */
+private void displayResourceTiles() {
+    final int resId = getPreferenceScreenResId();
+    if (resId &lt;= 0) {
+        return;
+    }
+    addPreferencesFromResource(resId);
+    final PreferenceScreen screen = getPreferenceScreen();
+    mPreferenceControllers.values().stream().flatMap(Collection::stream).forEach(
+            controller -&gt; controller.displayPreference(screen));
+}
+</code></pre>
+
+<p>displayResourceTiles这个方法首先获取了PreferenceScreen，然后通过循环调用了每个controller的displayPreference方法</p>
+
+<p>以上面说的LockScreenPreferenceController为例，LockScreenPreferenceController继承于BasePreferenceController，因此会调用如下方法：</p>
+
+<pre><code>/**
+ * Displays preference in this controller.
+ */
+@Override
+public void displayPreference(PreferenceScreen screen) {
+    super.displayPreference(screen);
+    if (getAvailabilityStatus() == DISABLED_DEPENDENT_SETTING) {
+        // Disable preference if it depends on another setting.
+        final Preference preference = screen.findPreference(getPreferenceKey());
+        if (preference != null) {
+            preference.setEnabled(false);
+        }
+    }
+}
+</code></pre>
+
+<p>从而来决定一个preference是否该显示。</p>
+
+<p>执行完displayResourceTiles后接着会执行refreshDashboardTiles方法，从注释也可以看出这个方法是用来展示动态DashboardCategory的item的</p>
+
+<pre><code>/**
+ * Refresh preference items backed by DashboardCategory.
+ */
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+void refreshDashboardTiles(final String TAG) {
+    final PreferenceScreen screen = getPreferenceScreen();
+
+    final DashboardCategory category =
+            mDashboardFeatureProvider.getTilesForCategory(getCategoryKey());
+    ...
+    final List&lt;Tile&gt; tiles = category.getTiles();
+    ...
+    mSummaryLoader = new SummaryLoader(getActivity(), getCategoryKey());
+    mSummaryLoader.setSummaryConsumer(this);
+    ...
+    // Install dashboard tiles.
+    for (Tile tile : tiles) {
+        final String key = mDashboardFeatureProvider.getDashboardKeyForTile(tile);
+        ...
+        if (mDashboardTilePrefKeys.contains(key)) {
+            // Have the key already, will rebind.
+            ....
+        } else {
+            // Don't have this key, add it.
+            final Preference pref = new Preference(getPrefContext());
+            mDashboardFeatureProvider.bindPreferenceToTile(getActivity(), getMetricsCategory(),
+                    pref, tile, key, mPlaceholderPreferenceController.getOrder());
+            screen.addPreference(pref);
+            mDashboardTilePrefKeys.add(key);
+        }
+        remove.remove(key);
+    }
+    ...
+    mSummaryLoader.setListening(true);
+}
+</code></pre>
+
+<p>5-11行取出相关key的tile对象。对于SecuritySettings来说key是&rdquo;com.android.settings.category.ia.security&rdquo;，三个tile的title为“Google Play 保护机制、查找我的设备、安全更新”，如前面一节所介绍的，这三项是从gms服务中取出的，并不是Settings app本身内置的，因此可以看作是动态加载。</p>
+
+<p>13行创建了一个SummaryLoader对象，从之前的分析可知，会创建一个HandlerThread置于后台运行。</p>
+
+<p>14行把自己设置为SummaryConsumer接口对象，当SummaryLoader后台更新完，会调用setListeningW，这个方法又会取出所有满足要求的SummaryProvider去执行setListening方法，SummaryProvider又会反过来调用SummaryLoader的setSummary方法，SummaryLoader这时会post一个updateSummaryIfNeeded方法到主线程执行，而这个方法会取出mSummaryConsumer也就是DashboardFragment去执行notifySummaryChanged方法，这个方法会获取tile关联的preference，执行其setSummary方法，这个方法又会调用notifyChanged方法，这个方法调用OnPreferenceChangeInternalListener接口的onPreferenceChange方法，而PreferenceGroupAdapter实现了这个接口，因此最终通过PreferenceGroupAdapter实现了view中Summary的更新。</p>
+
+<p>25-29行创建Preference对象，并且将Preference和Tile进行绑定，然后添加到PreferenceScreen中。</p>
+
+<p>34行调用SummaryLoader的setListening方法，从前面一节分析可知，这个操作会往后台HandlerThread发送一个消息，从而在后台监听Summary是否有更新</p>
+
+<pre><code>private SummaryProvider getSummaryProvider(Tile tile) {
+    if (!mActivity.getPackageName().equals(tile.intent.getComponent().getPackageName())) {
+        // Not within Settings, can't load Summary directly.
+        // TODO: Load summary indirectly.
+        return null;
+    }
+    ...
+    return null;
+}
+</code></pre>
+
+<p>在SummaryLoader的getSummaryProvider方法第二行中当前包名为com.android.settings，而tile的包名为com.google.android.gms，因此返回空，从注释也可以看出，如果当前的tile不在Settings应用中，是不能获取到SummaryProvider的。因此后面的通知Adapter进行Summary的刷新操作也就不会执行了，</p>
+
+<h1 id="3-aosp-8-0-settingssearch分析">3.aosp 8.0 SettingsSearch分析</h1>
+
+<p>类图</p>
+
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwgy1fx3eqhh74zj30u017aqc3.jpg" alt="aospsearchclass" /></p>
+
+<h2 id="3-1搜索的数据源">3.1搜索的数据源</h2>
+
+<p>SearchIndexableData:用于搜索的可索引数据</p>
+
+<p>SearchIndexableResource：xml资源</p>
+
+<p>SearchIndexableRaw：原始数据</p>
+
+<p>BaseColumns：基类，rank排名，className类名，iconResId等；</p>
+
+<p>XmlResource：xml的资源id，关联SearchIndexableResource</p>
+
+<p>RawData：原始数据，title标题，summary概要等；关联SearchIndexableData</p>
+
+<p>NonIndexableKey：描述一个不能被索引的数据</p>
+
+<p>SearchIndexablesProvider：用于搜索的可索引provider的基类，用于给搜索提供preference的xml文件数据或者原始数据。</p>
+
+<p>以上的类除了SearchIndexableRaw外其他都位于framework包中；</p>
+
+<p>以下的类或接口位于settings中；</p>
+
+<p>Indexable.SearchIndexProvider：接口，其实现类的实例可以提供可索引的数据</p>
+
+<p>SettingsSearchIndexablesProvider：设置app中的content provider，实现了SearchIndexablesPrevider的相关搜索方法，在phone的app中也有一个类似的实现:PhoneSearchIndexablesProvider，从而可以在设置的搜索中找到Phone中的xml数据进行跳转</p>
+
+<p>BaseSearchIndexProvider：</p>
+
+<p>IndexDatabaseHelper：提供数据库的操作，数据库文件位于data/user_de/0/com.android.settings/databases/search_index.db</p>
+
+<h2 id="3-2数据库构建过程">3.2数据库构建过程</h2>
+
+<p>设置中的界面大部分都是通过xml文件中声明的Preference类的各种子类构建而成，页面打开时通过解析xml文件中的各个节点从而构建成listview中的各个item从而进行显示，以日期和时间页面DateTimeSettings为例:</p>
+
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx11cudlk5j307g0chjru.jpg" alt="datatimephone" /></p>
+
+<p>构成这个界面的文件date_time_prefs.xml如下</p>
+
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;PreferenceScreen xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+        xmlns:settings=&quot;http://schemas.android.com/apk/res/com.android.settings&quot;
+        android:title=&quot;@string/date_and_time&quot; 
+        settings:keywords=&quot;@string/keywords_date_and_time&quot;&gt;
+
+    &lt;com.android.settingslib.RestrictedSwitchPreference android:key=&quot;auto_time&quot;
+        android:title=&quot;@string/date_time_auto&quot;
+        android:summaryOn=&quot;@string/date_time_auto_summaryOn&quot;
+        android:summaryOff=&quot;@string/date_time_auto_summaryOff&quot;
+        settings:useAdditionalSummary=&quot;true&quot;
+        settings:restrictedSwitchSummary=&quot;@string/enabled_by_admin&quot;
+        /&gt;
+
+    &lt;SwitchPreference android:key=&quot;auto_zone&quot;
+        android:title=&quot;@string/zone_auto&quot;
+        android:summaryOn=&quot;@string/zone_auto_summaryOn&quot;
+        android:summaryOff=&quot;@string/zone_auto_summaryOff&quot;
+        /&gt;
+
+    &lt;Preference android:key=&quot;date&quot;
+        android:title=&quot;@string/date_time_set_date&quot;
+        android:summary=&quot;03/10/2008&quot;
+        /&gt;
+
+    &lt;Preference android:key=&quot;time&quot;
+        android:title=&quot;@string/date_time_set_time&quot;
+        android:summary=&quot;12:00am&quot;
+        /&gt;
+
+    &lt;Preference
+        android:fragment=&quot;com.android.settings.datetime.ZonePicker&quot;
+        android:key=&quot;timezone&quot;
+        android:title=&quot;@string/date_time_set_timezone&quot;
+        android:summary=&quot;GMT-8:00&quot;
+        /&gt;
+
+    &lt;SwitchPreference android:key=&quot;24 hour&quot;
+        android:title=&quot;@string/date_time_24hour&quot;
+        /&gt;
+
+&lt;/PreferenceScreen&gt;
+</code></pre>
+
+<p>上述的xml文件的每一项跟界面展示是一一对应的，实际情况也可能不一样，可以通过配置一些属性或者代码动态增删一些项。</p>
+
+<p>title为显示的标题，summary为摘要，keywords为关键词（不直接显示，用于搜索），留意上面的settings:keywords=&ldquo;@string/keywords_date_and_time&rdquo;中keywords_date_and_time的值为</p>
+
+<pre><code>string name=&quot;keywords_date_and_time&quot; msgid=&quot;758325881602648204&quot;&gt;&quot;时钟, 军用&quot;&lt;/string&gt;
+</code></pre>
+
+<p>上面写的是界面跟xml的关系，搜索过程是一个数据库的检索过程，因此搜索需要用到数据库，数据库数据的来源就是上面的xml文件，从模拟器取出search_index.db数据库观察，如下图</p>
+
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx1282l0m3j30t40fpq77.jpg" alt="searchdb" /></p>
+
+<p>可见xml的数据跟数据库中的记录也是一一对应的，因此搜索过程就是数据库的检索过程，输入搜索的字符串最终会转换成SQL数据库查询语句从而返回查询结果。</p>
+
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx12ff9u4tj307j0d8aal.jpg" alt="军用" /></p>
+
+<p>之所以搜索军用能出现日期和时间的结果，是因为“军用”是keyword的一部分</p>
+
+<p>设置中也能搜索其他app的数据，只要其实现了SearchIndexablesProvider，以phone的app为例，</p>
+
+<pre><code>public class PhoneSearchIndexablesProvider extends SearchIndexablesProvider {
+    private static final String TAG = &quot;PhoneSearchIndexablesProvider&quot;;
+
+    private static SearchIndexableResource[] INDEXABLE_RES = new SearchIndexableResource[] {
+            new SearchIndexableResource(1, R.xml.network_setting_fragment,
+                    MobileNetworkSettings.class.getName(),
+                    R.mipmap.ic_launcher_phone),
+    };
+
+    ...
+
+    @Override
+    public Cursor queryXmlResources(String[] projection) {
+        ....
+    }
+   ...
+}
+</code></pre>
+
+<p>这样实现后（还需要在AndroidManifest里面做些配置），设置app就能跨进程取到network_setting_fragment.xml中的数据并加入search_index.db数据库，如下</p>
+
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx12zl3typj30u30cc41w.jpg" alt="phonedb" /></p>
+
+<p>下面简单分析下数据库的创建过程：</p>
+
+<p>刚进入设置创建数据库流程如下：</p>
+
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx2a2t9qhzj31050t9gnq.jpg" alt="aospsearchcreatedb" /></p>
+
+<p>当点击搜索按钮后会启动SearchFragment</p>
+
+<pre><code>@Override
+public void onAttach(Context context) {
+    super.onAttach(context);
+    mSearchFeatureProvider = FeatureFactory.getFactory(context).getSearchFeatureProvider();
+    mMetricsFeatureProvider = FeatureFactory.getFactory(context).getMetricsFeatureProvider();
+}
+</code></pre>
+
+<p>首先会创建mSearchFeatureProvider，</p>
+
+<pre><code>@Override
+public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setHasOptionsMenu(true);
+
+    final LoaderManager loaderManager = getLoaderManager();
+    mSearchAdapter = new SearchResultsAdapter(this);
+    mSavedQueryController = new SavedQueryController(
+            getContext(), loaderManager, mSearchAdapter);
+    mSearchFeatureProvider.initFeedbackButton();
+
+    ...
+    
+    // Run the Index update only if we have some space
+    if (!Utils.isLowStorage(activity)) {
+        mSearchFeatureProvider.updateIndex(activity, this /* indexingCallback */);
+    } else {
+        Log.w(TAG, &quot;Cannot update the Indexer as we are running low on storage space!&quot;);
+    }
+}
+</code></pre>
+
+<p>在onCreate中会执行索引过程，</p>
+
+<pre><code>@Override
+public void updateIndex(Context context, IndexingCallback callback) {
+    long indexStartTime = System.currentTimeMillis();
+    getIndexingManager(context).indexDatabase(callback);
+    ...
+}
+</code></pre>
+
+<p>接着会执行IndexManager的indexDatabase方法</p>
+
+<pre><code>public void indexDatabase(IndexingCallback callback) {
+    IndexingTask task = new IndexingTask(callback);
+    task.execute();
+}
+</code></pre>
+
+<p>开启了一个台任务，IndexingTask是一个AsyncTask，后台执行performIndexing方法</p>
+
+<pre><code>@Override
+protected Void doInBackground(Void... voids) {
+    performIndexing();
+    return null;
+}
+</code></pre>
+
+<pre><code>/**
+ * Accumulate all data and non-indexable keys from each of the content-providers.
+ * Only the first indexing for the default language gets static search results - subsequent
+ * calls will only gather non-indexable keys.
+ */
+@VisibleForTesting
+void performIndexing() {
+    final Intent intent = new Intent(SearchIndexablesContract.PROVIDER_INTERFACE);
+    // 这里是返回手机中所有声明了action为&quot;android.content.action.SEARCH_INDEXABLES_PROVIDER&quot;的provider的信息，暂时只有三个应用做了这个声明，Settings，Phone和cellbroadcastreceiver，因此Settings的搜索中可以搜索到phone的app中的信息从而进行跳转。
+    final List&lt;ResolveInfo&gt; list =
+            mContext.getPackageManager().queryIntentContentProviders(intent, 0);
+
+    String localeStr = Locale.getDefault().toString();
+    String fingerprint = Build.FINGERPRINT;
+    final boolean isFullIndex = isFullIndex(localeStr, fingerprint);
+
+    if (isFullIndex) {
+        rebuildDatabase();
+    }
+
+    for (final ResolveInfo info : list) {
+        if (!DatabaseIndexingUtils.isWellKnownProvider(info, mContext)) {
+            continue;
+        }
+        final String authority = info.providerInfo.authority;
+        final String packageName = info.providerInfo.packageName;
+
+        if (isFullIndex) {
+        	加载外部app的索引
+            addIndexablesFromRemoteProvider(packageName, authority);
+        }
+        addNonIndexablesKeysFromRemoteProvider(packageName, authority);
+    }
+	// 更新到数据库
+    updateDatabase(isFullIndex, localeStr);
+	...
+}
+</code></pre>
+
+<h1 id="3-3数据搜索以及显示过程">3.3数据搜索以及显示过程</h1>
+
+<p>在搜索框输入字符后，会回调到SearchFragment的onQueryTextChange方法</p>
+
+<pre><code>@Override
+public boolean onQueryTextChange(String query) {
+    ...
+    if (isEmptyQuery) {
+        ...
+    } else {
+        restartLoaders();
+    }
+  ...
+}
+</code></pre>
+
+<p>整个搜索过程涉及到了Loader机制，</p>
+
+<pre><code>@Override
+public Loader&lt;List&lt;? extends SearchResult&gt;&gt; onCreateLoader(int id, Bundle args) {
+    final Activity activity = getActivity();
+
+    switch (id) {
+        case LOADER_ID_DATABASE:
+            return mSearchFeatureProvider.getDatabaseSearchLoader(activity, mQuery);
+        case LOADER_ID_INSTALLED_APPS:
+            return mSearchFeatureProvider.getInstalledAppSearchLoader(activity, mQuery);
+        default:
+            return null;
+    }
+}
+</code></pre>
+
+<pre><code>@Override
+public List&lt;? extends SearchResult&gt; loadInBackground() {
+    ...
+
+    primaryFirstWordResults = firstWordQuery(MATCH_COLUMNS_PRIMARY, BASE_RANKS[0]);
+    primaryMidWordResults = secondaryWordQuery(MATCH_COLUMNS_PRIMARY, BASE_RANKS[1]);
+    secondaryResults = anyWordQuery(MATCH_COLUMNS_SECONDARY, BASE_RANKS[2]);
+    tertiaryResults = anyWordQuery(MATCH_COLUMNS_TERTIARY, BASE_RANKS[3]);
+
+    final List&lt;SearchResult&gt; results = new ArrayList&lt;&gt;(
+            primaryFirstWordResults.size()
+            + primaryMidWordResults.size()
+            + secondaryResults.size()
+            + tertiaryResults.size());
+
+    results.addAll(primaryFirstWordResults);
+    results.addAll(primaryMidWordResults);
+    results.addAll(secondaryResults);
+    results.addAll(tertiaryResults);
+
+    return removeDuplicates(results);
+}
+</code></pre>
+
+<pre><code>private List&lt;SearchResult&gt; firstWordQuery(String[] matchColumns, int baseRank) {
+    final String whereClause = buildSingleWordWhereClause(matchColumns);
+    final String query = mQueryText + &quot;%&quot;;
+    final String[] selection = buildSingleWordSelection(query, matchColumns.length);
+
+    return query(whereClause, selection, baseRank);
+}
+</code></pre>
+
+<p>(data_title like ?  OR data_title_normalized like ? ) AND enabled = 1</p>
+
+<p>日期%</p>
+
+<p>% 日期%</p>
+
+<pre><code>@Override
+public void onLoadFinished(Loader&lt;List&lt;? extends SearchResult&gt;&gt; loader,
+        List&lt;? extends SearchResult&gt; data) {
+    mSearchAdapter.addSearchResults(data, loader.getClass().getName());
+    if (mUnfinishedLoadersCount.decrementAndGet() != 0) {
+        return;
+    }
+    final int resultCount = mSearchAdapter.displaySearchResults();
+
+    if (resultCount == 0) {
+        mNoResultsView.setVisibility(View.VISIBLE);
+    } else {
+        mNoResultsView.setVisibility(View.GONE);
+        mResultsRecyclerView.scrollToPosition(0);
+    }
+    mSearchFeatureProvider.showFeedbackButton(this, getView());
+}
+</code></pre>
+
+<pre><code>/**
+ * Merge the results from each of the loaders into one list for the adapter.
+ * Prioritizes results from the local database over installed apps.
+ *
+ * @return Number of matched results
+ */
+public int displaySearchResults() {
+    final List&lt;? extends SearchResult&gt; databaseResults = mResultsMap
+            .get(DatabaseResultLoader.class.getName());
+    final List&lt;? extends SearchResult&gt; installedAppResults = mResultsMap
+            .get(InstalledAppResultLoader.class.getName());
+    final int dbSize = (databaseResults != null) ? databaseResults.size() : 0;
+    final int appSize = (installedAppResults != null) ? installedAppResults.size() : 0;
+    final List&lt;SearchResult&gt; newResults = new ArrayList&lt;&gt;(dbSize + appSize);
+
+    int dbIndex = 0;
+    int appIndex = 0;
+    int rank = TOP_RANK;
+
+    while (rank &lt;= BOTTOM_RANK) {
+        while ((dbIndex &lt; dbSize) &amp;&amp; (databaseResults.get(dbIndex).rank == rank)) {
+            newResults.add(databaseResults.get(dbIndex++));
+        }
+        while ((appIndex &lt; appSize) &amp;&amp; (installedAppResults.get(appIndex).rank == rank)) {
+            newResults.add(installedAppResults.get(appIndex++));
+        }
+        rank++;
+    }
+
+    while (dbIndex &lt; dbSize) {
+        newResults.add(databaseResults.get(dbIndex++));
+    }
+    while (appIndex &lt; appSize) {
+        newResults.add(installedAppResults.get(appIndex++));
+    }
+
+    final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(
+            new SearchResultDiffCallback(mSearchResults, newResults), false /* detectMoves */);
+    mSearchResults = newResults;
+    diffResult.dispatchUpdatesTo(this);
+
+    return mSearchResults.size();
+}
+</code></pre>
+
+<pre><code>public void dispatchUpdatesTo(final RecyclerView.Adapter adapter) {
+    dispatchUpdatesTo(new ListUpdateCallback() {
+        @Override
+        public void onInserted(int position, int count) {
+            adapter.notifyItemRangeInserted(position, count);
+        }
+
+        @Override
+        public void onRemoved(int position, int count) {
+            adapter.notifyItemRangeRemoved(position, count);
+        }
+
+        @Override
+        public void onMoved(int fromPosition, int toPosition) {
+            adapter.notifyItemMoved(fromPosition, toPosition);
+        }
+
+        @Override
+        public void onChanged(int position, int count, Object payload) {
+            adapter.notifyItemRangeChanged(position, count, payload);
+        }
+    });
+}
+</code></pre>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">xuanliang</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2019-08-03
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/">
+            <span class="next-text nav-default">无障碍学习整理（基于talkback）</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+    
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="xuanliangdev@gmail.com" rel="me noopener" class="iconfont"
+      title="email"  target="_blank"
+      >
+      <svg class="icon" viewBox="0 0 1451 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M664.781909 681.472759 0 97.881301C0 3.997201 71.046997 0 71.046997 0L474.477909 0 961.649408 0 1361.641813 0C1361.641813 0 1432.688811 3.997201 1432.688811 97.881301L771.345323 681.472759C771.345323 681.472759 764.482731 685.154773 753.594283 688.65053L753.594283 688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858L682.561621 688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759L664.781909 681.472759ZM718.063616 811.603883C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633 0 212.052267 0 212.052267L0 942.809523C0 942.809523 0 1024 83.726336 1024L682.532949 1024 753.579947 1024 1348.948139 1024C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523L1432.688811 212.052267C1432.688811 212.052267 893.138176 701.759633 817.019477 767.734955 777.248 802.205449 742.347691 811.03081 718.063616 811.603883L718.063616 811.603883Z"></path>
+</svg>
+
+    </a>
+  
+    <a href="https://github.com/xuanliangdev" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://xuanliangdev.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2019
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        xuanliang
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
