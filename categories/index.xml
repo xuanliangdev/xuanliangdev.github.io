@@ -1,51 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on xuanliang blog</title>
+    <title>Categories on xuanliang</title>
     <link>https://xuanliangdev.github.io/categories/</link>
-    <description>Recent content in Categories on xuanliang blog</description>
+    <description>Recent content in Categories on xuanliang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 23 Apr 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://xuanliangdev.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Android Framework</title>
-      <link>https://xuanliangdev.github.io/categories/android-framework/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/categories/android-framework/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Binder</title>
-      <link>https://xuanliangdev.github.io/categories/binder/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/categories/binder/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Design Pattern</title>
-      <link>https://xuanliangdev.github.io/categories/design-pattern/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/categories/design-pattern/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Memory</title>
-      <link>https://xuanliangdev.github.io/categories/memory/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/categories/memory/</guid>
-      <description></description>
-    </item>
     
   </channel>
 </rss>

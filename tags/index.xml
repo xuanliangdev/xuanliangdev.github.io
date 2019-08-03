@@ -1,51 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on xuanliang blog</title>
+    <title>Tags on xuanliang</title>
     <link>https://xuanliangdev.github.io/tags/</link>
-    <description>Recent content in Tags on xuanliang blog</description>
+    <description>Recent content in Tags on xuanliang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 23 Apr 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://xuanliangdev.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Binder</title>
-      <link>https://xuanliangdev.github.io/tags/binder/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/tags/binder/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Design Pattern</title>
-      <link>https://xuanliangdev.github.io/tags/design-pattern/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/tags/design-pattern/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Development</title>
-      <link>https://xuanliangdev.github.io/tags/development/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/tags/development/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Memory</title>
-      <link>https://xuanliangdev.github.io/tags/memory/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/tags/memory/</guid>
-      <description></description>
-    </item>
     
   </channel>
 </rss>

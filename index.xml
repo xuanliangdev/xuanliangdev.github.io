@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>xuanliang blog</title>
+    <title>xuanliang</title>
     <link>https://xuanliangdev.github.io/</link>
-    <description>Recent content on xuanliang blog</description>
+    <description>Recent content on xuanliang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 23 Apr 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 03 Aug 2019 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://xuanliangdev.github.io/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,3093 +14,545 @@
     <item>
       <title>About</title>
       <link>https://xuanliangdev.github.io/about/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 03 Aug 2019 00:00:00 +0000</pubDate>
       
       <guid>https://xuanliangdev.github.io/about/</guid>
       
-        <description>&lt;p&gt;我的Android学习记录&lt;/p&gt;
+        <description>
+
+&lt;h2 id=&#34;如果你有理想在远方-就不要被路边的风景影响了前进的速度-因为人的时间是有限的&#34;&gt;——如果你有理想在远方，就不要被路边的风景影响了前进的速度，因为人的时间是有限的。&lt;/h2&gt;
+
+&lt;p&gt;来小米差一个月就满一年了，与来之前的雄心壮志相比，进步之缓慢超出了预期，主要还是没有定下切实的目标并坚持执行，没有在繁忙的杂活中或者抽出空闲时间总结提升，甚至从今年4月中旬开始胡思乱想到了现在，迷失了自己，浪费了3个半月，今天开始重新制定半年计划并执行，尽一切努力排除杂念💪。&lt;/p&gt;
+
+&lt;p&gt;人没有目标就会胡思乱想，有了目标就要切实执行，不然就会停滞不前甚至倒退。&lt;/p&gt;
+
+&lt;p&gt;今天是2019年8月3日，体检发现甲状腺结节，还好是良性的。。。&lt;/p&gt;
 </description>
       
     </item>
     
     <item>
-      <title>ActivityManagerService流程总结</title>
-      <link>https://xuanliangdev.github.io/post/activitymanagerservice%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
+      <title>无障碍学习整理（基于talkback）</title>
+      <link>https://xuanliangdev.github.io/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/</link>
+      <pubDate>Sat, 03 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://xuanliangdev.github.io/post/activitymanagerservice%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93/</guid>
-      
-        <description>
-
-&lt;p&gt;ActivityManagerService是一个Binder服务，用来负责系统中四大组件的管理和调度。&lt;/p&gt;
-
-&lt;h2 id=&#34;1-activitymanagerservice启动流程分析&#34;&gt;1.ActivityManagerService启动流程分析&lt;/h2&gt;
-
-&lt;p&gt;Android系统第一个启动的进程是Zygote进程，是通过脚本启动的，这个进程启动后马上会通过fork启动一个System Server进程，system server进程很重要，PackageManagerService和ActivityManagerService等一些重要服务都是运行在这个进程里。System Server进程启动后会开启一个ServerThread线程，这是一个开启了looper的线程，然后会在这个线程里调用ActivityManagerService的main函数进行启动。&lt;/p&gt;
-
-&lt;p&gt;main函数执行的时序图如下：
-&lt;img src=&#34;https://i.imgur.com/T62lh6t.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;1.创建一个AThread的线程&lt;/p&gt;
-
-&lt;p&gt;2.启动Athread线程&lt;/p&gt;
-
-&lt;p&gt;3.等待ActivityManagerService对象的创建&lt;/p&gt;
-
-&lt;p&gt;4.Athread这时会去创建ActivityManagerService对象，即执行ActivityManagerService的构造方法&lt;/p&gt;
-
-&lt;p&gt;5.ActivityManagerService对象创建完成唤醒ServerThread线程&lt;/p&gt;
-
-&lt;p&gt;6.Athread等待&lt;/p&gt;
-
-&lt;p&gt;7.执行ActivityThread.systemMain()函数，（我们知道ActivityThread是一个app进程的主线程，借用《深入理解Android卷2》中一句话，systemMain的目的是为system_server进程搭建一个和普通app进程一样的android运行环境）&lt;/p&gt;
-
-&lt;p&gt;8.创建ActivityThread对象（在这里其实是system/framework/framework-res.apk的主线程）&lt;/p&gt;
-
-&lt;p&gt;9.关联到系统进程&lt;/p&gt;
-
-&lt;p&gt;10.取得系统ContextImpl对象（同样是system/framework/framework-res.apk的context）&lt;/p&gt;
-
-&lt;p&gt;11.返回ContextImpl对象，然后创建一个ActivityStack对象。&lt;/p&gt;
-
-&lt;p&gt;12.唤醒Athread线程，Athread线程进入looper循环&lt;/p&gt;
-
-&lt;p&gt;13.继续执行startRunning函数（此处由于系统没准备好，直接返回）&lt;/p&gt;
-
-&lt;h2 id=&#34;2-startactivity流程分析&#34;&gt;2.startActivity流程分析&lt;/h2&gt;
-
-&lt;p&gt;在控制台可以通过adb shell登录，并通过am命令打开一个activity
-比如&lt;/p&gt;
-
-&lt;p&gt;am start -n demo.leakcanary.srain.in.leakcanarydemo/.MainActivity&lt;/p&gt;
-
-&lt;p&gt;activity从桌面启动的时序图如下图所示：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/TUdt4OH.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h5 id=&#34;1-9-11步在ams-activitymanagerservice-进程中执行&#34;&gt;1-9、11步在AMS（ActivityManagerService）进程中执行；&lt;/h5&gt;
-
-&lt;p&gt;1.使用am命令启动一个activity，实质是Am类通过ActivityManagerNative.getDefault()获得一个ActivityManagerProxy代理，ActivityManagerProxy代理会调用startActivityAndWait方法，而这其实又会调用AMS的startActivityAndWait方法。（因为AMS是ActivityManagerNative子类）&lt;/p&gt;
-
-&lt;p&gt;2.调用ActivityStack的startActivityAndWait方法，ActivityStack是AMS的一个实例，是对activity进行调度的核心，比如管理activity的启动模式。&lt;/p&gt;
-
-&lt;p&gt;3.这里会获取launchFlags来取出启动模式，检查权限等。&lt;/p&gt;
-
-&lt;p&gt;4.创建activityRecod。&lt;/p&gt;
-
-&lt;p&gt;5.这里也会对不同的启动模式进行处理，即为新建的activity_record找task。&lt;/p&gt;
-
-&lt;p&gt;6.里面有一些动画相关的处理&lt;/p&gt;
-
-&lt;p&gt;7.判断当前是否有resume的activity，有就进行pause操作（当前是home界面，所以先对launcher当前显示的activity进行pause操作）&lt;/p&gt;
-
-&lt;p&gt;8.取出launcher进程的ApplicationThreadProxy代理。&lt;/p&gt;
-
-&lt;p&gt;9.调用launcher进程代理的schedulePauseActivity方法进行pause activity的操作&lt;/p&gt;
-
-&lt;p&gt;11、AMS执行完毕进入等待。&lt;/p&gt;
-
-&lt;h5 id=&#34;10-12-14在launcher所在进程中执行&#34;&gt;10、12-14在launcher所在进程中执行；&lt;/h5&gt;
-
-&lt;p&gt;10.取出AMS发过来的参数。&lt;/p&gt;
-
-&lt;p&gt;12.launcher通过H向自己的主线程发送pause activity的消息&lt;/p&gt;
-
-&lt;p&gt;13.处理activity的pause操作。&lt;/p&gt;
-
-&lt;p&gt;14.通过ActivityManagerProxy通知AMS当前activity已经完成暂停操作了。由此可见打开一个activity，首先得先把当前显示的activity先暂停。而不是先创建新的activity。&lt;/p&gt;
-
-&lt;h5 id=&#34;15-22在ams进程中执行&#34;&gt;15-22在AMS进程中执行；&lt;/h5&gt;
-
-&lt;p&gt;15.AMS调用ActivityStack的activityPaused方法。&lt;/p&gt;
-
-&lt;p&gt;16.该过程会检查系统是否正在进入睡眠或关闭，否则再次调用resumeTopActivityLocked函数。&lt;/p&gt;
-
-&lt;p&gt;17.resumeTopActivityLocked这个函数在第7步调用过，当时前面的activity没pause所以直接返回了，现在launcher显示的activity已经pause成功，则马上调用startSpecificActivityLocked方法、&lt;/p&gt;
-
-&lt;p&gt;18.该函数首先会检查当前要启动的activity所在进程是否存在，如果不存在则新建进程，如果存在则直接执行realStartActivityLocked方法（这个方法后面32步也会调到）。&lt;/p&gt;
-
-&lt;p&gt;19.取出ProcessRecord对象，如果进程不存在，则新建ProcessRecord对象，并加入到AMS的mProcessNames中。&lt;/p&gt;
-
-&lt;p&gt;20.调用另一个startProcessLocked来创建新的进程对象&lt;/p&gt;
-
-&lt;p&gt;21.调用Process.start方法开启一个新进程&lt;/p&gt;
-
-&lt;p&gt;22.AMS执行完进入等待。&lt;/p&gt;
-
-&lt;h5 id=&#34;23-26在新开的应用进程中执行&#34;&gt;23-26在新开的应用进程中执行；&lt;/h5&gt;
-
-&lt;p&gt;23.Process.start开启进程后会进入新的app的主线程的main方法，也就是ActivityThread的main方法。ActivityThread类加载时会new一个ApplicationThread的binder对象，AMS便会和这个ApplicationThread进行进程间通信。&lt;/p&gt;
-
-&lt;p&gt;24.创建一个ActivityThread对象。&lt;/p&gt;
-
-&lt;p&gt;25.调用对象的attach方法&lt;/p&gt;
-
-&lt;p&gt;26.通过AMS代理调用AMS的attachApplication方法&lt;/p&gt;
-
-&lt;h5 id=&#34;27-28在ams进程中执行&#34;&gt;27-28在AMS进程中执行；&lt;/h5&gt;
-
-&lt;p&gt;27.目的是将新的app的ApplicationThread和pid在AMS中注册。&lt;/p&gt;
-
-&lt;p&gt;28.通过ApplicationThreadProxy将信息返回给新的app进程。&lt;/p&gt;
-
-&lt;h5 id=&#34;29-31在新开的应用进程中执行&#34;&gt;29-31在新开的应用进程中执行；&lt;/h5&gt;
-
-&lt;p&gt;29.新应用取出AMS发过来的数据向自己主线程的H发送消息。&lt;/p&gt;
-
-&lt;p&gt;30.H处理消息。&lt;/p&gt;
-
-&lt;p&gt;31.执行handleBindApplication进行相关信息的绑定。此处的操作包括创建上下文ContextImpl，创建应用的application，并调用application的oncreate方法。&lt;/p&gt;
-
-&lt;h5 id=&#34;32-33在ams进程中执行&#34;&gt;32-33在AMS进程中执行；&lt;/h5&gt;
-
-&lt;p&gt;32.AMS执行完bindApplication后便开始调用ActivityStack的realStartActivityLocked进行activity的显示，（该方法在之前18步的一个分支也可能会调用到）&lt;/p&gt;
-
-&lt;p&gt;33.调用scheduleLaunchActivity方法，通过ApplicationThreadPoxy通知应用进行打开activity。&lt;/p&gt;
-
-&lt;h5 id=&#34;34-44在新开的应用进程中执行&#34;&gt;34-44在新开的应用进程中执行；&lt;/h5&gt;
-
-&lt;p&gt;34.像主线程的H发送打开activity的message。&lt;/p&gt;
-
-&lt;p&gt;35.处理打开activity的操作。&lt;/p&gt;
-
-&lt;p&gt;36.调用performLaunchActivity进行创建并打开activity的操作。&lt;/p&gt;
-
-&lt;p&gt;37.该函数内会调用activity声明周期的oncreate和onstart方法。&lt;/p&gt;
-
-&lt;p&gt;38.通过反射创建activity对象。&lt;/p&gt;
-
-&lt;p&gt;39.newActivity创建完成返回activity变量。&lt;/p&gt;
-
-&lt;p&gt;40.调用Instrumentation的callActivityOnCreate方法。&lt;/p&gt;
-
-&lt;p&gt;41.调用activity的oncreate方法。&lt;/p&gt;
-
-&lt;p&gt;42.执行完后会紧接着执行activity.performStart方法，即回调activity的onstart方法。&lt;/p&gt;
-
-&lt;p&gt;43.执行handleResumeActivity方法，当44步调用完后，接着还会往主线程的MessageQueue发送一个Idler对象，会在这里面通知AMS对已经暂停的activity调用onStop和onDestroy的生命周期&lt;/p&gt;
-
-&lt;p&gt;44.该过程会调用activity的onresume方法。&lt;/p&gt;
-
-&lt;h3 id=&#34;参考资料&#34;&gt;参考资料&lt;/h3&gt;
-
-&lt;p&gt;Android AOSP代码&lt;/p&gt;
-
-&lt;p&gt;《深入理解Android 卷2 邓凡平》&lt;/p&gt;
-
-&lt;p&gt;《Android系统源代码情景分析 罗升阳》&lt;/p&gt;
-</description>
-      
-    </item>
-    
-    <item>
-      <title>Android内存性能分析</title>
-      <link>https://xuanliangdev.github.io/post/android%E5%86%85%E5%AD%98%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/post/android%E5%86%85%E5%AD%98%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/</guid>
+      <guid>https://xuanliangdev.github.io/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/</guid>
       
         <description>
 
-&lt;p&gt;工具：Android Studio、MAT(Memory Analyzer Tool)&lt;/p&gt;
+&lt;h2 id=&#34;一-疑问&#34;&gt;一、疑问：&lt;/h2&gt;
 
-&lt;p&gt;第三方库：LeakCanary&lt;/p&gt;
+&lt;p&gt;1.无障碍机制涉及哪些模块？&lt;/p&gt;
 
-&lt;h3 id=&#34;1-android-profiler基础用法&#34;&gt;1、Android Profiler基础用法&lt;/h3&gt;
+&lt;p&gt;2.开启talkback后talkback手势生效原理？&lt;/p&gt;
 
-&lt;p&gt;首先附上Android Profilder的官方使用说明地址：&lt;/p&gt;
+&lt;p&gt;3.无障碍焦点的方框如何产生？&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;https://developer.android.google.cn/studio/profile/memory-profiler.html&#34;&gt;https://developer.android.google.cn/studio/profile/memory-profiler.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;4.talkback如何获取view的内容从而调用tts进行朗读？&lt;/p&gt;
 
-&lt;p&gt;Android Profiler可以实时查看app的cpu、memory和network状态，这里只说memory，简单写个用GridView加载大量网络图片的例子，对于加载到的bitmap对象分别采用HashMap和LruCache进行保存，观察内存变化。&lt;/p&gt;
+&lt;p&gt;5.为什么实现了AccessibilityService的apk安装后设置无障碍就会出现相关的开关？&lt;/p&gt;
 
-&lt;p&gt;当使用HashMap时，观察Android Profiler中memory的变化
-&lt;img src=&#34;https://i.imgur.com/cHCcRzV.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;6.打开某个页面时talkback的默认焦点怎么来的？&lt;/p&gt;
 
-&lt;p&gt;可以看出内存不停增加，最终程序oom；&lt;/p&gt;
+&lt;h2 id=&#34;二-结构分析&#34;&gt;二、结构分析&lt;/h2&gt;
 
-&lt;p&gt;接着用LruCache替换HashMap，LruCahe的配置如下：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;    // 获取应用程序最大可用内存
-    int maxMemory = (int) Runtime.getRuntime().maxMemory();
-    int cacheSize = maxMemory / 8;
-    // 设置图片缓存大小为程序最大可用内存的1/8
-    mMemoryCache = new android.util.LruCache&amp;lt;String, Bitmap&amp;gt;(cacheSize) {
-        @Override
-        protected int sizeOf(String key, Bitmap bitmap) {
-            return bitmap.getByteCount();
-        }
-    };&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/6kTihCh.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;h3 id=&#34;1-代码结构&#34;&gt;1.代码结构&lt;/h3&gt;
 
-&lt;p&gt;可以看出，当内存达到一定的值时得到了回收。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://ws3.sinaimg.cn/large/006tNc79gy1g1t8b1vx1zj317l0signa.jpg&#34; alt=&#34;无障碍架构&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;*AndroidManifest.xml文件&lt;applicatiion&gt;中可以设置 android:largeHeap=&amp;ldquo;true&amp;rdquo;来增加app的可使用内存，实验发现默认情况下nexus5手机android6.0系统当内存达到300多M时产生oom，如果设置该选项内存达到500多M时才会oom，但是设置该值会导致gc时间变长从而一定程度上影响性能，所以要斟酌使用。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://ws1.sinaimg.cn/large/006tNc79gy1g1t8avpt29j30vh0u01kx.jpg&#34; alt=&#34;accessibilityclass&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;*ActivityManager获取的内存值定义在系统rom中，编译时已经写入系统，而Runtime类可以获得运行时的内存数据，也是Android profiler显示的动态图数据。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;02-02 20:39:17.158 14633-14633/com.blogxuan.oomdemo2 I/OOMDEMO: 机型：AOSP on HammerHead am.getMemoryClass()为192
-02-02 20:39:17.158 14633-14633/com.blogxuan.oomdemo2 I/OOMDEMO: 机型：AOSP on HammerHead am.getLargeMemoryClass()为512
-02-02 20:39:17.158 14633-14633/com.blogxuan.oomdemo2 I/OOMDEMO: 机型：AOSP on HammerHeadRuntime.getRuntime().maxMemory()为：536870912&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;android:largeHeap=&amp;ldquo;false&amp;rdquo;时&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;02-02 20:44:46.550 17492-17492/com.blogxuan.oomdemo2 I/OOMDEMO: 机型：AOSP on HammerHeadRuntime.getRuntime().maxMemory()为：201326592&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h3 id=&#34;2-使用android-profiler进行内存泄露分析&#34;&gt;2、使用Android Profiler进行内存泄露分析。&lt;/h3&gt;
+&lt;p&gt;整个talkback机制涉及了4个进程，SystemServer（蓝色部分）、Talkback（黄色部分）、前台app进程（绿色部分），TTS引擎进程（暂不分析）&lt;/p&gt;
 
-&lt;p&gt;一个简单的内存泄露例子&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class TestActivity extends Activity {
-    TextView textView;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
-        textView = (TextView) findViewById(R.id.test_text_view);
-        TestDataModel.getInstance().setRetainedTextView(textView);
-    }
+&lt;p&gt;四个AIDL接口，图上红色部分&lt;/p&gt;
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;TestDataModel的class文件&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class TestDataModel {
+&lt;h4 id=&#34;1-1-talkback-辅助app-实现了accessibilityservice的app&#34;&gt;1.1、talkback（辅助app，实现了AccessibilityService的app）&lt;/h4&gt;
 
-    private static TestDataModel sInstance;
-    private TextView mRetainedTextView;
+&lt;p&gt;&lt;img src=&#34;https://ws1.sinaimg.cn/large/006tNc79gy1g1qzm48qapj30b40abacc.jpg&#34; alt=&#34;WX20190404-224703@2x&#34; /&gt;&lt;/p&gt;
 
-    public static TestDataModel getInstance() {
-        if (sInstance == null) {
-            sInstance = new TestDataModel();
-        }
-        return sInstance;
-    }
+&lt;p&gt;talkback实现了AccessiblityService用于接收系统传过来的无障碍事件。&lt;/p&gt;
 
-    public void setRetainedTextView(TextView textView) {
-        mRetainedTextView = textView;
-    }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;在例子中，当TestActivity finish后，由于静态变量sInstance引用了textView，而textView引用了TestActivity的context，最终导致TestActivity对象不能被回收产生了内存泄露。&lt;/p&gt;
+&lt;h4 id=&#34;1-2-前台app进程-被辅助app&#34;&gt;1.2、前台app进程（被辅助app）&lt;/h4&gt;
 
-&lt;p&gt;找出本应该回收但是并没有回收的对象（也就是发生了泄露的对象）：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://ws4.sinaimg.cn/large/006tNc79gy1g1r0sbx0bxj30b40b8421.jpg&#34; alt=&#34;viewaccessibility&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;通过分析操作前和操作后的堆中的对象分配，首先找出堆计数异常大或者本该回收但是却没得到回收的对象，然后查看具体是哪些对象引用了他们导致他们没能回收。&lt;/p&gt;
+&lt;h4 id=&#34;1-3-system-process&#34;&gt;1.3、system_process&lt;/h4&gt;
 
-&lt;p&gt;也可以从Android Studio中将堆转储保存为hprof文件来用其他工具（比如MAT）进行分析，比如上面的例子，TestActivity打开前保存一二hprof文件，然后打开后再finish，然后再在android studio中手动gc一下，再导出hprof文件。接着在MAT中对比这两个堆文件。结果如下图：&lt;/p&gt;
+&lt;p&gt;1.3.1（AccessibilityManagerService）&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/xgxv91w.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://ws2.sinaimg.cn/large/006tNc79gy1g1r04mvninj30b40d8q73.jpg&#34; alt=&#34;acms&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;可见TestDataModel对象和TestActivity对象并没有被回收，这是因为静态的sInstance生命周期跟application一样，而sInstance引用了textView，textView引用了TestActivity的context，因此TestActivity也没有被回收。&lt;/p&gt;
+&lt;p&gt;系统进程SystemServer维护了ActivityManagerService，用来作为binder服务端，SystemServer启动时会启动AccessibilityManagerService。&lt;/p&gt;
 
-&lt;h3 id=&#34;3-使用leakcanary进行内存泄露分析&#34;&gt;3、使用LeakCanary进行内存泄露分析。&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;com.android.server.SystemServer.java
 
-&lt;p&gt;LeakCanary是square公司开源的一个检测内存泄露的工具库，使用很简单，只要在gradle中依赖一下，然后在application中注册一下就行了。&lt;/p&gt;
-
-&lt;p&gt;github地址：&lt;a href=&#34;https://github.com/square/leakcanary&#34;&gt;https://github.com/square/leakcanary&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;使用LeakCanary检测内存泄露实例：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class TestActivity2 extends Activity {
-    TextView textView;
-    Message msg;
-    Handler mLeakyHandler= new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-        }
-    };
-    Message msg;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
-        msg = Message.obtain();
-        mLeakyHandler.sendMessageDelayed(msg, 40000);
-    }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;上面的例子中TestActivity打开后马上关闭，会产生内存泄露，LeakCanary会有如下内存泄露提示&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/OvnpAow.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;这是因为handler发送一个消息给MessageQueue后，存在一条这样的引用链，MessageQueue→Message→handler→TestActivity，当activity destroy后，message还存在消息队列里，因此activity对象得不得回收。&lt;/p&gt;
-
-&lt;p&gt;要使activity能得到回收，只要在activity关闭后在这个引用链的任意一处切断都行，有如下三种方法：&lt;/p&gt;
-
-&lt;p&gt;1.切断Message和messageQueue的联系，即在activity的onDestroy中调用&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;mLeakyHandler.removeCallbacksAndMessages(null);&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;这个方法可以移除消息队列中的消息从而切断Message和MessageQueue的联系，使activity得到回收。&lt;/p&gt;
-
-&lt;p&gt;2.切断Message和handler的联系，可以通过在activity的onDestroy中调用&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt; msg.setTarget(null);&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;来实现，即把handler至空。&lt;/p&gt;
-
-&lt;p&gt;3.由于非静态内部类或匿名类会持有外部类的引用，即handler持有activity的引用，因此可以通过把handler声明为静态内部类来切断handler对activity实例的引用，但是静态内部类的对象是不能调用外部类的实例变量的，因此可以通过传递一个外部activity实例的WeakReference给handler使用，如下所示：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;    public static class MyHandler extends Handler
-    {
-        private WeakReference&amp;lt;Context&amp;gt; reference;
-
-        public MyHandler(Context activity)
-        {
-            reference = new WeakReference&amp;lt;Context&amp;gt;(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg)
-        {
-            TestActivity2 mTestActivity = (TestActivity2) reference.get();
-            if (reference.get() != null)
-            {
-                mTestActivity.textView.setText(&amp;#34;hello&amp;#34;);
+/**
+ * Starts a miscellaneous grab bag of stuff that has yet to be refactored
+ * and organized.
+ */
+private void startOtherServices() {
+...
+            traceBeginAndSlog(&amp;quot;StartAccessibilityManagerService&amp;quot;);
+            try {
+                ServiceManager.addService(Context.ACCESSIBILITY_SERVICE,
+                        new AccessibilityManagerService(context));
+            } catch (Throwable e) {
+                reportWtf(&amp;quot;starting Accessibility Manager&amp;quot;, e);
             }
-        }
-    }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;handler泄露的危害：有的人会说通常情况不会使用handler发送延迟太久的消息，而且消息达到延迟的时间后，activity不就可以自动被回收了么，因此handler泄露也没什么打不了啊，但是考虑这样一个情景，通常我们都会在onDestory里处理一些资源回收的操作，如果handler的handleMessage里面使用到了某些资源，而这些资源被回收了，那就会出问题了，最常见的就是产生空指针导致程序崩溃。&lt;/p&gt;
+            traceEnd();
+...
+}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;###4、LeakCanary原理简单介绍。&lt;/p&gt;
+&lt;p&gt;1.3.2、TTS&lt;/p&gt;
 
-&lt;p&gt;leakCanary内存泄露检测时序图。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://ws3.sinaimg.cn/large/006tNc79gy1g1rg51wbiij30b40m0q9h.jpg&#34; alt=&#34;tts&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/35tOsdB.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;h4 id=&#34;4-语音引擎&#34;&gt;4.语音引擎&lt;/h4&gt;
 
-&lt;p&gt;代码中我们只要简单使用&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;LeakCanary.install(this);&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;就能完成LeakCanary的初始化。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;  public static RefWatcher install(Application application) {
-    return refWatcher(application).listenerServiceClass(DisplayLeakService.class)
-        .excludedRefs(AndroidExcludedRefs.createAppDefaults().build())
-        .buildAndInstall();
-  }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;主要看下buildAndInstall这个方法&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;  public RefWatcher buildAndInstall() {
-    RefWatcher refWatcher = build();
-    if (refWatcher != DISABLED) {
-      LeakCanary.enableDisplayLeakActivity(context);
-      ActivityRefWatcher.install((Application) context, refWatcher);
-    }
-    return refWatcher;
-  }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;里面调用了ActivityRefWatcher.install方法&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public static void install(Application application, RefWatcher refWatcher) {
-    new ActivityRefWatcher(application, refWatcher).watchActivities();
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;里面调用了watchActivities这个方法&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;  public void watchActivities() {
-    // Make sure you don&amp;#39;t get installed twice.
-    stopWatchingActivities();
-    application.registerActivityLifecycleCallbacks(lifecycleCallbacks);
-  }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;lifecycleCallbacks定义如下：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;private final Application.ActivityLifecycleCallbacks lifecycleCallbacks =
-  new Application.ActivityLifecycleCallbacks() {
-    @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-    }
+&lt;p&gt;暂不分析&lt;/p&gt;
 
-    @Override public void onActivityStarted(Activity activity) {
-    }
+&lt;h3 id=&#34;1-2-aidl接口&#34;&gt;1.2 AIDL接口&lt;/h3&gt;
 
-    @Override public void onActivityResumed(Activity activity) {
-    }
+&lt;p&gt;跨进程通信的需要用到aidl，理解aidl的设计是理解无障碍框架的关键。&lt;/p&gt;
 
-    @Override public void onActivityPaused(Activity activity) {
-    }
+&lt;h4 id=&#34;1-2-1-iaccessibilityserviceclient&#34;&gt;1.2.1 、IAccessibilityServiceClient&lt;/h4&gt;
 
-    @Override public void onActivityStopped(Activity activity) {
-    }
+&lt;p&gt;服务端为辅助app进程（talkback），调用客户端为SystemServer进程。&lt;/p&gt;
 
-    @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-    }
+&lt;p&gt;当SystemServer绑定AccessibilityService时，AccessibilityService会返回实现该接口的binder对象给SystemServer进程。&lt;/p&gt;
 
-    @Override public void onActivityDestroyed(Activity activity) {
-      ActivityRefWatcher.this.onActivityDestroyed(activity);
-    }
-  };&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;这是application提供的一个方法，可以用来监听我们应用中所有activity的生命周期，LeakCanay就是在这里通过监控所有activity的onDestroyed方法来检测内存泄露的。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.accessibilityservice.IAccessibilityServiceClient.aidl
 
-&lt;p&gt;继续进入ActivityRefWatcher.this.onActivityDestroyed方法，如下所示：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;  void onActivityDestroyed(Activity activity) {
-    refWatcher.watch(activity);
-  }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;LeakCanay内存泄露检测的核心就是这个watch方法，此过程通过向主线程发送一个idlehandler，等主线程空闲后，这个idlehandler会再向一个后台HandlerThread post一个消息，从而在后台线程执行watch操作：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;  public void watch(Object watchedReference, String referenceName) {
-    if (this == DISABLED) {
-      return;
-    }
-    checkNotNull(watchedReference, &amp;#34;watchedReference&amp;#34;);
-    checkNotNull(referenceName, &amp;#34;referenceName&amp;#34;);
-    final long watchStartNanoTime = System.nanoTime();
-    String key = UUID.randomUUID().toString();
-    retainedKeys.add(key);
-    final KeyedWeakReference reference =
-        new KeyedWeakReference(watchedReference, key, referenceName, queue);
+/**
+ * Top-level interface to an accessibility service component.
+ */
+oneway interface IAccessibilityServiceClient {
 
-    ensureGoneAsync(watchStartNanoTime, reference);
-  }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;retainedKeys是一个Set&lt;String&gt;类型的集合，用来记录被监控的所有还在内存的对象（这里是刚调用了onDestoryed方法的activity对象），KeyedWeakReference继承自WeakReference，作用是用一个弱引用来引用被监控的对象（activity），queue是一个ReferenceQueue队列，作用后面说，&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;Retryable.Result ensureGone(final KeyedWeakReference reference, final long watchStartNanoTime) {
-    long gcStartNanoTime = System.nanoTime();
-    long watchDurationMs = NANOSECONDS.toMillis(gcStartNanoTime - watchStartNanoTime);
+    void onAccessibilityEvent(in AccessibilityEvent event, in boolean serviceWantsEvent);
 
-    removeWeaklyReachableReferences();
+    void onSoftKeyboardShowModeChanged(int showMode);
 
-    if (debuggerControl.isDebuggerAttached()) {
-      // The debugger can create false leaks.
-      return RETRY;
-    }
-    if (gone(reference)) {
-      return DONE;
-    }
-    gcTrigger.runGc();
+    void onPerformGestureResult(int sequence, boolean completedSuccessfully);
 
-    removeWeaklyReachableReferences();
-    if (!gone(reference)) {
-      long startDumpHeap = System.nanoTime();
-      long gcDurationMs = NANOSECONDS.toMillis(startDumpHeap - gcStartNanoTime);
+    void onAccessibilityButtonClicked();
 
-      File heapDumpFile = heapDumper.dumpHeap();
-      if (heapDumpFile == RETRY_LATER) {
-        // Could not dump the heap.
-        return RETRY;
-      }
-      long heapDumpDurationMs = NANOSECONDS.toMillis(System.nanoTime() - startDumpHeap);
-      heapdumpListener.analyze(
-          new HeapDump(heapDumpFile, reference.key, reference.name, excludedRefs, watchDurationMs,
-              gcDurationMs, heapDumpDurationMs));
-    }
-    return DONE;
-  }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;ensureGone是LeakCanay内存泄露检测主要逻辑。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;  private void removeWeaklyReachableReferences() {
-    // WeakReferences are enqueued as soon as the object to which they point to becomes weakly
-    // reachable. This is before finalization or garbage collection has actually happened.
-    KeyedWeakReference ref;
-    while ((ref = (KeyedWeakReference) queue.poll()) != null) {
-      retainedKeys.remove(ref.key);
-    }
-  }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;首先从removeWeaklyReachableReferences这个方法说起，从上面的注释我们可以看出ReferenceQueue的作用（如果一个对象变成弱引用，那么这个对象入队），也就是如果我们的activity被finish了，正常情况下这个activity是应该进入这个队列了，因此当我们通过queue.poll()把这个activity对象取出来，retainedKeys中就移除这个activity，表示这个activity被回收了，而gone(reference)这个方法就是来判断retainedKeys中是否还存在这个对象，代码如下&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;  private boolean gone(KeyedWeakReference reference) {
-    return !retainedKeys.contains(reference.key);
-  }&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;removeWeaklyReachableReferences和gone方法都执行了两次，如果第一次对象就从retainedKeys移除了，那就是表示对象已经成功被回收了，如果没有，则调用gcTrigger.runGc()执行一次gc操作，再进一步确认对象是否还存在，如果还存在则猜测发生了内存泄露，因此取出dump文件进一步分析。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;      heapdumpListener.analyze(
-          new HeapDump(heapDumpFile, reference.key, reference.name, excludedRefs, watchDurationMs,
-              gcDurationMs, heapDumpDurationMs));&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;heapdumpListener.analyze方法实际为ServiceHeapDumpListener.analyze方法&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;@Override public void analyze(HeapDump heapDump) {
-    checkNotNull(heapDump, &amp;#34;heapDump&amp;#34;);
-    HeapAnalyzerService.runAnalysis(context, heapDump, listenerServiceClass);
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;最终会执行HeapAnalyzerService.runAnalysis方法，HeapAnalyzerService继承自intentservice，而且运行在另一个进程，
-intentservice会在另一个进程开启一个工作线程对dump文件进行分析，这样做可以减少主进程所占用的内存，降低被杀死的概率。
-dump文件的分析使用了squareup的另一个haha库，如果确实出现了泄露，则找出泄露对象的引用路径通知用户。如有需要我们也可以导出LeakCanay生成的dump文件使用其他工具比如MAT，Android Studio进行分析。&lt;/p&gt;
-
-&lt;p&gt;*看LeakCanary源码时发现使用到了一个&lt;a href=&#34;https://github.com/tbroyer/gradle-errorprone-plugin&#34;&gt;net.ltgt.gradle:gradle-errorprone-plugin&lt;/a&gt;的库，通过这个库，如果我们的handler有内存泄露的隐患，直接在运行app时就会报错，因此我们可以在项目中引用这个库来提前发现一些问题，从而避免一些安全隐患。
-###推荐书籍##
-《Android群英传：神兵利器》&lt;/p&gt;
-
-&lt;p&gt;《高性能Android应用开发》&lt;/p&gt;
-</description>
-      
-    </item>
+    void onAccessibilityButtonAvailabilityChanged(boolean available);
     
-    <item>
-      <title>图解Binder</title>
-      <link>https://xuanliangdev.github.io/post/%E5%9B%BE%E8%A7%A3binder%E7%B1%BB%E5%9B%BE%E6%97%B6%E5%BA%8F%E5%9B%BE/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/post/%E5%9B%BE%E8%A7%A3binder%E7%B1%BB%E5%9B%BE%E6%97%B6%E5%BA%8F%E5%9B%BE/</guid>
-      
-        <description>
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Binder是用在Android系统中的一个进程间通信(IPC)机制，使用C/S架构，服务端和客户端通过Binder进行跨进程的数据交换，Binder继承自IBinder接口，因此IBinder接口最重要的一个方法是transact，所以虽然Android为了减少开发者开发工作量，采用了代理模式封装了一个复杂的Binder架构，但是其本质都是从源进程传递数据给目标进程，然后目标进程处理完后再把数据回传给源进程，所以在学习Binder实现原理时最好是要不时回想起框架实现的目的，才能不被架构里的各种类似的概念搞迷糊。&lt;/p&gt;
+&lt;h4 id=&#34;1-2-2-iaccessibilityserviceconnection&#34;&gt;1.2.2、IAccessibilityServiceConnection&lt;/h4&gt;
 
-&lt;p&gt;关于Service，其实就是提供服务的代码，在java端是通过AIDL来定义进程间通信的接口，Service端实现接口并通过onBind方法向客户端公开该接口，客户端取得该接口后就可以调用接口的相关方法。调用方法也很简单，具体可以参考官方API指南AIDL章节&lt;a href=&#34;https://developer.android.google.cn/guide/components/aidl.html#Defining&#34; title=&#34;官方API指南AIDL章节&#34;&gt;https://developer.android.google.cn/guide/components/aidl.html#Defining&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;服务端为SystemServer进程，调用客户端为辅助app进程（talkback）。&lt;/p&gt;
 
-&lt;h2 id=&#34;相关类图&#34;&gt;相关类图&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;android.accessibilityservice.IAccessibilityServiceConnection.aidl
 
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/ZpWxEWx.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+/**
+ * Interface given to an AccessibilitySerivce to talk to the AccessibilityManagerService.
+ */
+interface IAccessibilityServiceConnection {
 
-&lt;p&gt;复杂的架构都是为了更方便别人进行调用，我们可以在java端或native端进行binder的使用，作为java开发者我们要使用Binder只要实现图上绿色部分的接口和类就够了（绿色部分的aidl类为android sdk自带的apidemo中的一个示例），而作为native端的开发者需要实现如蓝色部分的接口和类。&lt;/p&gt;
+    String[] findAccessibilityNodeInfoByAccessibilityId(int accessibilityWindowId,
+        long accessibilityNodeId, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, int flags, long threadId,
+        in Bundle arguments);
 
-&lt;p&gt;关于Binder的源码分析的书籍有《Android系统源代码情景分析[罗升阳著]》《深入理解Android卷I[邓平凡著]》《Android技术内幕系统卷[杨丰盛著]》，写的都比较好，最好是边看源码边看书，看的时候多想想为什么这么设计，为了防止自己忘记，画了几幅时序图辅助理解。如下图是Binder通信的四个主要过程：&lt;/p&gt;
+    String[] findAccessibilityNodeInfosByViewId(int accessibilityWindowId,
+        long accessibilityNodeId, String viewId, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, long threadId);
 
-&lt;h3 id=&#34;servicemanagerproxy获取过程&#34;&gt;ServiceManagerProxy获取过程&lt;/h3&gt;
+    String[] findFocus(int accessibilityWindowId, long accessibilityNodeId, int focusType,
+        int interactionId, IAccessibilityInteractionConnectionCallback callback, long threadId);
 
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/Sk2n7PY.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+    boolean performAccessibilityAction(int accessibilityWindowId, long accessibilityNodeId,
+        int action, in Bundle arguments, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, long threadId);
 
-&lt;h3 id=&#34;向servicemanager注册service过程&#34;&gt;向ServiceManager注册Service过程&lt;/h3&gt;
+    AccessibilityServiceInfo getServiceInfo();
 
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/rujtct8.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+    boolean performGlobalAction(int action);
 
-&lt;h3 id=&#34;service代理对象获取过程&#34;&gt;Service代理对象获取过程&lt;/h3&gt;
+    boolean isAccessibilityButtonAvailable();
+}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/RgrRRCF.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;用于talkback和system_process之间，服务端为system_process（AccessibilityManagerService），客户端为talkback。&lt;/p&gt;
 
-&lt;h3 id=&#34;跨进程调用过程&#34;&gt;跨进程调用过程&lt;/h3&gt;
+&lt;h4 id=&#34;1-2-3-iaccessibilitymanager&#34;&gt;1.2.3、IAccessibilityManager&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/3qjjRUb.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-</description>
-      
-    </item>
-    
-    <item>
-      <title>设计模式总结</title>
-      <link>https://xuanliangdev.github.io/post/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</link>
-      <pubDate>Mon, 23 Apr 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/post/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</guid>
-      
-        <description>
+&lt;p&gt;服务端为SystemServer进程，调用客户端为被辅助app进程。&lt;/p&gt;
 
-&lt;p&gt;这个月看了一遍《Android源码设计模式解析与实战》，又一次被android中framework层的设计震惊了，也得到了一些学习的心得体会，“想要理解一个概念，要先理解why，然后才深入how，不能深入细节而忘了初衷”。&lt;/p&gt;
+&lt;p&gt;当被辅助app产生触摸事件后，会通过这个接口发送无障碍事件给SystemServer进程的AccessibilityManagerService&lt;/p&gt;
 
-&lt;h2 id=&#34;面向对象六大原则&#34;&gt;面向对象六大原则&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;android.view.accessibility.IAccessibilityManager.aidl
 
-&lt;p&gt;设计模式其实就是面向对象的六大原则的体现。&lt;/p&gt;
+/**
+ * Interface implemented by the AccessibilityManagerService called by
+ * the AccessibilityManagers.
+ *
+ * @hide
+ */
+interface IAccessibilityManager {
 
-&lt;p&gt;S:单一职责（Single Responsibility Principle）一个类的职责应该只有一个。&lt;/p&gt;
+    oneway void sendAccessibilityEvent(in AccessibilityEvent uiEvent, int userId);
 
-&lt;p&gt;O：开闭原则（Open Close Principle）一个对象应该对修改是封闭的，对扩展是开放的。（使用接口实现）&lt;/p&gt;
+    long addClient(IAccessibilityManagerClient client, int userId);
 
-&lt;p&gt;L：里氏替换（Liskov Substitution Principle）（子类能替换父类）&lt;/p&gt;
+    List&amp;lt;AccessibilityServiceInfo&amp;gt; getInstalledAccessibilityServiceList(int userId);
 
-&lt;p&gt;I：接口隔离（Interface Segregation Principle）(类依赖应该建立在最小接口上)&lt;/p&gt;
+    List&amp;lt;AccessibilityServiceInfo&amp;gt; getEnabledAccessibilityServiceList(int feedbackType, int userId);
 
-&lt;p&gt;D：依赖倒置（Dependence Inversion Principle）（参考UML图，使用类指向被依赖的类，倒置后使用类指向接口，实现类也指向接口）&lt;/p&gt;
+    int addAccessibilityInteractionConnection(IWindow windowToken,
+            in IAccessibilityInteractionConnection connection,
+            String packageName, int userId);
 
-&lt;p&gt;迪米特原则(Law of Demeter)一个对象应该与其他对象有最少的了解（参考中介模式，）&lt;/p&gt;
+    void removeAccessibilityInteractionConnection(IWindow windowToken);
 
-&lt;h3 id=&#34;一-创建型模式&#34;&gt;一、创建型模式&lt;/h3&gt;
+    void notifyAccessibilityButtonClicked();
 
-&lt;h4 id=&#34;1-singleton-单例&#34;&gt;1、Singleton（单例）&lt;/h4&gt;
+    // Requires WRITE_SECURE_SETTINGS
+    void performAccessibilityShortcut();
 
-&lt;p&gt;实际应用：ImageLoader（双重校验锁DCL），ActivityThread，ActivityManagerNative（懒汉式），WindowManagerGlobal（懒汉式）&lt;/p&gt;
+}
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;懒汉式：&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public abstract class Singleton&amp;lt;T&amp;gt; {
-    private T mInstance;
+&lt;h4 id=&#34;1-2-4-iaccessibilityinteractionconnection&#34;&gt;1.2.4、IAccessibilityInteractionConnection&lt;/h4&gt;
 
-    protected abstract T create();
+&lt;p&gt;服务端为被辅助app进程，调用客户端为SystemServer进程。&lt;/p&gt;
 
-    public final T get() {
-        synchronized (this) {
-           if (mInstance == null) {
-               mInstance = create();
-           }
-           return mInstance;
-        }
+&lt;pre&gt;&lt;code&gt;android.view.accessibility.IAccessibilityInteractionConnection.aidl
+
+/**
+ * Interface for interaction between the AccessibilityManagerService
+ * and the ViewRoot in a given window.
+ *
+ * @hide
+ */
+oneway interface IAccessibilityInteractionConnection {
+
+    void findAccessibilityNodeInfoByAccessibilityId(long accessibilityNodeId, in Region bounds,
+        int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
+        int interrogatingPid, long interrogatingTid, in MagnificationSpec spec,
+        in Bundle arguments);
+
+    ...
+
+    void findFocus(long accessibilityNodeId, int focusType, in Region bounds, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, int flags, int interrogatingPid,
+        long interrogatingTid, in MagnificationSpec spec);
+
+  ...
+
+    void performAccessibilityAction(long accessibilityNodeId, int action, in Bundle arguments,
+        int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
+        int interrogatingPid, long interrogatingTid);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;三-流程分析&#34;&gt;三、流程分析&lt;/h2&gt;
+
+&lt;h3 id=&#34;1-talkback开关打开后到talkbackservice启动过程&#34;&gt;1、talkback开关打开后到TalkbackService启动过程。&lt;/h3&gt;
+
+&lt;p&gt;1.1、在设置中打开talback开关后，会调用到如下方法，最终会往Settings provider中key为Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES的字段写入Talkback注册的AccessibilityService值（TalkbackService），这个值保存在&lt;/p&gt;
+
+&lt;p&gt;/data/system/users/0/settings_secure.xml文件中。（其他app的AccessibilityService也保存在同一个key中）&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;com.android.settingslib.accessibility.AccessibilityUtils.java
+
+/**
+ * Changes an accessibility component&#39;s state for {@param userId}.
+ */
+public static void setAccessibilityServiceState(Context context, ComponentName toggledService,
+        boolean enabled, int userId) {
+    ...
+    Settings.Secure.putStringForUser(context.getContentResolver(),
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+            enabledServicesBuilder.toString(), userId);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;由于AccessibilityManagerService创建时注册了AccessibilityContentObserver，因此马上会收到Settings provider数据变化的监听。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityServiceConnection.java
+
+private void updateServicesLocked(UserState userState) {
+    ...
+        if (userState.mEnabledServices.contains(componentName)
+                &amp;amp;&amp;amp; !mUiAutomationManager.suppressingAccessibilityServicesLocked()) {
+            if (service == null) {
+                service = new AccessibilityServiceConnection(userState, mContext, componentName,
+                        installedService, sIdCounter++, mMainHandler, mLock, mSecurityPolicy,
+                        this, mWindowManagerService, mGlobalActionPerformer);
+            } 
+            ...
+            service.bindLocked();
+        } ...
     }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;DCL&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;class Singleton {
-    private static volatile Singleton mInstance = null;
-    private Singleton() {}
-    public static Singleton getInstance() {
-        if (mInstance == null) {
-            synchronized(Singleton.class) {
-                if (mInstance == null) {
-                    mInstance = new Singleton();
+    ...
+    updateAccessibilityEnabledSetting(userState);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;根据获取到的AccessibilityService信息（com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService）创建出AccessibilityServiceConnection。AccessibilityServiceConnection代表了一个无障碍服务，存储用于管理这个服务需要的所有数据，提供了开始/停止服务和在服务管理的数据结构中添加或者移除这个服务的api。&lt;/p&gt;
+
+&lt;p&gt;接着调用bindServiceAsUser方法来绑定服务。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityServiceConnection.java
+
+public void bindLocked() {
+    ...
+    try {
+        ...
+        if (mService == null &amp;amp;&amp;amp; mContext.bindServiceAsUser(
+                mIntent, this, flags, new UserHandle(userState.mUserId))) {
+            userState.getBindingServicesLocked().add(mComponentName);
+        }
+    } ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;服务启动后会跨进程调用到TalkbackService(AccessibilityService)的onBind方法&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android.accessibilityservice.AccessibilityService
+
+/**
+ * Implement to return the implementation of the internal accessibility
+ * service interface.
+ */
+@Override
+public final IBinder onBind(Intent intent) {
+    return new IAccessibilityServiceClientWrapper(this, getMainLooper(), new Callbacks() {
+        @Override
+        public void onServiceConnected() {
+            AccessibilityService.this.dispatchServiceConnected();
+        }
+
+        ...
+        @Override
+        public void onAccessibilityEvent(AccessibilityEvent event) {
+            AccessibilityService.this.onAccessibilityEvent(event);
+        }
+...
+    });
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;onBind方法返回的是一个IAccessibilityServiceClientWrapper的binder对象&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/**
+ * Implements the internal {@link IAccessibilityServiceClient} interface to convert
+ * incoming calls to it back to calls on an {@link AccessibilityService}.
+ *
+ * @hide
+ */
+public static class IAccessibilityServiceClientWrapper extends IAccessibilityServiceClient.Stub
+        implements HandlerCaller.Callback {
+    ...
+
+    private final HandlerCaller mCaller;
+
+    private final Callbacks mCallback;
+
+    private int mConnectionId = AccessibilityInteractionClient.NO_ID;
+
+    public IAccessibilityServiceClientWrapper(Context context, Looper looper,
+            Callbacks callback) {
+        mCallback = callback;
+        mCaller = new HandlerCaller(context, looper, this, true /*asyncHandler*/);
+    }
+
+    public void init(IAccessibilityServiceConnection connection, int connectionId,
+            IBinder windowToken) {
+        Message message = mCaller.obtainMessageIOO(DO_INIT, connectionId,
+                connection, windowToken);
+        mCaller.sendMessage(message);
+    }
+
+    ...
+
+    public void onAccessibilityEvent(AccessibilityEvent event, boolean serviceWantsEvent) {
+        Message message = mCaller.obtainMessageBO(
+                DO_ON_ACCESSIBILITY_EVENT, serviceWantsEvent, event);
+        mCaller.sendMessage(message);
+    }
+...
+
+    @Override
+    public void executeMessage(Message message) {
+        switch (message.what) {
+            case DO_ON_ACCESSIBILITY_EVENT: {
+                AccessibilityEvent event = (AccessibilityEvent) message.obj;
+                boolean serviceWantsEvent = message.arg1 != 0;
+                if (event != null) {
+                    // Send the event to AccessibilityCache via AccessibilityInteractionClient
+                    AccessibilityInteractionClient.getInstance().onAccessibilityEvent(event);
+                    if (serviceWantsEvent
+                            &amp;amp;&amp;amp; (mConnectionId != AccessibilityInteractionClient.NO_ID)) {
+                        // Send the event to AccessibilityService
+                        mCallback.onAccessibilityEvent(event);
+                    }
+                    ...
                 }
-            }
-        }
-        return mInstance;
-    }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;静态内部类&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;class Singleton {
-    private Singleton() {}
-    private static class SingletonHolder {
-        private static Singleton mInstance = new Singleton();
-    }
-    public static Singleton getInstance() {
-        return SingletonHolder.mInstance;
-    }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;2-factory-method-工厂方法&#34;&gt;2、Factory Method（工厂方法）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/8cVWWSS.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：BitmapFactory（简单工厂或静态工厂），Iterable&lt;/p&gt;
-
-&lt;p&gt;有的书上说简单工厂并不算工厂模式，真正意义上的工厂方法模式里，“工厂方法”其实是一个抽象方法，该模式拥有不同的工厂类，不同的工厂类实现了各自的工厂方法，例如ArrayListIterator，LinkIterator都可以算是一个工厂，next方法，previous方法都可以看做是一个工厂方法。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class FactoryMethon {
-    public static void main(String[] args) {
-        // 简单工厂
-        Product p = SimpleFactory.create(&amp;#34;A&amp;#34;);
-        p.method();
-        // 工厂方法
-        Factory f = new ConreteFactoryA();
-        p = f.create();
-        p.method();
-        f = new ConreteFactoryB();
-        p = f.create();
-        p.method();
-    }
-}
-
-abstract class Product {
-    abstract void method();
-}
-
-class ConcreteProductA extends Product {
-
-    @Override
-    void method() {
-        System.out.println(&amp;#34;ConcreteProductA&amp;#34;);
-    }
-}
-
-class ConcreteProductB extends Product {
-
-    @Override
-    void method() {
-        System.out.println(&amp;#34;ConcreteProductB&amp;#34;);
-    }
-}
-
-// 简单工厂
-class SimpleFactory {
-    public static Product create(String s) {
-        if (&amp;#34;A&amp;#34;.equals(s))
-            return new ConcreteProductA();
-        if (&amp;#34;B&amp;#34;.equals(s))
-            return new ConcreteProductB();
-        else
-            return null;
-    }
-
-}
-
-// 工厂方法
-abstract class Factory {
-    abstract Product create();
-}
-
-class ConreteFactoryA extends Factory {
-    Product create() {
-        return new ConcreteProductA();
-    }
-}
-
-class ConreteFactoryB extends Factory {
-    Product create() {
-        return new ConcreteProductB();
-    }
-}
-
-//ouput:
-ConcreteProductA
-ConcreteProductA
-ConcreteProductB&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;3-abstract-factory-抽象工厂&#34;&gt;3、Abstract Factory（抽象工厂）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/ipMOViK.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：MediaPlayerFactory&lt;/p&gt;
-
-&lt;p&gt;抽象工厂相比于工厂方法，多了产品簇的概念，工厂方法是为了当出现新的工厂时可以用很小的代价进行扩展（比如生产智能手机实现了一个createPhone的抽象工厂方法，一开始只有ios和android的工厂实现该方法，当出现新的winphone系统时，只要新建一个winphone工厂来实现createPhone方法就行，代价很小），第一层抽象是根据手机系统的不同，但是如果产品之间也有关联，比如三种系统生产的手机都各自分为高端机型，中端机型，低端机型，这时出现了第二个层次的抽象，高、中、低分别可以抽象出一个接口，再实现三个抽象工厂方法分别生产高、中、低端的手机。&lt;/p&gt;
-
-&lt;p&gt;抽象工厂有利于交换产品系列（从一个系统的高端机换到另一系统的高端机），有利于产品一致性（当一个系列的产品被设计成一起工作时）。&lt;/p&gt;
-
-&lt;p&gt;抽象工厂不利于接入新的工厂，因为如果新工厂只打算生产低端机，也必须实现生产中端、高端机的接口。&lt;/p&gt;
-
-&lt;p&gt;（和工厂方法的明显区别，抽象工厂生产的产品比工厂方法生产的产品多了一层抽象，工厂方法：手机&amp;lt;-android手机，抽象工厂：手机&amp;lt;-高端机&amp;lt;-android手机）&lt;/p&gt;
-
-&lt;h4 id=&#34;4-builder-创建者&#34;&gt;4、Builder（创建者）&lt;/h4&gt;
-
-&lt;p&gt;实际应用：ImageLoader(ImageLoaderConfiguration.Builder) AlertDialog（AlertDialog.Builder）&lt;/p&gt;
-
-&lt;p&gt;builder中链式调用进行配置，最后通过build方法或create方法生成对象并返回。其实就是通过builder对象的相关方法对各个配置项进行配置。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class BulderPattern {
-
-    public static void main(String[] args) {
-        new Dialog.Builder().setTitle(&amp;#34;Title&amp;#34;).setMessage(&amp;#34;Message&amp;#34;).build().show();
-    }
-}
-
-class Dialog {
-    String title = &amp;#34;defaultTitle&amp;#34;;
-    String message = &amp;#34;defaultMessage&amp;#34;;
-
-    public void show() {
-        System.out.println(title + &amp;#34; &amp;#34; + message);
-    }
-
-    public static class Builder {
-        private Dialog mD;
-
-        Builder() {
-            mD = new Dialog();
-        }
-
-        Builder setTitle(String title) {
-            mD.title = title;
-            return this;
-        }
-
-        Builder setMessage(String message) {
-            mD.message = message;
-            return this;
-        }
-
-        Dialog build() {
-            return mD;
-        }
-    }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;5-prototype-原型&#34;&gt;5、Prototype（原型）&lt;/h4&gt;
-
-&lt;p&gt;实际应用：clone方法 Intent的clone方法是通过new自身来实现的&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;@Override
-public Object clone() {
-    return new Intent(this);
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;hr /&gt;
-
-&lt;h3 id=&#34;二-结构型模式&#34;&gt;二、结构型模式&lt;/h3&gt;
-
-&lt;h4 id=&#34;6-adapter-适配器&#34;&gt;6、Adapter（适配器）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/79y6BUu.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：ListView中的Adapter&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class AdapterPettern {
-
-    public static void main(String[] args) {
-        Target t = new Adapter();
-        t.method();
-    }
-}
-
-interface Target {
-    void method();
-}
-
-class Adaptee {
-    public void methodA() {
-        System.out.println(&amp;#34;Adaptee Menthod&amp;#34;);
-    };
-}
-
-class Adapter implements Target {
-    Adaptee a = new Adaptee();
-
-    @Override
-    public void method() {
-        a.methodA();
-    }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;7-bridge-桥接&#34;&gt;7、Bridge（桥接）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/7hWqaOJ.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：经常用在一些imp类中，比如WindowManagerImp（感觉其实没必要设计WindowManager接口）&lt;/p&gt;
-
-&lt;p&gt;*这个设计模式对于理解android framework的很多设计相当有帮助，可以扩展到其他一些框架的接口类和相关的Imp类进行分析。 用于多维度变化类或者多个树状类之间的耦合的解耦。一个类存在两个独立变化的维度，并且两个维度都需要扩展。&lt;/p&gt;
-
-&lt;p&gt;这个模式诠释了（多用组合，少用继承）的好处&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class Bridge {
-
-    public static void main(String[] args) {
-        //两个维度，Size和Additive
-        LargeCoffee lc = new LargeCoffee(new Additives() {
-        });
-        lc.makeCoffee();
-
-        Suger suger = new Suger();
-        lc = new LargeCoffee(suger);
-        lc.makeCoffee();
-    }
-}
-
-abstract class Coffee {
-    Additives add;
-
-    Coffee(Additives add) {
-        this.add = add;
-    }
-
-    abstract void makeCoffee();
-}
-
-abstract class Additives {
-    String addSomething() {
-        return &amp;#34;Nothing&amp;#34;;
-    };
-}
-
-class Suger extends Additives {
-
-    @Override
-    String addSomething() {
-        return &amp;#34;Suger&amp;#34;;
-    }
-}
-
-class LargeCoffee extends Coffee {
-    LargeCoffee(Additives add) {
-        super(add);
-    }
-
-    @Override
-    void makeCoffee() {
-        System.out.println(&amp;#34;Large &amp;#34; + add.addSomething());
-    }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;8-composite-组成&#34;&gt;8、Composite（组成）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/xCnYlrw.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：View和ViewGroup&lt;/p&gt;
-
-&lt;p&gt;ViewGrop继承于View，并且已聚合的方式包含View&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;class View {
-    public void create() {
-    };
-}
-
-abstract class ViewGroup extends View {
-    private ArrayList&amp;lt;View&amp;gt; views = new ArrayList&amp;lt;View&amp;gt;();
-
-    public void addView(View v) {
-        views.add(v);
-    };
-
-    public void removeView(View v) {
-        views.remove(v);
-    };
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;9-decorator-装饰&#34;&gt;9、Decorator（装饰）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/CPaLmU1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：Context和ContextWrapper，java中的各种输入输出流&lt;/p&gt;
-
-&lt;p&gt;包装器Wrapper中包含实际对象的引用，并调用实际对象引用的方法，并对实际对象进行功能扩展。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class Decorator {
-
-    public static void main(String[] args) {
-        ContextImpl ctImp = new ContextImpl();
-        new ContextThemeWrapper(ctImp).doSomething();
-    }
-}
-
-abstract class Context {
-    abstract void doSomething();
-}
-
-class ContextImpl extends Context {
-    void doSomething() {
-        System.out.println(&amp;#34;ContextImpl doSomething&amp;#34;);
-    };
-}
-
-class ContextWrapper extends Context {
-    Context mBase;
-
-    ContextWrapper(Context context) {
-        mBase = context;
-    }
-
-    void doSomething() {
-        mBase.doSomething();
-    }
-}
-
-class ContextThemeWrapper extends ContextWrapper {
-
-    ContextThemeWrapper(Context context) {
-        super(context);
-    }
-
-    void doSomething() {
-        super.doSomething();
-        System.out.println(&amp;#34;ContextThemeWrapper doSomething&amp;#34;);
-    }
-}
-//output:
-ContextImpl doSomething
-ContextThemeWrapper doSomething&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;10-facade-外观&#34;&gt;10、Facade（外观）&lt;/h4&gt;
-
-&lt;p&gt;实际应用：ContextImpl（管理ActivityManagerNative，PackageManager，ResourcesManager等子系统）&lt;/p&gt;
-
-&lt;p&gt;提供了一个高层次接口，方便各个子系统的使用&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/I8wpgJZ.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;class ContextImpl {
-    AMS ams;
-    PKMS pkms;
-
-    void startActivities() {
-        ams.startActivity();
-    };
-
-    void getPackageManager() {
-        pkms.getPackageManager();
-    }
-
-}
-
-class AMS {
-    void startActivity() {
-        System.out.println(&amp;#34;startActivity&amp;#34;);
-    };
-}
-
-class PKMS {
-    void getPackageManager() {
-        System.out.println(&amp;#34;getPackageManager&amp;#34;);
-    }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;ContextImpl相当于一个外观模式，Wrapper类是装饰器模式&lt;/p&gt;
-
-&lt;h4 id=&#34;11-flyweight-享元&#34;&gt;11、Flyweight（享元）&lt;/h4&gt;
-
-&lt;p&gt;实际应用：Message的重用，JDK中的String对象的常量池&lt;/p&gt;
-
-&lt;p&gt;对象池的一种实现，比如一篇word文档中有一万个字符，创建一万个字符对象代价就太大了。通常和state模式或strategy模式一起使用&lt;/p&gt;
-
-&lt;h4 id=&#34;12-proxy-代理&#34;&gt;12、Proxy（代理）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/Qzvj41v.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：Binder&lt;/p&gt;
-
-&lt;p&gt;对于理解Binder机制很有帮助。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class Proxy {
-
-    public static void main(String[] args) {
-        RealSub rs = new RealSub();
-        ProxySub ps = new ProxySub(rs);
-        ps.visit();
-    }
-}
-
-abstract class Sub {
-    abstract void visit();
-}
-
-class RealSub extends Sub {
-    @Override
-    void visit() {
-        System.out.println(&amp;#34;RealVisit&amp;#34;);
-    }
-}
-
-class ProxySub extends Sub {
-    RealSub sub;
-
-    ProxySub(RealSub sub) {
-        this.sub = sub;
-    }
-
-    @Override
-    void visit() {
-        sub.visit();
-    }
-}&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;hr /&gt;
-
-&lt;h3 id=&#34;三-行为模式&#34;&gt;三、行为模式&lt;/h3&gt;
-
-&lt;h4 id=&#34;13-chain-of-responsibility-责任链-对象行为&#34;&gt;13、chain of responsibility（责任链）（对象行为）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/Vb1eYBL.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：事件分发机制，比如屏幕的触摸事件&lt;/p&gt;
-
-&lt;p&gt;要点是当前Handler保持一个下一节点Handler的引用，当前节点处理不了则把消息分发给下一节点。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;80
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;81
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;82
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class ChainOfResponsibility {
-
-    public static void main(String[] args) {
-        Request1 r1 = new Request1();
-        Request2 r2 = new Request2();
-
-        Handler1 h1 = new Handler1();
-        Handler2 h2 = new Handler2();
-        h1.next = h2;
-        h1.handlerRequest(r1);
-        h1.handlerRequest(r2);
-    }
-
-}
-
-abstract class AbsHandler {
-    AbsHandler next;
-
-    void handlerRequest(AbsRequest req) {
-        if (getHanlderLevel() == req.getRequestLevel()) {
-            handle(req);
-        } else {
-            next.handle(req);
-        }
-    }
-
-    abstract String getHanlderLevel();
-
-    abstract void handle(AbsRequest req);
-}
-
-class Handler1 extends AbsHandler {
-
-    @Override
-    String getHanlderLevel() {
-        return &amp;#34;1&amp;#34;;
-    }
-
-    @Override
-    void handle(AbsRequest req) {
-        System.out.println(&amp;#34;Handler1 handle&amp;#34;);
-
-    }
-}
-
-class Handler2 extends AbsHandler {
-
-    @Override
-    String getHanlderLevel() {
-        return &amp;#34;2&amp;#34;;
-    }
-
-    @Override
-    void handle(AbsRequest req) {
-        System.out.println(&amp;#34;Handler2 handle&amp;#34;);
-    }
-
-}
-
-abstract class AbsRequest {
-    abstract String getRequestLevel();
-}
-
-class Request1 extends AbsRequest {
-
-    @Override
-    String getRequestLevel() {
-        return &amp;#34;1&amp;#34;;
-    }
-}
-
-class Request2 extends AbsRequest {
-
-    @Override
-    String getRequestLevel() {
-        return &amp;#34;2&amp;#34;;
-    }
-
-}
-//output:
-Handler1 handle
-Handler2 handle&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;14-command-命令-对象行为&#34;&gt;14、command（命令）（对象行为）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/4F7RUzM.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：PackageManagerService中的MeasureParams、InstallParams和MoveParams&lt;/p&gt;
-
-&lt;p&gt;通过把请求封装成对象，不同的命令对象子类持有各自的接收者，接受者可以相同也可以不同，然后不同的命令对象中，接收者执行不同的具体操作。&lt;/p&gt;
-
-&lt;p&gt;command模式是过程语言中回调（callback）机制的一个面向对象的替代品&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;  1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 70
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 71
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 72
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 73
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 74
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 75
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 76
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 77
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 78
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 79
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 80
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 81
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 82
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 83
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 84
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 85
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 86
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 87
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 88
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 89
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 90
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 91
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 92
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 93
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 94
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 95
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 96
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 97
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 98
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 99
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;100
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;101
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;102
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;103
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;104
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;105
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;106
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;107
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;108
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;109
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;110
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;111
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;112
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;113
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;114
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;115
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;116
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;117
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;118
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;119
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;120
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;121
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;122
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;123
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;124
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;125
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;126
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;127
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;128
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;129
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;130
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;131
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;132
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;133
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;134
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;135
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;136
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;137
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;138
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;139
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;140
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;141
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;142
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;143
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;144
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;145
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;146
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;147
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;148
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;149
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;150
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;151
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;152
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;153
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;154
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;155
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;156
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;157
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;158
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;159
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;160
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;161
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;162
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;163
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;164
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;165
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;166
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;167
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;168
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;169
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;170
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;171
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;172
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;173
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;174
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;175
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;176
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;177
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;178
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;179
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;180
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;181
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;182
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;183
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;184
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;185
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;186
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;187
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;188
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;189
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;190
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;191
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;192
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class CommandPattern {
-
-    public static void main(String[] args) {
-        Car car = new Car();
-        LeftCommand left = new LeftCommand(car);
-        RightCommand right = new RightCommand(car);
-        BackCommand back = new BackCommand(car);
-        ForwardCommand forward = new ForwardCommand(car);
-
-        Handler h = new Handler();
-        h.setBack(back);
-        h.setForward(forward);
-        h.setLeft(left);
-        h.setRight(right);
-
-        h.toBack();
-        h.toLeft();
-        h.toForward();
-        h.toRight();
-
-        h.undo();
-        h.undo();
-        h.undo();
-        h.undo();
-    }
-}
-
-class Car {
-
-    void toLeft() {
-        System.out.println(&amp;#34;toLeft&amp;#34;);
-    }
-
-    void toRight() {
-        System.out.println(&amp;#34;toRight&amp;#34;);
-    }
-
-    void toForward() {
-        System.out.println(&amp;#34;toForward&amp;#34;);
-    }
-
-    void toBack() {
-        System.out.println(&amp;#34;toBack&amp;#34;);
-    }
-}
-
-interface Command {
-    void execute();
-    void undo();
-}
-
-class LeftCommand implements Command {
-    Car car;
-
-    public LeftCommand(Car car) {
-        super();
-        this.car = car;
-    }
-
-    @Override
-    public void execute() {
-        car.toLeft();
-    }
-
-    @Override
-    public void undo() {
-        car.toRight();
-
-    }
-}
-
-class RightCommand implements Command {
-    Car car;
-
-    public RightCommand(Car car) {
-        super();
-        this.car = car;
-    }
-
-    @Override
-    public void execute() {
-        car.toRight();
-    }
-
-    @Override
-    public void undo() {
-        car.toLeft();
-
-    }
-}
-
-class ForwardCommand implements Command {
-    Car car;
-
-    public ForwardCommand(Car car) {
-        super();
-        this.car = car;
-    }
-
-    @Override
-    public void execute() {
-        car.toForward();
-    }
-
-    @Override
-    public void undo() {
-        car.toBack();
-
-    }
-}
-
-class BackCommand implements Command {
-    Car car;
-
-    public BackCommand(Car car) {
-        super();
-        this.car = car;
-    }
-
-    @Override
-    public void execute() {
-        car.toBack();
-    }
-
-    @Override
-    public void undo() {
-        car.toForward();
-
-    }
-}
-
-class Handler {
-    LeftCommand left;
-    RightCommand right;
-    BackCommand back;
-    ForwardCommand forward;
-    ArrayList&amp;lt;Command&amp;gt; commandList = new ArrayList&amp;lt;&amp;gt;();
-    Handler() {
-    }
-
-    public void setLeft(LeftCommand left) {
-        this.left = left;
-    }
-
-    public void setRight(RightCommand right) {
-        this.right = right;
-    }
-
-    public void setBack(BackCommand back) {
-        this.back = back;
-    }
-
-    public void setForward(ForwardCommand forward) {
-        this.forward = forward;
-    }
-
-    void toLeft() {
-        left.execute();
-        commandList.add(left);
-    }
-
-    void toRight() {
-        right.execute();
-        commandList.add(right);
-    }
-
-    void toBack() {
-        back.execute();
-        commandList.add(back);
-    }
-
-    void toForward() {
-        forward.execute();
-        commandList.add(forward);
-    }
-
-    void undo(){
-        if(commandList.size() &amp;gt; 0){
-            commandList.get(commandList.size() - 1).undo();
-            commandList.remove(commandList.size() - 1);
+            } return;
+
+            ...
+            case DO_INIT: {
+                mConnectionId = message.arg1;
+                SomeArgs args = (SomeArgs) message.obj;
+                IAccessibilityServiceConnection connection =
+                        (IAccessibilityServiceConnection) args.arg1;
+                IBinder windowToken = (IBinder) args.arg2;
+                args.recycle();
+                if (connection != null) {
+                    AccessibilityInteractionClient.getInstance().addConnection(mConnectionId,
+                            connection);
+                    mCallback.init(mConnectionId, windowToken);
+                    mCallback.onServiceConnected();
+                }...
+            } return;
+...
         }
     }
 }
-//output:
-toBack
-toLeft
-toForward
-toRight
-toLeft
-toBack
-toRight
-toForward&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;15-interpreter-解释器-类行为&#34;&gt;15、interpreter（解释器）（类行为）&lt;/h4&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;实际应用：xml解释器&lt;/p&gt;
+&lt;p&gt;IAccessibilityServiceClientWrapper中保存了一个HandlerCaller和Callbacks对象，其中HandlerCaller主要是将SystemServer进程中AccessibilityServiceConnection的binder call的binder线程调研切换到AccessibilityService的主线程调用。Callbacks对象则将IAccessibilityServiceClientWrapper中的调用回调到AccessibilityService中。&lt;/p&gt;
 
-&lt;p&gt;经常会用到一些正则表达式进行字符串匹配，比较复杂&lt;/p&gt;
+&lt;p&gt;AccessibilityService返回binder后会走到AccessibilityServiceConnection的onServiceConnected调用中:&lt;/p&gt;
 
-&lt;h4 id=&#34;16-iterator-迭代器-对象行为&#34;&gt;16、iterator（迭代器）（对象行为）&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityServiceConnection.java
 
-&lt;p&gt;实际应用：容器对象的遍历，提供一种方法顺序访问集合各个元素，又不暴露集合的内部表示&lt;/p&gt;
-
-&lt;h4 id=&#34;17-mediator-中介者-对象行为&#34;&gt;17、mediator（中介者）（对象行为）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/I9vOrQt.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：KeyguardViewMediator&lt;/p&gt;
-
-&lt;p&gt;将两个对象直接的操作通过实现一个中介者进行解耦。具体客户类都持有一个中介者对象，中介者持有具体客户类对象。缺点是中介者封装了协议，比任何一个客户类都复杂，业务太多的话会变得难以维护。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class MediatorPattern {
-
-    public static void main(String[] args) {
-        ConcreteMediator mediator = new ConcreteMediator();
-        Owner owner = new Owner(mediator);
-        Render render = new Render(mediator);
-        System.out.println(&amp;#34;mediator has money : &amp;#34; + mediator.money);
-        render.action();
-        System.out.println(&amp;#34;mediator has money : &amp;#34; + mediator.money);
-        owner.action();
-        System.out.println(&amp;#34;mediator has money : &amp;#34; + mediator.money);
-    }
-
-}
-
-abstract class Trader {
-    Mediator m;
-
-    abstract void action();
-}
-
-class Owner extends Trader {
-
-    public Owner(ConcreteMediator m) {
-        this.m = m;
-    }
-
-    @Override
-    void action() {
-        m.giveMoney(100);
-        System.out.println(&amp;#34;Owner receive money from mediator&amp;#34;);
-    }
-
-}
-
-class Render extends Trader {
-
-    public Render(ConcreteMediator m) {
-        this.m = m;
-    }
-
-    @Override
-    void action() {
-        m.receiveMoney(100);
-        System.out.println(&amp;#34;Render give money to mediator&amp;#34;);
-
-    }
-
-}
-
-abstract class Mediator {
-    Owner owner;
-    Render render;
-
-    abstract void receiveMoney(int money);
-
-    abstract void giveMoney(int money);
-}
-
-class ConcreteMediator extends Mediator {
-    int money = 0;
-
-    @Override
-    void receiveMoney(int money) {
-        this.money += money;
-    }
-
-    @Override
-    void giveMoney(int money) {
-        this.money -= money;
-
+@Override
+public void onServiceConnected(ComponentName componentName, IBinder service) {
+    synchronized (mLock) {
+        ...
+        mServiceInterface = IAccessibilityServiceClient.Stub.asInterface(service);
+        ...
+        userState.addServiceLocked(this);
+        mSystemSupport.onClientChange(false);
+        // Initialize the service on the main handler after we&#39;re done setting up for
+        // the new configuration (for example, initializing the input filter).
+        mMainHandler.sendMessage(obtainMessage(
+                AccessibilityServiceConnection::initializeService, this));
     }
 }
-//output:
-mediator has money : 0
-Render give money to mediator
-mediator has money : 100
-Owner receive money from mediator
-mediator has money : 0&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;18-memento-备忘录-对象行为&#34;&gt;18、memento（备忘录）（对象行为）&lt;/h4&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;实际应用：onSaveInstanceState（activity相当于caretaker，Bundle相当于memento，各种UI信息相当于originator）&lt;/p&gt;
-
-&lt;p&gt;通过实现一个备忘录（memento）对象，保存原发器（originator）的状态，caretaker负责管理memento。&lt;/p&gt;
-
-&lt;p&gt;*变量以及状态封装成对象进行保存&lt;/p&gt;
-
-&lt;h4 id=&#34;19-observer-观察者-对象行为&#34;&gt;19、observer（观察者）（对象行为）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/l4vSWS1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：ListView&lt;/p&gt;
-
-&lt;p&gt;BaseAdapter创建的时候会同时创建一个DataSetObservable（被观察者），当listview调用setAdapter时会创建一个AdapterDataSetObserver（观察者），当Adapter调用notifyDataSetChanged时，被观察者调用notifyChanged遍历通知所有观察者执行onChanged方法，然后观察者会执行重新布局的操作。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt; 1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class ObserverPattern {
-    public static void main(String[] args) {
-        ConcreteObserver osr1 = new ConcreteObserver(&amp;#34;osr1&amp;#34;);
-        ConcreteObserver osr2 = new ConcreteObserver(&amp;#34;osr2&amp;#34;);
-        ConcreteSubject sub = new ConcreteSubject();
-        sub.attach(osr1);
-        sub.attach(osr2);
-        sub.notifyObservers();
+&lt;pre&gt;&lt;code&gt;private void initializeService() {
+    IAccessibilityServiceClient serviceInterface = null;
+    ...
+    try {
+        serviceInterface.init(this, mId, mOverlayWindowToken);
+    } catch (RemoteException re) {
+        ...
     }
 }
+&lt;/code&gt;&lt;/pre&gt;
 
-interface Observer {
-    void update(Subject o, String arg);
-}
+&lt;p&gt;在serviceInterface.init方法中（binder调用）将这个AccessibilityServiceConnection、mId和mOverlayWindowToken传给AccessibilityService完成初始化工作。&lt;/p&gt;
 
-class ConcreteObserver implements Observer {
-    String name;
+&lt;p&gt;初始化时会调用&lt;/p&gt;
 
-    public ConcreteObserver(String name) {
-        super();
-        this.name = name;
-    }
+&lt;pre&gt;&lt;code&gt;AccessibilityInteractionClient.getInstance().addConnection(mConnectionId,
+        connection);
+&lt;/code&gt;&lt;/pre&gt;
 
-    @Override
-    public void update(Subject o, String arg) {
-        System.out.println(name + &amp;#34; receive: &amp;#34; + arg);
-    }
-}
+&lt;p&gt;将AccessibilityServiceConnection保存到AccessibilityInteractionClient中。&lt;/p&gt;
 
-abstract class Subject {
-    abstract void attach(Observer observer);
+&lt;h3 id=&#34;2-触摸事件出发到焦点绘制过程&#34;&gt;2、触摸事件出发到焦点绘制过程。&lt;/h3&gt;
 
-    abstract void detach(Observer observer);
+&lt;p&gt;2.1 触摸事件发出到AccessibilityService接收到onAccessibilityEvent事件流程&lt;/p&gt;
 
-    abstract void notifyObservers();
-}
+&lt;p&gt;&lt;img src=&#34;https://ws2.sinaimg.cn/large/006tNc79gy1g1t16x2ozmj313g0u0x0h.jpg&#34; alt=&#34;accessibilitytouch&#34; /&gt;&lt;/p&gt;
 
-class ConcreteSubject extends Subject {
-    ArrayList&amp;lt;Observer&amp;gt; list = new ArrayList&amp;lt;&amp;gt;();
+&lt;p&gt;2.2 talkback发出focus事件通知ViewRootImpl绘制绿框焦点过程。&lt;/p&gt;
 
-    @Override
-    void attach(Observer observer) {
-        list.add(observer);
-    }
+&lt;h3 id=&#34;3-talkback调用tts发出声音过程&#34;&gt;3、talkback调用TTS发出声音过程。&lt;/h3&gt;
 
-    @Override
-    void detach(Observer observer) {
-        list.remove(observer);
-    }
+&lt;h1 id=&#34;四-解疑&#34;&gt;四、解疑&lt;/h1&gt;
 
-    @Override
-    void notifyObservers() {
-        for (Observer observer : list) {
-            observer.update(this, &amp;#34;new content!&amp;#34;);
+&lt;p&gt;1.无障碍机制涉及哪些模块？答案如上分析&lt;/p&gt;
+
+&lt;p&gt;2.开启talkback后talkback手势生效原理？&lt;/p&gt;
+
+&lt;p&gt;答：service的xml配置中android:canRequestTouchExplorationMode=&amp;ldquo;true&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;配上这个属性时com.android.server.accessibility.TouchExplorer会生效，该类会处理无障碍手势。&lt;/p&gt;
+
+&lt;p&gt;3.无障碍焦点的方框如何产生？&lt;/p&gt;
+
+&lt;p&gt;答：ViewRootImp进行绘制&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android.view.ViewRootImpl.java
+
+/**
+ * We want to draw a highlight around the current accessibility focused.
+ * Since adding a style for all possible view is not a viable option we
+ * have this specialized drawing method.
+ *
+ * Note: We are doing this here to be able to draw the highlight for
+ *       virtual views in addition to real ones.
+ *
+ * @param canvas The canvas on which to draw.
+ */
+private void drawAccessibilityFocusedDrawableIfNeeded(Canvas canvas) {
+    final Rect bounds = mAttachInfo.mTmpInvalRect;
+    if (getAccessibilityFocusedRect(bounds)) {
+        final Drawable drawable = getAccessibilityFocusedDrawable();
+        if (drawable != null) {
+            drawable.setBounds(bounds);
+            drawable.draw(canvas);
         }
-    }
-}
-//output:
-osr1 receive: new content!
-osr2 receive: new content!&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;20-state-状态-对象行为&#34;&gt;20、state（状态）（对象行为）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/4xNqeSN.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：WifiStateMachine&lt;/p&gt;
-
-&lt;p&gt;状态模式把对象行为包装在不同的状态对象里，意图是让一个对象在内部状态改变的时候行为也跟着改变。&lt;/p&gt;
-
-&lt;p&gt;*状态封装成接口&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;  1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 70
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 71
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 72
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 73
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 74
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 75
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 76
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 77
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 78
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 79
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 80
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 81
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 82
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 83
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 84
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 85
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 86
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 87
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 88
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 89
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 90
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 91
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 92
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 93
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 94
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 95
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 96
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 97
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 98
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 99
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;100
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;101
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;102
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;103
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;104
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;105
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;106
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;107
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class State {
-
-    public static void main(String[] args) {
-        TvController tvController = new TvController();
-        tvController.downVolme();
-        tvController.powerOn();
-        tvController.downVolme();
-        tvController.powerOff();
-        tvController.preChannel();
-        tvController.powerOn();
-        tvController.nextChannel();
+    } else if (mAttachInfo.mAccessibilityFocusDrawable != null) {
+        mAttachInfo.mAccessibilityFocusDrawable.setBounds(0, 0, 0, 0);
     }
 }
 
-interface TvState{
-    void upVolume();
-    void downVolme();
-    void nextChannel();
-    void preChannel();
+private boolean getAccessibilityFocusedRect(Rect bounds) {
+    final AccessibilityManager manager = AccessibilityManager.getInstance(mView.mContext);
+    if (!manager.isEnabled() || !manager.isTouchExplorationEnabled()) {
+        return false;
+    }
+
+    final View host = mAccessibilityFocusedHost;
+    if (host == null || host.mAttachInfo == null) {
+        return false;
+    }
+
+    final AccessibilityNodeProvider provider = host.getAccessibilityNodeProvider();
+    if (provider == null) {
+        host.getBoundsOnScreen(bounds, true);
+    } else if (mAccessibilityFocusedVirtualView != null) {
+        mAccessibilityFocusedVirtualView.getBoundsInScreen(bounds);
+    } else {
+        return false;
+    }
+
+    // Transform the rect into window-relative coordinates.
+    final AttachInfo attachInfo = mAttachInfo;
+    bounds.offset(0, attachInfo.mViewRootImpl.mScrollY);
+    bounds.offset(-attachInfo.mWindowLeft, -attachInfo.mWindowTop);
+    if (!bounds.intersect(0, 0, attachInfo.mViewRootImpl.mWidth,
+            attachInfo.mViewRootImpl.mHeight)) {
+        // If no intersection, set bounds to empty.
+        bounds.setEmpty();
+    }
+    return !bounds.isEmpty();
 }
+&lt;/code&gt;&lt;/pre&gt;
 
-class PowerOffState implements TvState{
+&lt;p&gt;可以看出，绿框出现的条件有AccessibilityManager可用（isEnabled）、开启了TouchExploration模式（同上第二点）等。&lt;/p&gt;
 
-    @Override
-    public void upVolume() {
-        System.out.println(&amp;#34;TV is PowerOff&amp;#34;);
-    }
+&lt;p&gt;4.talkback如何获取view的内容从而调用tts进行朗读？&lt;/p&gt;
 
-    @Override
-    public void downVolme() {
-        System.out.println(&amp;#34;TV is PowerOff&amp;#34;);
-    }
+&lt;p&gt;5.为什么实现了AccessibilityService的apk安装后设置无障碍就会出现相关的开关？&lt;/p&gt;
 
-    @Override
-    public void nextChannel() {
-        System.out.println(&amp;#34;TV is PowerOff&amp;#34;);
-    }
+&lt;p&gt;有待研究，猜测是从PKMS中查询。&lt;/p&gt;
 
-    @Override
-    public void preChannel() {
-        System.out.println(&amp;#34;TV is PowerOff&amp;#34;);
-    }
-}
-
-class PowerOnState implements TvState{
-
-    @Override
-    public void upVolume() {
-        System.out.println(&amp;#34;upVolume&amp;#34;);
-    }
-
-    @Override
-    public void downVolme() {
-        System.out.println(&amp;#34;downVolme&amp;#34;);
-    }
-
-    @Override
-    public void nextChannel() {
-        System.out.println(&amp;#34;nextChannel&amp;#34;);
-    }
-
-    @Override
-    public void preChannel() {
-        System.out.println(&amp;#34;preChannel&amp;#34;);
-    }
-}
-
-class TvController{
-    TvState tvState = new PowerOffState();;
-    public void powerOn(){
-        tvState = new PowerOnState();
-        System.out.println(&amp;#34;PowerOn TV!&amp;#34;);
-    }
-
-    public void powerOff(){
-        tvState = new PowerOffState();
-        System.out.println(&amp;#34;PowerOff TV!&amp;#34;);
-    }
-
-
-    public void upVolume() {
-        tvState.upVolume();
-    }
-
-
-    public void downVolme() {
-        tvState.downVolme();
-    }
-
-
-    public void nextChannel() {
-        tvState.nextChannel();
-    }
-
-
-    public void preChannel() {
-        tvState.preChannel();
-    }
-}
-//output:
-TV is PowerOff
-PowerOn TV!
-downVolme
-PowerOff TV!
-TV is PowerOff
-PowerOn TV!
-nextChannel&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;h4 id=&#34;21-strategy-策略-对象行为&#34;&gt;21、strategy（策略）（对象行为）&lt;/h4&gt;
-
-&lt;p&gt;实际应用：ImageLoader中的各种MemoryCache算法，android实现动画效果的各种插值器算法。&lt;/p&gt;
-
-&lt;p&gt;对算法进行封装，让各个算法直接可以相互替换。&lt;/p&gt;
-
-&lt;p&gt;*方法封装成对象&lt;/p&gt;
-
-&lt;h4 id=&#34;22-template-method-模板方法-类行为&#34;&gt;22、template method（模板方法）（类行为）&lt;/h4&gt;
-
-&lt;p&gt;实际应用：asyncTask，Activity（生命周期方法）&lt;/p&gt;
-
-&lt;p&gt;定义一个算法框架，让其实现延迟到子类。&lt;/p&gt;
-
-&lt;h4 id=&#34;23-visitor-访问者-对象行为&#34;&gt;23、visitor（访问者）（对象行为）&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://i.imgur.com/WPhL7iD.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;实际应用：注解框架的实现（ButterKnife）&lt;/p&gt;
-
-&lt;p&gt;是为了将数据操作与数据结构分离的模式。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;&lt;span class=&#34;lnt&#34;&gt;  1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  3
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  4
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  5
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  6
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  7
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  8
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  9
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 10
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 11
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 12
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 13
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 14
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 15
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 16
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 17
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 18
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 19
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 20
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 21
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 22
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 23
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 24
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 25
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 26
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 27
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 28
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 29
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 30
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 31
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 32
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 33
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 34
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 35
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 36
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 37
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 38
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 39
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 40
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 41
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 42
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 43
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 44
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 45
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 46
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 47
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 48
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 49
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 50
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 51
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 52
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 53
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 54
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 55
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 56
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 57
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 58
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 59
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 60
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 61
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 62
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 63
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 64
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 65
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 66
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 67
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 68
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 69
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 70
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 71
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 72
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 73
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 74
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 75
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 76
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 77
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 78
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 79
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 80
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 81
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 82
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 83
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 84
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 85
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 86
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 87
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 88
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 89
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 90
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 91
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 92
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 93
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 94
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 95
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 96
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 97
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 98
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 99
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;100
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;101
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;102
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;103
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;104
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;105
-&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre class=&#34;chroma&#34;&gt;public class VisitorPattern {
-
-    public static void main(String[] args) {
-        Report report = new Report();
-        report.showReport(new VisitorA());
-        System.out.println(&amp;#34;----------------&amp;#34;);
-        report.showReport(new VisitorB());
-    }
-}
-
-abstract class Staff {
-    String name;
-    String sex;
-
-    public Staff(String name, String sex) {
-        super();
-        this.name = name;
-        this.sex = sex;
-    }
-
-    abstract void accept(Visitor visitor);
-}
-
-class StaffA extends Staff {
-
-    public StaffA(String name, String sex) {
-        super(name, sex);
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visitStaffA(this);
-    }
-}
-
-class StaffB extends Staff {
-
-    public StaffB(String name, String sex) {
-        super(name, sex);
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visitStaffB(this);
-    }
-}
-
-interface Visitor {
-    void visitStaffA(StaffA staffA);
-
-    void visitStaffB(StaffB staffB);
-}
-
-class VisitorA implements Visitor {
-
-    @Override
-    public void visitStaffA(StaffA staffA) {
-        System.out.println(staffA.name);
-    }
-
-    @Override
-    public void visitStaffB(StaffB staffB) {
-        System.out.println(staffB.name);
-    }
-}
-
-class VisitorB implements Visitor {
-
-    @Override
-    public void visitStaffA(StaffA staffA) {
-        System.out.println(staffA.sex);
-    }
-
-    @Override
-    public void visitStaffB(StaffB staffB) {
-        System.out.println(staffB.sex);
-    }
-}
-
-class Report {
-    List&amp;lt;Staff&amp;gt; list = new ArrayList&amp;lt;Staff&amp;gt;();
-
-    public Report() {
-        list.add(new StaffA(&amp;#34;AA&amp;#34;, &amp;#34;MALE&amp;#34;));
-        list.add(new StaffA(&amp;#34;AB&amp;#34;, &amp;#34;FEMALE&amp;#34;));
-        list.add(new StaffB(&amp;#34;BA&amp;#34;, &amp;#34;MALE&amp;#34;));
-        list.add(new StaffB(&amp;#34;BB&amp;#34;, &amp;#34;FEMALE&amp;#34;));
-    }
-
-    public void showReport(Visitor visitor) {
-        for (Staff staff : list) {
-            staff.accept(visitor);
-        }
-    }
-}
-//output：
-A
-A
-B
-B
-----------------
-MALE
-FEMALE
-MALE
-FEMALE&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;</description>
+&lt;p&gt;6.打开某个页面时talkback的默认焦点怎么来的？&lt;/p&gt;
+</description>
       
     </item>
     
