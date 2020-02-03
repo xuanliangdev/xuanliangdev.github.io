@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on xuanliang</title>
@@ -26,7 +26,7 @@
       <pubDate>Sat, 03 Aug 2019 00:00:00 +0000</pubDate>
       
       <guid>https://xuanliangdev.github.io/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/</guid>
-      <description>一、疑问： 1.无障碍机制涉及哪些模块？ 2.开启talkback后talkback手势生效原理？ 3.无障碍焦点的方框如何产生？ 4.talkba</description>
+      <description>一、整理原因： 为了辅助理解无障碍google官方开发文档api的原理。 二、参考文档 无障碍开发google官方文档 三、无障碍服务框架结构分析 3</description>
     </item>
     
   </channel>

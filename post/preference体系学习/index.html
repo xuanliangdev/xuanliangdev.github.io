@@ -32,10 +32,12 @@
 
 
 
-<meta name="generator" content="Hugo 0.55.5" />
+<meta name="generator" content="Hugo 0.63.2" />
 
 
 <link rel="canonical" href="https://xuanliangdev.github.io/post/preference%E4%BD%93%E7%B3%BB%E5%AD%A6%E4%B9%A0/" />
+
+
 
 
 
@@ -51,7 +53,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.31c4b7729c8d71cc152f8de4203d90bfd8a04f7eab69372de7234ebf55b7701b.css" integrity="sha256-McS3cpyNccwVL43kID2Qv9igT36raTct5yNOv1W3cBs=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.0995afa14b62cd93e93cfc066b646c4c17a3eddca0e9d52a1d9dcf5d90aaacd3.css" integrity="sha256-CZWvoUtizZPpPPwGa2RsTBej7dyg6dUqHZ3PXZCqrNM=" media="screen" crossorigin="anonymous">
 
 
 
@@ -61,21 +63,17 @@
 <meta property="og:description" content="1.preference体系学习总结 类图 第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分） 1.1 数据结构描述 1.1.1 pref" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xuanliangdev.github.io/post/preference%E4%BD%93%E7%B3%BB%E5%AD%A6%E4%B9%A0/" />
-<meta property="article:published_time" content="2019-08-03T00:00:00&#43;00:00"/>
-<meta property="article:modified_time" content="2019-08-03T00:00:00&#43;00:00"/>
-
+<meta property="article:published_time" content="2019-08-03T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-08-03T00:00:00+00:00" />
 <meta itemprop="name" content="preference体系学习总结">
 <meta itemprop="description" content="1.preference体系学习总结 类图 第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分） 1.1 数据结构描述 1.1.1 pref">
-
-
 <meta itemprop="datePublished" content="2019-08-03T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-08-03T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="11468">
+<meta itemprop="wordCount" content="11460">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="preference体系学习总结"/>
 <meta name="twitter:description" content="1.preference体系学习总结 类图 第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分） 1.1 数据结构描述 1.1.1 pref"/>
 
@@ -137,7 +135,7 @@
         
           
           
-            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">关于</a>
           
         
       </li>
@@ -273,7 +271,7 @@
         
           
           
-            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">关于</a>
           
 
         
@@ -320,321 +318,209 @@
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li><a href="#1-preference体系学习总结">1.preference体系学习总结</a>
-<ul>
-<li><a href="#1-1-数据结构描述">1.1 数据结构描述</a></li>
-<li><a href="#1-2-preferencefragment加载xml源码分析-旧">1.2 PreferenceFragment加载xml源码分析（旧）</a></li>
-<li><a href="#1-3-preferencefragment点击事件触发流程-旧">1.3  PreferenceFragment点击事件触发流程（旧）</a></li>
-<li><a href="#1-4-preferenceactivity加载xml源码分析">1.4 PreferenceActivity加载xml源码分析</a></li>
-<li><a href="#1-5-preferenceactivity点击事件触发流程">1.5. PreferenceActivity点击事件触发流程</a></li>
-</ul></li>
-<li><a href="#2-aosp中setting模块学习总结">2.aosp中Setting模块学习总结</a>
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#2-1-settings主页面的显示分析">2.1 Settings主页面的显示分析：</a>
-<ul>
-<li><a href="#1-settingsactivity的oncreate流程">1. SettingsActivity的onCreate流程</a></li>
-<li><a href="#2-settingsactivity的onresume流程">2. SettingsActivity的onResume流程</a></li>
-</ul></li>
-</ul></li>
-<li><a href="#2-2-securitysettings页面的显示流程分析">2.2 SecuritySettings页面的显示流程分析：</a>
-<ul>
-<li><a href="#2-2-1-dashboardfragmenet的onattach流程">2.2.1.DashboardFragmenet的onAttach流程</a></li>
-<li><a href="#2-2-1-dashboardfragmenet的oncreate流程">2.2.1.DashboardFragmenet的onCreate流程</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-<li><a href="#3-aosp-8-0-settingssearch分析">3.aosp 8.0 SettingsSearch分析</a>
-<ul>
-<li><a href="#3-1搜索的数据源">3.1搜索的数据源</a></li>
-<li><a href="#3-2数据库构建过程">3.2数据库构建过程</a></li>
-</ul></li>
-<li><a href="#3-3数据搜索以及显示过程">3.3数据搜索以及显示过程</a></li>
-</ul>
+  <ul>
+    <li><a href="#11-数据结构描述">1.1 数据结构描述</a></li>
+    <li><a href="#12-preferencefragment加载xml源码分析旧">1.2 PreferenceFragment加载xml源码分析（旧）</a></li>
+    <li><a href="#13--preferencefragment点击事件触发流程旧">1.3  PreferenceFragment点击事件触发流程（旧）</a></li>
+    <li><a href="#14-preferenceactivity加载xml源码分析">1.4 PreferenceActivity加载xml源码分析</a></li>
+    <li><a href="#15-preferenceactivity点击事件触发流程">1.5. PreferenceActivity点击事件触发流程</a></li>
+  </ul>
+
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+        <li><a href="#22-securitysettings页面的显示流程分析">2.2 SecuritySettings页面的显示流程分析：</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#31搜索的数据源">3.1搜索的数据源</a></li>
+    <li><a href="#32数据库构建过程">3.2数据库构建过程</a></li>
+  </ul>
 </nav>
   </div>
 </div>
 
     
     <div class="post-content">
-      
-
-<h1 id="1-preference体系学习总结">1.preference体系学习总结</h1>
-
+      <h1 id="1preference体系学习总结">1.preference体系学习总结</h1>
 <p>类图</p>
-
-<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx3akmgz13j31cg133k17.jpg" alt="preferenceclass" /></p>
-
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx3akmgz13j31cg133k17.jpg" alt="preferenceclass"></p>
 <p>第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分）</p>
-
-<h2 id="1-1-数据结构描述">1.1 数据结构描述</h2>
-
+<h2 id="11-数据结构描述">1.1 数据结构描述</h2>
 <p><strong>1.1.1</strong> <strong>preference</strong>：</p>
-
 <p>设置的基石，简单来讲可以认为是设置列表中的每一个项目。</p>
-
 <p>其中有个重要的方法getView，这个方法返回的View将会被添加到PreferenceFragment或PreferenceActivity里</p>
-
 <p>作用：提供一个view给即将被展示的activity并且关联一个sharepreferences来保存或取出preference数据，其他常用的preference子类都继承于该类从而进行view样式的改变。</p>
-
 <p><strong>1.1.2（v7包的Preference）</strong></p>
-
 <p>去除了getView方法，增加了继承于RecycleView.ViewHolder的PreferenceViewHolder类</p>
-
-<hr />
-
+<hr>
 <p><strong>1.1.3</strong> <strong>PreferenceGroup</strong>:</p>
-
 <p>继承于PreferenceGroup，内部维护了一个元素为Preference的List，和Preference的关系类似于View和ViewGroup一样，采用了组合模式进行组织。</p>
-
 <p><strong>1.1.4（v7包的PreferenceGroup）</strong></p>
-
 <p>与旧实现类似，改动不大</p>
-
-<hr />
-
+<hr>
 <p><strong>1.1.5</strong> <strong>PreferenceScreen</strong>：</p>
-
 <p>继承于PreferenceGroup，是一个界面的root节点。当一个PreferenceScreen嵌套在另一个PreferenceScreen内部时会以Dialog的形式开启一个新的界面进行显示。</p>
-
-<p>内部持有一个listView，一个listAdapter（PreferenceGroupAdapter），持有一个layout文件&rdquo;com.android.internal.R.layout.preference_list_fragment&rdquo;的id，还有一个Dialog，用于展示嵌套的preferenceScreen</p>
-
+<p>内部持有一个listView，一个listAdapter（PreferenceGroupAdapter），持有一个layout文件&quot;com.android.internal.R.layout.preference_list_fragment&quot;的id，还有一个Dialog，用于展示嵌套的preferenceScreen</p>
 <p><strong>1.1.6 （v7包的PreferenceScreen）</strong></p>
-
 <p>与旧实现对比解耦了关联的View体系的东西，更加简洁。</p>
-
-<hr />
-
+<hr>
 <p><strong>1.1.7 PreferenceManager</strong> ：</p>
-
 <p>管理类，用XmlPullParser遍历解析xml文件来创建preference。</p>
-
 <p>1.重要的属性</p>
-
 <p>activity，fragment，sharepreference，preferenceDataStore，preferenceScreen；</p>
-
 <p>关联了一个根布局“PreferenceScreen”，和SharedPreference进行交互。</p>
-
 <p>2.重要的方法</p>
-
 <p>inflateFromResource：通过PreferenceInflater（继承于GenericInflater）递归地扫描xml文件取出所有节点信息来构建出PreferenceScreen对象。</p>
-
 <p><strong>1.1.8 （v14包的PreferenceManager）</strong></p>
-
 <p>增加了一些接口OnDisplayPreferenceDialogListener、OnNavigateToScreenListener</p>
-
-<hr />
-
+<hr>
 <p><strong>1.1.9 PreferenceFragment：</strong></p>
-
 <p>用于显示preference对象列表</p>
-
 <p>持有一个listView，最终会关联到PreferenceScreen的listView，实现了onPreferenceTreeClick接口，这个接口会在ListView的项被点击时回调。</p>
-
 <p><strong>1.1.10（v14包的PreferenceFragment）</strong></p>
-
 <p>与旧实现相比改动较大。主要是采用了RecyclerView并且实现了一些Dialog的接口。</p>
-
 <p>关联了recycleView和preferenceManager</p>
-
-<hr />
-
+<hr>
 <p><strong>1.1.11 PreferenceActivity</strong></p>
-
 <p>继承于ListActivity，重要的内部类</p>
-
 <p>Header：</p>
-
 <p>Header包含的属性：</p>
-
 <p>1.title； 2.summary；3.icon；4.fragment；5.intent；6.bundle；</p>
-
 <p>HeaderAdapter</p>
-
 <p>HeaderAdapter包含的属性：1.icon；2.title；3.summary</p>
-
 <p>从这个adapter和layout布局(preference_header_item.xml)可以看出一个header只有这三项。</p>
-
-<hr />
-
-<h2 id="1-2-preferencefragment加载xml源码分析-旧">1.2 PreferenceFragment加载xml源码分析（旧）</h2>
-
-<p><img src="https://ws3.sinaimg.cn/large/006tNbRwgy1fwwaqbe99dj30ul14l76u.jpg" alt="PreferenceFragmentBuild" /></p>
-
+<hr>
+<h2 id="12-preferencefragment加载xml源码分析旧">1.2 PreferenceFragment加载xml源码分析（旧）</h2>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwgy1fwwaqbe99dj30ul14l76u.jpg" alt="PreferenceFragmentBuild"></p>
 <p>重要流程说明：</p>
-
 <p>第8步：PreferenceInflater是一个xml解析器，通过解析xml取出节点，然后反射生成PreferenceScreen对象</p>
-
-<h2 id="1-3-preferencefragment点击事件触发流程-旧">1.3  PreferenceFragment点击事件触发流程（旧）</h2>
-
+<h2 id="13--preferencefragment点击事件触发流程旧">1.3  PreferenceFragment点击事件触发流程（旧）</h2>
 <pre><code>AbsListView里的onKeyUp
     AdapterView里的performItemClick
         OnItemClickListener的onItemClick
             Preference的performClick
                 PreferenceManager.OnPreferenceTreeClickListener的onPreferenceTreeClick
 </code></pre>
-
-<h2 id="1-4-preferenceactivity加载xml源码分析">1.4 PreferenceActivity加载xml源码分析</h2>
-
-<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fwgb5lgqgfj30ol0ktab8.jpg" alt="preferenceActivityonCreate" /></p>
-
+<h2 id="14-preferenceactivity加载xml源码分析">1.4 PreferenceActivity加载xml源码分析</h2>
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fwgb5lgqgfj30ol0ktab8.jpg" alt="preferenceActivityonCreate"></p>
 <p>重要流程说明：</p>
-
 <p>第4步：生成Header的方式也是通过xml解析器解析xml的header节点然后反射生成Header对象。</p>
-
-<hr />
-
+<hr>
 <p>无论是新的loadHeadersFromResource还是旧的addPreferencesFromResource，底层解析xml都用的XmlPullParser类。</p>
-
-<h2 id="1-5-preferenceactivity点击事件触发流程">1.5. PreferenceActivity点击事件触发流程</h2>
-
-<pre><code>AbsListView里的onKeyUp    
+<h2 id="15-preferenceactivity点击事件触发流程">1.5. PreferenceActivity点击事件触发流程</h2>
+<pre><code>AbsListView里的onKeyUp	
     AdapterView里的performItemClick
         OnItemClickListener的onItemClick
             ListActivity里的onListItemClick
                 PreferenceAcitvity里的onHeaderClick
                     然后根据fragment是否为空来执行switchToHeader或者startActivity
 </code></pre>
-
-<hr />
-
-<h1 id="2-aosp中setting模块学习总结">2.aosp中Setting模块学习总结</h1>
-
+<hr>
+<h1 id="2aosp中setting模块学习总结">2.aosp中Setting模块学习总结</h1>
 <p>类图</p>
-
-<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx3akmgz13j31cg133k17.jpg" alt="preferenceclass" /></p>
-
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx3akmgz13j31cg133k17.jpg" alt="preferenceclass"></p>
 <p>主要分析只在系统Settings中使用的部分（除去上面分析过的蓝色和绿色部分）</p>
-
-<h4 id="2-1-settings主页面的显示分析">2.1 Settings主页面的显示分析：</h4>
-
-<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fwv0gkkantj309c0ibmz4.jpg" alt="pscreen" /></p>
-
+<h4 id="21-settings主页面的显示分析">2.1 Settings主页面的显示分析：</h4>
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fwv0gkkantj309c0ibmz4.jpg" alt="pscreen"></p>
 <p>aosp中P版本设置界面如上图所示，除去没显示的，主界面中一共展示了12个列表项，先分析列表项，后面再分析搜索和suggestion项。</p>
-
 <p>主Activity为Settings，继承于SettingsActivity，内部包含一个DashboardSummary的Fragment，从类图上看出DashboardSummary并没有用到preference的那一套东西。布局也相对简单，只有一个FocusRecyclerView，页面的布局由DashboardAdapter负责，DashboardAdapter用到的所有数据由DashboardData进行描述。这里只分析DashboardData中的DashboardCategory，也就是12个列表项所属的DashboardCategory，对于设置主界面来说只有一个DashboardCategory，如下：</p>
-
 <pre><code>&lt;meta-data android:name=&quot;com.android.settings.category&quot;
     android:value=&quot;com.android.settings.category.ia.homepage&quot;/&gt;
-</code></pre>
-
-<p>从android manifest中也可以看到12个这样的数据，代表主界面的12个列表项。</p>
-
+</code></pre><p>从android manifest中也可以看到12个这样的数据，代表主界面的12个列表项。</p>
 <p>从类图中可以看出一个列表项由<strong>Tile</strong>这样一个数据结构进行描述：</p>
-
 <pre><code>public class Tile implements Parcelable {
     public CharSequence title;
     public CharSequence summary;
     public Icon icon;
-</code></pre>
-
-<p><strong>DashboardCategory</strong>表示一个类别，持有一个元素为Tile的List表；</p>
-
+</code></pre><p><strong>DashboardCategory</strong>表示一个类别，持有一个元素为Tile的List表；</p>
 <p>可以发现Dashboard和Preference有很多相似的地方</p>
-
 <pre><code>/**
  * Base fragment for dashboard style UI containing a list of static and dynamic setting items.
  */
-</code></pre>
-
-<p>从注释可以看出DashboardFragment是为了动态加载而设计的，相对于Preference是静态地从xml文件中解析读取的。</p>
-
+</code></pre><p>从注释可以看出DashboardFragment是为了动态加载而设计的，相对于Preference是静态地从xml文件中解析读取的。</p>
 <p><strong>CategoryManager</strong>主要是对DashboardCategory进行管理，内部会借助于<strong>TileUtils</strong>来生成DashboardCategory对象，在生成DashboardCategory对象时会借助PackageManager来查询手机中的安装包信息来进行分析，来动态决定是否展示一些项。</p>
-
 <p><strong>DashboardFeatureProviderImpl</strong>实现了<strong>DashboardFeatureProvider</strong>接口，持有CategoryManager对象，通过CategoryManager对象进行Category的获取</p>
-
 <p><strong>SuggestionFeatureProviderImpl</strong>实现了<strong>SuggestionFeatureProvider</strong>接口，应该是用于获取推荐信息，后面再分析。</p>
-
 <p><strong>FeatureFactoryImpl</strong>实现了<strong>FeatureFactory</strong>接口，通过反射生成，用于生成DashboardFeatureProviderImpl和SuggestionFeatureProviderImpl等一些FeatureProvider对象。</p>
-
 <p>整个设置主界面加载流程大致如图所示</p>
-
-<p><img src="https://ws4.sinaimg.cn/large/006tNbRwgy1fww0pjn6xtj31kw1oewmo.jpg" alt="dashboardsummary" /></p>
-
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwgy1fww0pjn6xtj31kw1oewmo.jpg" alt="dashboardsummary"></p>
 <p>图中绿色为主线程，其他线程为后台线程。</p>
-
 <p>对于流程做个简单的分析。</p>
-
 <h5 id="1-settingsactivity的oncreate流程">1. SettingsActivity的onCreate流程</h5>
-
 <p>在这个过程中会进行FeatureFactory、DashboardFeatureProvider、CategoryManager的初始化，并且如果判断是主界面，则启动DashboardSummary这个Fragment。</p>
-
 <ul>
-<li><p>1.1 DashboardSummary在onAttach中会创建SuggestionFeatureProvider，使之来进行推荐功能的实现。</p></li>
-
-<li><p>1.2 DashboardSummary在onCreate中会成创建DashboardFeatureProvider，以及新建一个SummaryLoader，用&rdquo;om.android.settings.category.ia.homepage&rdquo;来作为CategoryKey，SummaryLoader构造时会启动一个HandlerThread来在后台运行，以便随时接受主线程发过来的消息从而触发SummaryProvider的setListening方法进行Summary的更新，比如更新存储空间或者电量的百分比，或者根据不同的手机特性显示不同的Summary，比如在安全设置Fragment中对于支持指纹的手机显示&rdquo;屏幕锁定、指纹&rdquo;，不支持指纹的手机仅显示&rdquo;屏幕锁定&rdquo;。</p></li>
-
-<li><p>1.3  DashboardSummary在onCreateView中会进行view相关的处理，rootview为R.layout.dashboard，这个view中只有一个简单的RecycleView，创建DashboardAdapter，执行rebuildUI方法，该方法启动一个后台线程调用updateCategory来进行Category的更新，更新完毕通过notifyDashboardDataChanged通知主线程进行view的更新，如果需要加载推荐项，推荐项没加载，则向主线程发送一个延迟更新view的消息，通过Handler的postDelayed方法实现。</p></li>
+<li>
+<p>1.1 DashboardSummary在onAttach中会创建SuggestionFeatureProvider，使之来进行推荐功能的实现。</p>
+</li>
+<li>
+<p>1.2 DashboardSummary在onCreate中会成创建DashboardFeatureProvider，以及新建一个SummaryLoader，用&quot;om.android.settings.category.ia.homepage&quot;来作为CategoryKey，SummaryLoader构造时会启动一个HandlerThread来在后台运行，以便随时接受主线程发过来的消息从而触发SummaryProvider的setListening方法进行Summary的更新，比如更新存储空间或者电量的百分比，或者根据不同的手机特性显示不同的Summary，比如在安全设置Fragment中对于支持指纹的手机显示&quot;屏幕锁定、指纹&rdquo;，不支持指纹的手机仅显示&quot;屏幕锁定&rdquo;。</p>
+</li>
+<li>
+<p>1.3  DashboardSummary在onCreateView中会进行view相关的处理，rootview为R.layout.dashboard，这个view中只有一个简单的RecycleView，创建DashboardAdapter，执行rebuildUI方法，该方法启动一个后台线程调用updateCategory来进行Category的更新，更新完毕通过notifyDashboardDataChanged通知主线程进行view的更新，如果需要加载推荐项，推荐项没加载，则向主线程发送一个延迟更新view的消息，通过Handler的postDelayed方法实现。</p>
+</li>
 </ul>
-
 <h5 id="2-settingsactivity的onresume流程">2. SettingsActivity的onResume流程</h5>
-
 <ul>
-<li><p>2.1 这个方法首先会在父类SettingsDrawerActivity的onResume中执行CategoriesUpdateTask，来在后台更新所有的Categories，调用完毕后回主线程调用CategoryListener接口的onCategoriesChanged方法，DashboardFrament和DashboardSummary实现了该接口来进行Category的刷新。</p></li>
-
-<li><p>2.2 SettingsAcitvity在重写onResume后再次向AsyncTask中post一个doUpdateTilesList的方法，这个方法会排在CategoriesUpdateTask之后执行，也是用来更新Categories的。</p></li>
-
-<li><p>2.3 在DashboardSummary的onResume中，会调用SummaryLoader的setListening方法，这个方法会向HandlerThread中post消息，分析这个消息类型MSG_GET_CATEGORY_TILES_AND_SET_LISTENING，对应时序图的47步，在后台线程获取到category后，遍历所有的tile，调用makeProviderW方法，因为所有该category下的Fragment都实现了SummaryProvider以及SummaryLoader.SummaryProviderFactory，SummaryProvider实现了SummaryLoader.SummaryProvider接口，因此通过tile找到相关的factory后，再通过反射生成SummaryProvider对象，如时序图的52步。紧接着在setListeningW中遍历调用所有的SummaryProvider的setListening方法，这个方法进一步触发SummaryLoader的setSummary方法来进行各个列表项summary的动态变化，比如电量的更新等。</p>
-
+<li>
+<p>2.1 这个方法首先会在父类SettingsDrawerActivity的onResume中执行CategoriesUpdateTask，来在后台更新所有的Categories，调用完毕后回主线程调用CategoryListener接口的onCategoriesChanged方法，DashboardFrament和DashboardSummary实现了该接口来进行Category的刷新。</p>
+</li>
+<li>
+<p>2.2 SettingsAcitvity在重写onResume后再次向AsyncTask中post一个doUpdateTilesList的方法，这个方法会排在CategoriesUpdateTask之后执行，也是用来更新Categories的。</p>
+</li>
+<li>
+<p>2.3 在DashboardSummary的onResume中，会调用SummaryLoader的setListening方法，这个方法会向HandlerThread中post消息，分析这个消息类型MSG_GET_CATEGORY_TILES_AND_SET_LISTENING，对应时序图的47步，在后台线程获取到category后，遍历所有的tile，调用makeProviderW方法，因为所有该category下的Fragment都实现了SummaryProvider以及SummaryLoader.SummaryProviderFactory，SummaryProvider实现了SummaryLoader.SummaryProvider接口，因此通过tile找到相关的factory后，再通过反射生成SummaryProvider对象，如时序图的52步。紧接着在setListeningW中遍历调用所有的SummaryProvider的setListening方法，这个方法进一步触发SummaryLoader的setSummary方法来进行各个列表项summary的动态变化，比如电量的更新等。</p>
 <pre><code>public void setSummary(SummaryProvider provider, final CharSequence summary) {
-  final ComponentName component = mSummaryProviderMap.get(provider);
-  ThreadUtils.postOnMainThread(() -&gt; {
+    final ComponentName component = mSummaryProviderMap.get(provider);
+    ThreadUtils.postOnMainThread(() -&gt; {
   
-      final Tile tile = getTileFromCategory(
-              mDashboardFeatureProvider.getTilesForCategory(mCategoryKey), component);
+        final Tile tile = getTileFromCategory(
+                mDashboardFeatureProvider.getTilesForCategory(mCategoryKey), component);
   
-      if (tile == null) {
-          if (DEBUG) {
-              Log.d(TAG, &quot;Can't find tile for &quot; + component);
-          }
-          return;
-      }
-      if (DEBUG) {
-          Log.d(TAG, &quot;setSummary &quot; + tile.title + &quot; - &quot; + summary);
-      }
+        if (tile == null) {
+            if (DEBUG) {
+                Log.d(TAG, &quot;Can't find tile for &quot; + component);
+            }
+            return;
+        }
+        if (DEBUG) {
+            Log.d(TAG, &quot;setSummary &quot; + tile.title + &quot; - &quot; + summary);
+        }
   
-      updateSummaryIfNeeded(tile, summary);
-  });
+        updateSummaryIfNeeded(tile, summary);
+    });
 }
   
 @VisibleForTesting
 void updateSummaryIfNeeded(Tile tile, CharSequence summary) {
-  if (TextUtils.equals(tile.summary, summary)) {
-      if (DEBUG) {
-          Log.d(TAG, &quot;Summary doesn't change, skipping summary update for &quot; + tile.title);
-      }
-      return;
-  }
-  mSummaryTextMap.put(mDashboardFeatureProvider.getDashboardKeyForTile(tile), summary);
-  tile.summary = summary;
-  if (mSummaryConsumer != null) {
-      mSummaryConsumer.notifySummaryChanged(tile);
-  } else {
-      if (DEBUG) {
-          Log.d(TAG, &quot;SummaryConsumer is null, skipping summary update for &quot;
-                  + tile.title);
-      }
-  }
+    if (TextUtils.equals(tile.summary, summary)) {
+        if (DEBUG) {
+            Log.d(TAG, &quot;Summary doesn't change, skipping summary update for &quot; + tile.title);
+        }
+        return;
+    }
+    mSummaryTextMap.put(mDashboardFeatureProvider.getDashboardKeyForTile(tile), summary);
+    tile.summary = summary;
+    if (mSummaryConsumer != null) {
+        mSummaryConsumer.notifySummaryChanged(tile);
+    } else {
+        if (DEBUG) {
+            Log.d(TAG, &quot;SummaryConsumer is null, skipping summary update for &quot;
+                    + tile.title);
+        }
+    }
 }
-</code></pre></li>
+</code></pre><p>而在SummaryLoader的setSummary方法中再通过SummaryConsumer接口的notifySummaryChanged方法进行界面的更新，对于主界面来说是DashboardAdapter实现了SummaryConsumer接口，会直接触发notifyItemChanged来进行view的更新（对于其他DashboardFragment的子类来说则是父类DashboardFragment实现了SummaryConsumer接口，会触发Preference的setSummary方法，这个方法会调用notifyChanged方法，进而触发OnPreferenceChangeInternalListener的onPreferenceChange方法，而PreferenceGroupAdapter实现了该接口，因而也会触发notifyItemChanged来进行view的更新）。</p>
+</li>
 </ul>
-
-<p>而在SummaryLoader的setSummary方法中再通过SummaryConsumer接口的notifySummaryChanged方法进行界面的更新，对于主界面来说是DashboardAdapter实现了SummaryConsumer接口，会直接触发notifyItemChanged来进行view的更新（对于其他DashboardFragment的子类来说则是父类DashboardFragment实现了SummaryConsumer接口，会触发Preference的setSummary方法，这个方法会调用notifyChanged方法，进而触发OnPreferenceChangeInternalListener的onPreferenceChange方法，而PreferenceGroupAdapter实现了该接口，因而也会触发notifyItemChanged来进行view的更新）。</p>
-
-<h3 id="2-2-securitysettings页面的显示流程分析">2.2 SecuritySettings页面的显示流程分析：</h3>
-
+<h3 id="22-securitysettings页面的显示流程分析">2.2 SecuritySettings页面的显示流程分析：</h3>
 <p>Settings主界面的显示完全是动态的，而除去主界面其他的Fragment的显示则是动态和静态相结合，以要分析的SecuritySettings来说明。SecuritySettings的继承于DashboardFragment，而DashboardFragment主要就是用来加载动态和静态的item。DashboardFragment最终继承于PreferenceFragment，因此可以解析xml中配置的preference来进行显示，而且持有DashboardFeatureProviderImpl对象，因此也可以加载DashboardCategory中的Tile进行显示。</p>
-
 <p>SecuritySettings界面显示是这个样子的：</p>
-
-<p><img src="https://ws3.sinaimg.cn/large/006tNbRwgy1fww1moiavmj30990icwgc.jpg" alt="securitysettings" /></p>
-
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwgy1fww1moiavmj30990icwgc.jpg" alt="securitysettings"></p>
 <p>layout文件R.xml.security_dashboard_settings如下所示：</p>
-
 <pre><code>&lt;PreferenceScreen
     xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
     xmlns:settings=&quot;http://schemas.android.com/apk/res-auto&quot;
@@ -680,12 +566,8 @@ void updateSummaryIfNeeded(Tile tile, CharSequence summary) {
 ....
 
 &lt;/PreferenceScreen&gt;
-</code></pre>
-
-<p>代码里会解析这个xml文件来构造PreferenceScreen对象。</p>
-
+</code></pre><p>代码里会解析这个xml文件来构造PreferenceScreen对象。</p>
 <p>从图里看到并没有显示锁屏时的偏好设置这一个Preference的条目，从源码分析是LockScreenPreferenceController这个类动态的改变了这一个Preference的显示状态。</p>
-
 <pre><code>    @Override
     public int getAvailabilityStatus() {
         if (!mLockPatternUtils.isSecure(MY_USER_ID)) {
@@ -708,12 +590,8 @@ void updateSummaryIfNeeded(Tile tile, CharSequence summary) {
     public void onResume() {
         mPreference.setVisible(isAvailable());
     }
-</code></pre>
-
-<p>而这三个item其实是通过动态从DashboardTiles中取出来的。下面简单分析SecuritySettings的显示过程，主要是DashboardFragment的流程分析。</p>
-
-<h4 id="2-2-1-dashboardfragmenet的onattach流程">2.2.1.DashboardFragmenet的onAttach流程</h4>
-
+</code></pre><p>而这三个item其实是通过动态从DashboardTiles中取出来的。下面简单分析SecuritySettings的显示过程，主要是DashboardFragment的流程分析。</p>
+<h4 id="221dashboardfragmenet的onattach流程">2.2.1.DashboardFragmenet的onAttach流程</h4>
 <pre><code>@Override
 public void onAttach(Context context) {
     super.onAttach(context);
@@ -745,12 +623,8 @@ public void onAttach(Context context) {
         addPreferenceController(controller);
     }
 }
-</code></pre>
-
-<p>方法里主要是一些controllers的创建，这些controller可以从代码创建，也可以从xml解析获取，</p>
-
+</code></pre><p>方法里主要是一些controllers的创建，这些controller可以从代码创建，也可以从xml解析获取，</p>
 <p>在SecuritySettings里通过代码创建了一些controller，如：</p>
-
 <pre><code>    private static List&lt;AbstractPreferenceController&gt; buildPreferenceControllers(Context context,
             Lifecycle lifecycle, SecuritySettings host) {
         final List&lt;AbstractPreferenceController&gt; controllers = new ArrayList&lt;&gt;();
@@ -762,21 +636,14 @@ public void onAttach(Context context) {
 
         return controllers;
     }
-</code></pre>
-
-<p>在xml中是通过声明settings:controller属性来创建的，如</p>
-
+</code></pre><p>在xml中是通过声明settings:controller属性来创建的，如</p>
 <pre><code>&lt;SwitchPreference
     android:key=&quot;visiblepattern_profile&quot;
     android:summary=&quot;@string/summary_placeholder&quot;
     android:title=&quot;@string/lockpattern_settings_enable_visible_pattern_title_profile&quot;
     settings:controller=&quot;com.android.settings.security.VisiblePatternProfilePreferenceController&quot;/&gt;
-</code></pre>
-
-<h4 id="2-2-1-dashboardfragmenet的oncreate流程">2.2.1.DashboardFragmenet的onCreate流程</h4>
-
+</code></pre><h4 id="221dashboardfragmenet的oncreate流程">2.2.1.DashboardFragmenet的onCreate流程</h4>
 <p>DashboardFragmenet最终继承于v14包里的PreferenceFragment的onCreate方法，里面会调用onCreatePreferences方法，DashboardFragmenet重写了onCreatePreferences方法，进而调用refreshAllPreferences方法。</p>
-
 <pre><code>/**
  * Refresh all preference items, including both static prefs from xml, and dynamic items from
  * DashboardCategory.
@@ -793,10 +660,7 @@ private void refreshAllPreferences(final String TAG) {
 
     refreshDashboardTiles(TAG);
 }
-</code></pre>
-
-<p>从注释可以看出这个方法是这个Fragment显示流程的核心。</p>
-
+</code></pre><p>从注释可以看出这个方法是这个Fragment显示流程的核心。</p>
 <pre><code>/**
  * Displays resource based tiles.
  */
@@ -810,12 +674,8 @@ private void displayResourceTiles() {
     mPreferenceControllers.values().stream().flatMap(Collection::stream).forEach(
             controller -&gt; controller.displayPreference(screen));
 }
-</code></pre>
-
-<p>displayResourceTiles这个方法首先获取了PreferenceScreen，然后通过循环调用了每个controller的displayPreference方法</p>
-
+</code></pre><p>displayResourceTiles这个方法首先获取了PreferenceScreen，然后通过循环调用了每个controller的displayPreference方法</p>
 <p>以上面说的LockScreenPreferenceController为例，LockScreenPreferenceController继承于BasePreferenceController，因此会调用如下方法：</p>
-
 <pre><code>/**
  * Displays preference in this controller.
  */
@@ -830,12 +690,8 @@ public void displayPreference(PreferenceScreen screen) {
         }
     }
 }
-</code></pre>
-
-<p>从而来决定一个preference是否该显示。</p>
-
+</code></pre><p>从而来决定一个preference是否该显示。</p>
 <p>执行完displayResourceTiles后接着会执行refreshDashboardTiles方法，从注释也可以看出这个方法是用来展示动态DashboardCategory的item的</p>
-
 <pre><code>/**
  * Refresh preference items backed by DashboardCategory.
  */
@@ -871,18 +727,11 @@ void refreshDashboardTiles(final String TAG) {
     ...
     mSummaryLoader.setListening(true);
 }
-</code></pre>
-
-<p>5-11行取出相关key的tile对象。对于SecuritySettings来说key是&rdquo;com.android.settings.category.ia.security&rdquo;，三个tile的title为“Google Play 保护机制、查找我的设备、安全更新”，如前面一节所介绍的，这三项是从gms服务中取出的，并不是Settings app本身内置的，因此可以看作是动态加载。</p>
-
+</code></pre><p>5-11行取出相关key的tile对象。对于SecuritySettings来说key是&quot;com.android.settings.category.ia.security&rdquo;，三个tile的title为“Google Play 保护机制、查找我的设备、安全更新”，如前面一节所介绍的，这三项是从gms服务中取出的，并不是Settings app本身内置的，因此可以看作是动态加载。</p>
 <p>13行创建了一个SummaryLoader对象，从之前的分析可知，会创建一个HandlerThread置于后台运行。</p>
-
 <p>14行把自己设置为SummaryConsumer接口对象，当SummaryLoader后台更新完，会调用setListeningW，这个方法又会取出所有满足要求的SummaryProvider去执行setListening方法，SummaryProvider又会反过来调用SummaryLoader的setSummary方法，SummaryLoader这时会post一个updateSummaryIfNeeded方法到主线程执行，而这个方法会取出mSummaryConsumer也就是DashboardFragment去执行notifySummaryChanged方法，这个方法会获取tile关联的preference，执行其setSummary方法，这个方法又会调用notifyChanged方法，这个方法调用OnPreferenceChangeInternalListener接口的onPreferenceChange方法，而PreferenceGroupAdapter实现了这个接口，因此最终通过PreferenceGroupAdapter实现了view中Summary的更新。</p>
-
 <p>25-29行创建Preference对象，并且将Preference和Tile进行绑定，然后添加到PreferenceScreen中。</p>
-
 <p>34行调用SummaryLoader的setListening方法，从前面一节分析可知，这个操作会往后台HandlerThread发送一个消息，从而在后台监听Summary是否有更新</p>
-
 <pre><code>private SummaryProvider getSummaryProvider(Tile tile) {
     if (!mActivity.getPackageName().equals(tile.intent.getComponent().getPackageName())) {
         // Not within Settings, can't load Summary directly.
@@ -892,54 +741,29 @@ void refreshDashboardTiles(final String TAG) {
     ...
     return null;
 }
-</code></pre>
-
-<p>在SummaryLoader的getSummaryProvider方法第二行中当前包名为com.android.settings，而tile的包名为com.google.android.gms，因此返回空，从注释也可以看出，如果当前的tile不在Settings应用中，是不能获取到SummaryProvider的。因此后面的通知Adapter进行Summary的刷新操作也就不会执行了，</p>
-
-<h1 id="3-aosp-8-0-settingssearch分析">3.aosp 8.0 SettingsSearch分析</h1>
-
+</code></pre><p>在SummaryLoader的getSummaryProvider方法第二行中当前包名为com.android.settings，而tile的包名为com.google.android.gms，因此返回空，从注释也可以看出，如果当前的tile不在Settings应用中，是不能获取到SummaryProvider的。因此后面的通知Adapter进行Summary的刷新操作也就不会执行了，</p>
+<h1 id="3aosp-80-settingssearch分析">3.aosp 8.0 SettingsSearch分析</h1>
 <p>类图</p>
-
-<p><img src="https://ws4.sinaimg.cn/large/006tNbRwgy1fx3eqhh74zj30u017aqc3.jpg" alt="aospsearchclass" /></p>
-
-<h2 id="3-1搜索的数据源">3.1搜索的数据源</h2>
-
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwgy1fx3eqhh74zj30u017aqc3.jpg" alt="aospsearchclass"></p>
+<h2 id="31搜索的数据源">3.1搜索的数据源</h2>
 <p>SearchIndexableData:用于搜索的可索引数据</p>
-
 <p>SearchIndexableResource：xml资源</p>
-
 <p>SearchIndexableRaw：原始数据</p>
-
 <p>BaseColumns：基类，rank排名，className类名，iconResId等；</p>
-
 <p>XmlResource：xml的资源id，关联SearchIndexableResource</p>
-
 <p>RawData：原始数据，title标题，summary概要等；关联SearchIndexableData</p>
-
 <p>NonIndexableKey：描述一个不能被索引的数据</p>
-
 <p>SearchIndexablesProvider：用于搜索的可索引provider的基类，用于给搜索提供preference的xml文件数据或者原始数据。</p>
-
 <p>以上的类除了SearchIndexableRaw外其他都位于framework包中；</p>
-
 <p>以下的类或接口位于settings中；</p>
-
 <p>Indexable.SearchIndexProvider：接口，其实现类的实例可以提供可索引的数据</p>
-
 <p>SettingsSearchIndexablesProvider：设置app中的content provider，实现了SearchIndexablesPrevider的相关搜索方法，在phone的app中也有一个类似的实现:PhoneSearchIndexablesProvider，从而可以在设置的搜索中找到Phone中的xml数据进行跳转</p>
-
 <p>BaseSearchIndexProvider：</p>
-
 <p>IndexDatabaseHelper：提供数据库的操作，数据库文件位于data/user_de/0/com.android.settings/databases/search_index.db</p>
-
-<h2 id="3-2数据库构建过程">3.2数据库构建过程</h2>
-
+<h2 id="32数据库构建过程">3.2数据库构建过程</h2>
 <p>设置中的界面大部分都是通过xml文件中声明的Preference类的各种子类构建而成，页面打开时通过解析xml文件中的各个节点从而构建成listview中的各个item从而进行显示，以日期和时间页面DateTimeSettings为例:</p>
-
-<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx11cudlk5j307g0chjru.jpg" alt="datatimephone" /></p>
-
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx11cudlk5j307g0chjru.jpg" alt="datatimephone"></p>
 <p>构成这个界面的文件date_time_prefs.xml如下</p>
-
 <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 
 &lt;PreferenceScreen xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
@@ -983,27 +807,15 @@ void refreshDashboardTiles(final String TAG) {
         /&gt;
 
 &lt;/PreferenceScreen&gt;
-</code></pre>
-
-<p>上述的xml文件的每一项跟界面展示是一一对应的，实际情况也可能不一样，可以通过配置一些属性或者代码动态增删一些项。</p>
-
-<p>title为显示的标题，summary为摘要，keywords为关键词（不直接显示，用于搜索），留意上面的settings:keywords=&ldquo;@string/keywords_date_and_time&rdquo;中keywords_date_and_time的值为</p>
-
+</code></pre><p>上述的xml文件的每一项跟界面展示是一一对应的，实际情况也可能不一样，可以通过配置一些属性或者代码动态增删一些项。</p>
+<p>title为显示的标题，summary为摘要，keywords为关键词（不直接显示，用于搜索），留意上面的settings:keywords=&rdquo;@string/keywords_date_and_time&quot;中keywords_date_and_time的值为</p>
 <pre><code>string name=&quot;keywords_date_and_time&quot; msgid=&quot;758325881602648204&quot;&gt;&quot;时钟, 军用&quot;&lt;/string&gt;
-</code></pre>
-
-<p>上面写的是界面跟xml的关系，搜索过程是一个数据库的检索过程，因此搜索需要用到数据库，数据库数据的来源就是上面的xml文件，从模拟器取出search_index.db数据库观察，如下图</p>
-
-<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx1282l0m3j30t40fpq77.jpg" alt="searchdb" /></p>
-
+</code></pre><p>上面写的是界面跟xml的关系，搜索过程是一个数据库的检索过程，因此搜索需要用到数据库，数据库数据的来源就是上面的xml文件，从模拟器取出search_index.db数据库观察，如下图</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx1282l0m3j30t40fpq77.jpg" alt="searchdb"></p>
 <p>可见xml的数据跟数据库中的记录也是一一对应的，因此搜索过程就是数据库的检索过程，输入搜索的字符串最终会转换成SQL数据库查询语句从而返回查询结果。</p>
-
-<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx12ff9u4tj307j0d8aal.jpg" alt="军用" /></p>
-
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx12ff9u4tj307j0d8aal.jpg" alt="军用"></p>
 <p>之所以搜索军用能出现日期和时间的结果，是因为“军用”是keyword的一部分</p>
-
 <p>设置中也能搜索其他app的数据，只要其实现了SearchIndexablesProvider，以phone的app为例，</p>
-
 <pre><code>public class PhoneSearchIndexablesProvider extends SearchIndexablesProvider {
     private static final String TAG = &quot;PhoneSearchIndexablesProvider&quot;;
 
@@ -1021,30 +833,19 @@ void refreshDashboardTiles(final String TAG) {
     }
    ...
 }
-</code></pre>
-
-<p>这样实现后（还需要在AndroidManifest里面做些配置），设置app就能跨进程取到network_setting_fragment.xml中的数据并加入search_index.db数据库，如下</p>
-
-<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx12zl3typj30u30cc41w.jpg" alt="phonedb" /></p>
-
+</code></pre><p>这样实现后（还需要在AndroidManifest里面做些配置），设置app就能跨进程取到network_setting_fragment.xml中的数据并加入search_index.db数据库，如下</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx12zl3typj30u30cc41w.jpg" alt="phonedb"></p>
 <p>下面简单分析下数据库的创建过程：</p>
-
 <p>刚进入设置创建数据库流程如下：</p>
-
-<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx2a2t9qhzj31050t9gnq.jpg" alt="aospsearchcreatedb" /></p>
-
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx2a2t9qhzj31050t9gnq.jpg" alt="aospsearchcreatedb"></p>
 <p>当点击搜索按钮后会启动SearchFragment</p>
-
 <pre><code>@Override
 public void onAttach(Context context) {
     super.onAttach(context);
     mSearchFeatureProvider = FeatureFactory.getFactory(context).getSearchFeatureProvider();
     mMetricsFeatureProvider = FeatureFactory.getFactory(context).getMetricsFeatureProvider();
 }
-</code></pre>
-
-<p>首先会创建mSearchFeatureProvider，</p>
-
+</code></pre><p>首先会创建mSearchFeatureProvider，</p>
 <pre><code>@Override
 public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -1065,36 +866,25 @@ public void onCreate(Bundle savedInstanceState) {
         Log.w(TAG, &quot;Cannot update the Indexer as we are running low on storage space!&quot;);
     }
 }
-</code></pre>
-
-<p>在onCreate中会执行索引过程，</p>
-
+</code></pre><p>在onCreate中会执行索引过程，</p>
 <pre><code>@Override
 public void updateIndex(Context context, IndexingCallback callback) {
     long indexStartTime = System.currentTimeMillis();
     getIndexingManager(context).indexDatabase(callback);
     ...
 }
-</code></pre>
-
-<p>接着会执行IndexManager的indexDatabase方法</p>
-
+</code></pre><p>接着会执行IndexManager的indexDatabase方法</p>
 <pre><code>public void indexDatabase(IndexingCallback callback) {
     IndexingTask task = new IndexingTask(callback);
     task.execute();
 }
-</code></pre>
-
-<p>开启了一个台任务，IndexingTask是一个AsyncTask，后台执行performIndexing方法</p>
-
+</code></pre><p>开启了一个台任务，IndexingTask是一个AsyncTask，后台执行performIndexing方法</p>
 <pre><code>@Override
 protected Void doInBackground(Void... voids) {
     performIndexing();
     return null;
 }
-</code></pre>
-
-<pre><code>/**
+</code></pre><pre><code>/**
  * Accumulate all data and non-indexable keys from each of the content-providers.
  * Only the first indexing for the default language gets static search results - subsequent
  * calls will only gather non-indexable keys.
@@ -1131,12 +921,8 @@ void performIndexing() {
     updateDatabase(isFullIndex, localeStr);
 	...
 }
-</code></pre>
-
-<h1 id="3-3数据搜索以及显示过程">3.3数据搜索以及显示过程</h1>
-
+</code></pre><h1 id="33数据搜索以及显示过程">3.3数据搜索以及显示过程</h1>
 <p>在搜索框输入字符后，会回调到SearchFragment的onQueryTextChange方法</p>
-
 <pre><code>@Override
 public boolean onQueryTextChange(String query) {
     ...
@@ -1147,10 +933,7 @@ public boolean onQueryTextChange(String query) {
     }
   ...
 }
-</code></pre>
-
-<p>整个搜索过程涉及到了Loader机制，</p>
-
+</code></pre><p>整个搜索过程涉及到了Loader机制，</p>
 <pre><code>@Override
 public Loader&lt;List&lt;? extends SearchResult&gt;&gt; onCreateLoader(int id, Bundle args) {
     final Activity activity = getActivity();
@@ -1164,9 +947,7 @@ public Loader&lt;List&lt;? extends SearchResult&gt;&gt; onCreateLoader(int id, B
             return null;
     }
 }
-</code></pre>
-
-<pre><code>@Override
+</code></pre><pre><code>@Override
 public List&lt;? extends SearchResult&gt; loadInBackground() {
     ...
 
@@ -1188,23 +969,16 @@ public List&lt;? extends SearchResult&gt; loadInBackground() {
 
     return removeDuplicates(results);
 }
-</code></pre>
-
-<pre><code>private List&lt;SearchResult&gt; firstWordQuery(String[] matchColumns, int baseRank) {
+</code></pre><pre><code>private List&lt;SearchResult&gt; firstWordQuery(String[] matchColumns, int baseRank) {
     final String whereClause = buildSingleWordWhereClause(matchColumns);
     final String query = mQueryText + &quot;%&quot;;
     final String[] selection = buildSingleWordSelection(query, matchColumns.length);
 
     return query(whereClause, selection, baseRank);
 }
-</code></pre>
-
-<p>(data_title like ?  OR data_title_normalized like ? ) AND enabled = 1</p>
-
+</code></pre><p>(data_title like ?  OR data_title_normalized like ? ) AND enabled = 1</p>
 <p>日期%</p>
-
 <p>% 日期%</p>
-
 <pre><code>@Override
 public void onLoadFinished(Loader&lt;List&lt;? extends SearchResult&gt;&gt; loader,
         List&lt;? extends SearchResult&gt; data) {
@@ -1222,9 +996,7 @@ public void onLoadFinished(Loader&lt;List&lt;? extends SearchResult&gt;&gt; load
     }
     mSearchFeatureProvider.showFeedbackButton(this, getView());
 }
-</code></pre>
-
-<pre><code>/**
+</code></pre><pre><code>/**
  * Merge the results from each of the loaders into one list for the adapter.
  * Prioritizes results from the local database over installed apps.
  *
@@ -1267,9 +1039,7 @@ public int displaySearchResults() {
 
     return mSearchResults.size();
 }
-</code></pre>
-
-<pre><code>public void dispatchUpdatesTo(final RecyclerView.Adapter adapter) {
+</code></pre><pre><code>public void dispatchUpdatesTo(final RecyclerView.Adapter adapter) {
     dispatchUpdatesTo(new ListUpdateCallback() {
         @Override
         public void onInserted(int position, int count) {
@@ -1293,7 +1063,6 @@ public int displaySearchResults() {
     });
 }
 </code></pre>
-
     </div>
 
     
@@ -1364,6 +1133,8 @@ public int displaySearchResults() {
 
     
 
+  
+
         </div>
       </div>
     </main>
@@ -1409,7 +1180,7 @@ public int displaySearchResults() {
     &copy;
     
       2017 -
-    2019
+    2020
     <span class="heart">
       
       <i class="iconfont">
@@ -1454,6 +1225,12 @@ public int displaySearchResults() {
 
 
 <script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
 
 
 

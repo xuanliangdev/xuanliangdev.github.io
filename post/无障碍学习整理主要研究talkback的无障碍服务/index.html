@@ -23,7 +23,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="xuanliang" />
-  <meta name="description" content="一、疑问： 1.无障碍机制涉及哪些模块？ 2.开启talkback后talkback手势生效原理？ 3.无障碍焦点的方框如何产生？ 4.talkba" />
+  <meta name="description" content="一、整理原因： 为了辅助理解无障碍google官方开发文档api的原理。 二、参考文档 无障碍开发google官方文档 三、无障碍服务框架结构分析 3" />
 
   <meta name="keywords" content="Hugo, theme, jane" />
 
@@ -32,10 +32,12 @@
 
 
 
-<meta name="generator" content="Hugo 0.55.5" />
+<meta name="generator" content="Hugo 0.63.2" />
 
 
 <link rel="canonical" href="https://xuanliangdev.github.io/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/" />
+
+
 
 
 
@@ -51,33 +53,29 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.31c4b7729c8d71cc152f8de4203d90bfd8a04f7eab69372de7234ebf55b7701b.css" integrity="sha256-McS3cpyNccwVL43kID2Qv9igT36raTct5yNOv1W3cBs=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.0995afa14b62cd93e93cfc066b646c4c17a3eddca0e9d52a1d9dcf5d90aaacd3.css" integrity="sha256-CZWvoUtizZPpPPwGa2RsTBej7dyg6dUqHZ3PXZCqrNM=" media="screen" crossorigin="anonymous">
 
 
 
 
 
 <meta property="og:title" content="无障碍学习整理（基于talkback）" />
-<meta property="og:description" content="一、疑问： 1.无障碍机制涉及哪些模块？ 2.开启talkback后talkback手势生效原理？ 3.无障碍焦点的方框如何产生？ 4.talkba" />
+<meta property="og:description" content="一、整理原因： 为了辅助理解无障碍google官方开发文档api的原理。 二、参考文档 无障碍开发google官方文档 三、无障碍服务框架结构分析 3" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://xuanliangdev.github.io/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/" />
-<meta property="article:published_time" content="2019-08-03T00:00:00&#43;00:00"/>
-<meta property="article:modified_time" content="2019-08-03T00:00:00&#43;00:00"/>
-
+<meta property="article:published_time" content="2019-08-03T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-08-03T00:00:00+00:00" />
 <meta itemprop="name" content="无障碍学习整理（基于talkback）">
-<meta itemprop="description" content="一、疑问： 1.无障碍机制涉及哪些模块？ 2.开启talkback后talkback手势生效原理？ 3.无障碍焦点的方框如何产生？ 4.talkba">
-
-
+<meta itemprop="description" content="一、整理原因： 为了辅助理解无障碍google官方开发文档api的原理。 二、参考文档 无障碍开发google官方文档 三、无障碍服务框架结构分析 3">
 <meta itemprop="datePublished" content="2019-08-03T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-08-03T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="3956">
+<meta itemprop="wordCount" content="10455">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="无障碍学习整理（基于talkback）"/>
-<meta name="twitter:description" content="一、疑问： 1.无障碍机制涉及哪些模块？ 2.开启talkback后talkback手势生效原理？ 3.无障碍焦点的方框如何产生？ 4.talkba"/>
+<meta name="twitter:description" content="一、整理原因： 为了辅助理解无障碍google官方开发文档api的原理。 二、参考文档 无障碍开发google官方文档 三、无障碍服务框架结构分析 3"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -137,7 +135,7 @@
         
           
           
-            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">关于</a>
           
         
       </li>
@@ -273,7 +271,7 @@
         
           
           
-            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">关于</a>
           
 
         
@@ -320,88 +318,52 @@
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#一-疑问">一、疑问：</a></li>
-<li><a href="#二-结构分析">二、结构分析</a>
-<ul>
-<li><a href="#1-代码结构">1.代码结构</a>
-<ul>
-<li><a href="#1-1-talkback-辅助app-实现了accessibilityservice的app">1.1、talkback（辅助app，实现了AccessibilityService的app）</a></li>
-<li><a href="#1-2-前台app进程-被辅助app">1.2、前台app进程（被辅助app）</a></li>
-<li><a href="#1-3-system-process">1.3、system_process</a></li>
-<li><a href="#4-语音引擎">4.语音引擎</a></li>
-</ul></li>
-<li><a href="#1-2-aidl接口">1.2 AIDL接口</a>
-<ul>
-<li><a href="#1-2-1-iaccessibilityserviceclient">1.2.1 、IAccessibilityServiceClient</a></li>
-<li><a href="#1-2-2-iaccessibilityserviceconnection">1.2.2、IAccessibilityServiceConnection</a></li>
-<li><a href="#1-2-3-iaccessibilitymanager">1.2.3、IAccessibilityManager</a></li>
-<li><a href="#1-2-4-iaccessibilityinteractionconnection">1.2.4、IAccessibilityInteractionConnection</a></li>
-</ul></li>
-</ul></li>
-<li><a href="#三-流程分析">三、流程分析</a>
-<ul>
-<li><a href="#1-talkback开关打开后到talkbackservice启动过程">1、talkback开关打开后到TalkbackService启动过程。</a></li>
-<li><a href="#2-触摸事件出发到焦点绘制过程">2、触摸事件出发到焦点绘制过程。</a></li>
-<li><a href="#3-talkback调用tts发出声音过程">3、talkback调用TTS发出声音过程。</a></li>
-</ul></li>
-</ul></li>
-<li><a href="#四-解疑">四、解疑</a></li>
-</ul>
+  <ul>
+    <li><a href="#一整理原因">一、整理原因：</a></li>
+    <li><a href="#二参考文档">二、参考文档</a></li>
+    <li><a href="#三无障碍服务框架结构分析">三、无障碍服务框架结构分析</a>
+      <ul>
+        <li><a href="#31结构">3.1.结构</a></li>
+        <li><a href="#32相关类图">3.2、相关类图</a></li>
+        <li><a href="#33-无障碍框架aidl接口">3.3 无障碍框架AIDL接口</a></li>
+      </ul>
+    </li>
+    <li><a href="#四流程分析">四、流程分析</a>
+      <ul>
+        <li><a href="#41accessibilityservice启动流程以talkback开关打开后到talkbackservice启动进行分析">4.1、AccessibilityService启动流程（以talkback开关打开后到TalkbackService启动进行分析）。</a></li>
+        <li><a href="#42无障碍模式下视图状态初始化流程">4.2、无障碍模式下视图状态初始化流程。</a></li>
+        <li><a href="#43无障碍事件分发流程重要app适配无障碍以及处理无障碍相关问题主要通过该流程入手">4.3、无障碍事件分发流程（重要，app适配无障碍以及处理无障碍相关问题主要通过该流程入手）。</a></li>
+        <li><a href="#44执行无障碍事件流程以talkback发出focus无障碍事件到被辅助的app端通过viewrootimpl绘制绿框焦点过程进行分析">4.4、执行无障碍事件流程（以talkback发出focus无障碍事件，到被辅助的app端通过ViewRootImpl绘制绿框焦点过程进行分析）。</a></li>
+        <li><a href="#45talkback调用tts读出view中的text的过程">4.5、talkback调用TTS读出view中的text的过程。</a></li>
+      </ul>
+    </li>
+    <li><a href="#五webview下的无障碍分析">五、WebView下的无障碍分析</a></li>
+  </ul>
 </nav>
   </div>
 </div>
 
     
     <div class="post-content">
-      
-
-<h2 id="一-疑问">一、疑问：</h2>
-
-<p>1.无障碍机制涉及哪些模块？</p>
-
-<p>2.开启talkback后talkback手势生效原理？</p>
-
-<p>3.无障碍焦点的方框如何产生？</p>
-
-<p>4.talkback如何获取view的内容从而调用tts进行朗读？</p>
-
-<p>5.为什么实现了AccessibilityService的apk安装后设置无障碍就会出现相关的开关？</p>
-
-<p>6.打开某个页面时talkback的默认焦点怎么来的？</p>
-
-<h2 id="二-结构分析">二、结构分析</h2>
-
-<h3 id="1-代码结构">1.代码结构</h3>
-
-<p><img src="https://ws3.sinaimg.cn/large/006tNc79gy1g1t8b1vx1zj317l0signa.jpg" alt="无障碍架构" /></p>
-
-<p><img src="https://ws1.sinaimg.cn/large/006tNc79gy1g1t8avpt29j30vh0u01kx.jpg" alt="accessibilityclass" /></p>
-
-<p>整个talkback机制涉及了4个进程，SystemServer（蓝色部分）、Talkback（黄色部分）、前台app进程（绿色部分），TTS引擎进程（暂不分析）</p>
-
+      <h2 id="一整理原因">一、整理原因：</h2>
+<p>为了辅助理解无障碍google官方开发文档api的原理。</p>
+<h2 id="二参考文档">二、参考文档</h2>
+<p><a href="https://developer.android.google.cn/guide/topics/ui/accessibility">无障碍开发google官方文档</a></p>
+<h2 id="三无障碍服务框架结构分析">三、无障碍服务框架结构分析</h2>
+<h3 id="31结构">3.1.结构</h3>
+<p><img src="/Users/xuanliang/road/accessibility_learn/%E6%97%A0%E9%9A%9C%E7%A2%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.jpg" alt=""></p>
+<h3 id="32相关类图">3.2、相关类图</h3>
+<p><img src="/Users/xuanliang/road/accessibility_learn/accessibilityclass.jpg" alt=""></p>
+<p>整个talkback机制涉及了4个进程，SystemServer（蓝色部分）、Talkback（黄色部分）、被辅助app进程（绿色部分），TTS引擎进程（暂不分析）</p>
 <p>四个AIDL接口，图上红色部分</p>
-
-<h4 id="1-1-talkback-辅助app-实现了accessibilityservice的app">1.1、talkback（辅助app，实现了AccessibilityService的app）</h4>
-
-<p><img src="https://ws1.sinaimg.cn/large/006tNc79gy1g1qzm48qapj30b40abacc.jpg" alt="WX20190404-224703@2x" /></p>
-
+<h4 id="321talkback辅助app实现了accessibilityservice的app">3.2.1、talkback（辅助app，实现了AccessibilityService的app）</h4>
+<p><img src="/Users/xuanliang/road/accessibility_learn/a11yservice.png" alt=""></p>
 <p>talkback实现了AccessiblityService用于接收系统传过来的无障碍事件。</p>
-
-<h4 id="1-2-前台app进程-被辅助app">1.2、前台app进程（被辅助app）</h4>
-
-<p><img src="https://ws4.sinaimg.cn/large/006tNc79gy1g1r0sbx0bxj30b40b8421.jpg" alt="viewaccessibility" /></p>
-
-<h4 id="1-3-system-process">1.3、system_process</h4>
-
-<p>1.3.1（AccessibilityManagerService）</p>
-
-<p><img src="https://ws2.sinaimg.cn/large/006tNc79gy1g1r04mvninj30b40d8q73.jpg" alt="acms" /></p>
-
-<p>系统进程SystemServer维护了ActivityManagerService，用来作为binder服务端，SystemServer启动时会启动AccessibilityManagerService。</p>
-
+<h4 id="322被辅助app进程被辅助app">3.2.2、被辅助app进程（被辅助app）</h4>
+<p><img src="/Users/xuanliang/road/accessibility_learn/viewaccessibility.png" alt=""></p>
+<h4 id="323system_process">3.2.3、system_process</h4>
+<p><img src="/Users/xuanliang/road/accessibility_learn/a11yms.png" alt=""></p>
+<p>系统进程SystemServer中的AccessibilityManagerService，用来管理所有的无障碍服务，类似AMS，SystemServer启动时会在startOtherServices方法中启动AccessibilityManagerService，startOtherServices方法在ActivityManagerService、PackageManagerService等一些核心服务的后面启动。</p>
 <pre><code>com.android.server.SystemServer.java
 
 /**
@@ -420,90 +382,22 @@ private void startOtherServices() {
             traceEnd();
 ...
 }
-</code></pre>
-
-<p>1.3.2、TTS</p>
-
-<p><img src="https://ws3.sinaimg.cn/large/006tNc79gy1g1rg51wbiij30b40m0q9h.jpg" alt="tts" /></p>
-
-<h4 id="4-语音引擎">4.语音引擎</h4>
-
+</code></pre><h5 id="334tts">3.3.4、TTS</h5>
+<p><img src="/Users/xuanliang/road/accessibility_learn/tts.png" alt=""></p>
 <p>暂不分析</p>
-
-<h3 id="1-2-aidl接口">1.2 AIDL接口</h3>
-
-<p>跨进程通信的需要用到aidl，理解aidl的设计是理解无障碍框架的关键。</p>
-
-<h4 id="1-2-1-iaccessibilityserviceclient">1.2.1 、IAccessibilityServiceClient</h4>
-
-<p>服务端为辅助app进程（talkback），调用客户端为SystemServer进程。</p>
-
-<p>当SystemServer绑定AccessibilityService时，AccessibilityService会返回实现该接口的binder对象给SystemServer进程。</p>
-
-<pre><code>android.accessibilityservice.IAccessibilityServiceClient.aidl
-
-/**
- * Top-level interface to an accessibility service component.
- */
-oneway interface IAccessibilityServiceClient {
-
-    void onAccessibilityEvent(in AccessibilityEvent event, in boolean serviceWantsEvent);
-
-    void onSoftKeyboardShowModeChanged(int showMode);
-
-    void onPerformGestureResult(int sequence, boolean completedSuccessfully);
-
-    void onAccessibilityButtonClicked();
-
-    void onAccessibilityButtonAvailabilityChanged(boolean available);
-    
-    ...
-}
-</code></pre>
-
-<h4 id="1-2-2-iaccessibilityserviceconnection">1.2.2、IAccessibilityServiceConnection</h4>
-
-<p>服务端为SystemServer进程，调用客户端为辅助app进程（talkback）。</p>
-
-<pre><code>android.accessibilityservice.IAccessibilityServiceConnection.aidl
-
-/**
- * Interface given to an AccessibilitySerivce to talk to the AccessibilityManagerService.
- */
-interface IAccessibilityServiceConnection {
-
-    String[] findAccessibilityNodeInfoByAccessibilityId(int accessibilityWindowId,
-        long accessibilityNodeId, int interactionId,
-        IAccessibilityInteractionConnectionCallback callback, int flags, long threadId,
-        in Bundle arguments);
-
-    String[] findAccessibilityNodeInfosByViewId(int accessibilityWindowId,
-        long accessibilityNodeId, String viewId, int interactionId,
-        IAccessibilityInteractionConnectionCallback callback, long threadId);
-
-    String[] findFocus(int accessibilityWindowId, long accessibilityNodeId, int focusType,
-        int interactionId, IAccessibilityInteractionConnectionCallback callback, long threadId);
-
-    boolean performAccessibilityAction(int accessibilityWindowId, long accessibilityNodeId,
-        int action, in Bundle arguments, int interactionId,
-        IAccessibilityInteractionConnectionCallback callback, long threadId);
-
-    AccessibilityServiceInfo getServiceInfo();
-
-    boolean performGlobalAction(int action);
-
-    boolean isAccessibilityButtonAvailable();
-}
-</code></pre>
-
-<p>用于talkback和system_process之间，服务端为system_process（AccessibilityManagerService），客户端为talkback。</p>
-
-<h4 id="1-2-3-iaccessibilitymanager">1.2.3、IAccessibilityManager</h4>
-
-<p>服务端为SystemServer进程，调用客户端为被辅助app进程。</p>
-
-<p>当被辅助app产生触摸事件后，会通过这个接口发送无障碍事件给SystemServer进程的AccessibilityManagerService</p>
-
+<h3 id="33-无障碍框架aidl接口">3.3 无障碍框架AIDL接口</h3>
+<p>理解无障碍框架的aidl的设计是理解无障碍框架的关键。</p>
+<p>我们进行无障碍的开发通常会涉及到三个进程：</p>
+<p>辅助app（talkback、或者我们自己开发的无障碍应用（比如红包助手））</p>
+<p>SystemServer（系统服务进程，管理所有的无障碍服务，并且起到中转的作用，类似AMS的设计）</p>
+<p>被辅助的app（）</p>
+<p>跨进程通信需要用到aidl接口，无障碍服务框架也不例外，由于涉及到三个进程的通信，并且辅助app通常不需要直接跟被辅助的app通信，大部分通过SystemServer进行中转通信，因此主要涉及到了四个aidl接口：</p>
+<p>被辅助app-&gt;SystemServer（IAccessibilityManager.aidl）</p>
+<p>SystemServer-&gt;辅助app（IAccessibilityServiceClient.aidl）</p>
+<p>辅助app-&gt;SystemServer（IAccessibilityServiceConnection.aidl）</p>
+<p>SystemServer-&gt;被辅助app（IAccessibilityInteractionConnection.aidl）</p>
+<h4 id="331iaccessibilitymanageraidl客户端被辅助app服务端systemserver">3.3.1、IAccessibilityManager.aidl（客户端：被辅助app、服务端：SystemServer）</h4>
+<p>比如当被辅助app产生触摸事件后，会通过这个接口发送无障碍事件给SystemServer进程的AccessibilityManagerService</p>
 <pre><code>android.view.accessibility.IAccessibilityManager.aidl
 
 /**
@@ -534,12 +428,60 @@ interface IAccessibilityManager {
     void performAccessibilityShortcut();
 
 }
-</code></pre>
+</code></pre><h4 id="332-iaccessibilityserviceclientaidl客户端systemserver服务端辅助app">3.3.2 、IAccessibilityServiceClient.aidl（客户端：SystemServer、服务端：辅助app）</h4>
+<p>当SystemServer接收到被辅助的app发送的无障碍事件时，会将事件通过该接口传递给辅助app进程进行处理。</p>
+<pre><code>android.accessibilityservice.IAccessibilityServiceClient.aidl
 
-<h4 id="1-2-4-iaccessibilityinteractionconnection">1.2.4、IAccessibilityInteractionConnection</h4>
+/**
+ * Top-level interface to an accessibility service component.
+ */
+oneway interface IAccessibilityServiceClient {
 
-<p>服务端为被辅助app进程，调用客户端为SystemServer进程。</p>
+    void onAccessibilityEvent(in AccessibilityEvent event, in boolean serviceWantsEvent);
 
+    void onSoftKeyboardShowModeChanged(int showMode);
+
+    void onPerformGestureResult(int sequence, boolean completedSuccessfully);
+
+    void onAccessibilityButtonClicked();
+
+    void onAccessibilityButtonAvailabilityChanged(boolean available);
+    
+    ...
+}
+</code></pre><h4 id="333iaccessibilityserviceconnectionaidl客户端辅助app服务端systemserver">3.3.3、IAccessibilityServiceConnection.aidl（客户端：辅助app、服务端：SystemServer）</h4>
+<p>当我们需要找到被辅助的app的某个view的信息时，可以通过该接口的findAccessibilityNodeInfosByViewId方法实现。</p>
+<pre><code>android.accessibilityservice.IAccessibilityServiceConnection.aidl
+
+/**
+ * Interface given to an AccessibilitySerivce to talk to the AccessibilityManagerService.
+ */
+interface IAccessibilityServiceConnection {
+
+    String[] findAccessibilityNodeInfoByAccessibilityId(int accessibilityWindowId,
+        long accessibilityNodeId, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, int flags, long threadId,
+        in Bundle arguments);
+
+    String[] findAccessibilityNodeInfosByViewId(int accessibilityWindowId,
+        long accessibilityNodeId, String viewId, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, long threadId);
+
+    String[] findFocus(int accessibilityWindowId, long accessibilityNodeId, int focusType,
+        int interactionId, IAccessibilityInteractionConnectionCallback callback, long threadId);
+
+    boolean performAccessibilityAction(int accessibilityWindowId, long accessibilityNodeId,
+        int action, in Bundle arguments, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, long threadId);
+
+    AccessibilityServiceInfo getServiceInfo();
+
+    boolean performGlobalAction(int action);
+
+    boolean isAccessibilityButtonAvailable();
+}
+</code></pre><h4 id="heading"></h4>
+<h4 id="334iaccessibilityinteractionconnectionaidl客户端systemserver服务端被辅助app">3.3.4、IAccessibilityInteractionConnection.aidl（客户端：SystemServer、服务端：被辅助app）</h4>
 <pre><code>android.view.accessibility.IAccessibilityInteractionConnection.aidl
 
 /**
@@ -567,16 +509,10 @@ oneway interface IAccessibilityInteractionConnection {
         int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
         int interrogatingPid, long interrogatingTid);
 }
-</code></pre>
-
-<h2 id="三-流程分析">三、流程分析</h2>
-
-<h3 id="1-talkback开关打开后到talkbackservice启动过程">1、talkback开关打开后到TalkbackService启动过程。</h3>
-
-<p>1.1、在设置中打开talback开关后，会调用到如下方法，最终会往Settings provider中key为Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES的字段写入Talkback注册的AccessibilityService值（TalkbackService），这个值保存在</p>
-
+</code></pre><h2 id="四流程分析">四、流程分析</h2>
+<h3 id="41accessibilityservice启动流程以talkback开关打开后到talkbackservice启动进行分析">4.1、AccessibilityService启动流程（以talkback开关打开后到TalkbackService启动进行分析）。</h3>
+<p>在设置中打开talback开关后，会调用到如下方法，最终会往Settings provider中key为Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES的字段写入Talkback注册的AccessibilityService值（TalkbackService），这个值保存在</p>
 <p>/data/system/users/0/settings_secure.xml文件中。（其他app的AccessibilityService也保存在同一个key中）</p>
-
 <pre><code>com.android.settingslib.accessibility.AccessibilityUtils.java
 
 /**
@@ -589,10 +525,7 @@ public static void setAccessibilityServiceState(Context context, ComponentName t
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
             enabledServicesBuilder.toString(), userId);
 }
-</code></pre>
-
-<p>由于AccessibilityManagerService创建时注册了AccessibilityContentObserver，因此马上会收到Settings provider数据变化的监听。</p>
-
+</code></pre><p>由于AccessibilityManagerService创建时注册了AccessibilityContentObserver，因此马上会收到Settings provider数据变化的监听。</p>
 <pre><code>com.android.server.accessibility.AccessibilityServiceConnection.java
 
 private void updateServicesLocked(UserState userState) {
@@ -611,12 +544,8 @@ private void updateServicesLocked(UserState userState) {
     ...
     updateAccessibilityEnabledSetting(userState);
 }
-</code></pre>
-
-<p>根据获取到的AccessibilityService信息（com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService）创建出AccessibilityServiceConnection。AccessibilityServiceConnection代表了一个无障碍服务，存储用于管理这个服务需要的所有数据，提供了开始/停止服务和在服务管理的数据结构中添加或者移除这个服务的api。</p>
-
+</code></pre><p>根据获取到的AccessibilityService信息（com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService）创建出AccessibilityServiceConnection。AccessibilityServiceConnection代表了一个无障碍服务，存储用于管理这个服务需要的所有数据，提供了开始/停止服务和在服务管理的数据结构中添加或者移除这个服务的api。</p>
 <p>接着调用bindServiceAsUser方法来绑定服务。</p>
-
 <pre><code>com.android.server.accessibility.AccessibilityServiceConnection.java
 
 public void bindLocked() {
@@ -629,10 +558,7 @@ public void bindLocked() {
         }
     } ...
 }
-</code></pre>
-
-<p>服务启动后会跨进程调用到TalkbackService(AccessibilityService)的onBind方法</p>
-
+</code></pre><p>服务启动后会跨进程调用到TalkbackService(AccessibilityService)的onBind方法</p>
 <pre><code>android.accessibilityservice.AccessibilityService
 
 /**
@@ -655,10 +581,7 @@ public final IBinder onBind(Intent intent) {
 ...
     });
 }
-</code></pre>
-
-<p>onBind方法返回的是一个IAccessibilityServiceClientWrapper的binder对象</p>
-
+</code></pre><p>onBind方法返回的是一个IAccessibilityServiceClientWrapper的binder对象</p>
 <pre><code>/**
  * Implements the internal {@link IAccessibilityServiceClient} interface to convert
  * incoming calls to it back to calls on an {@link AccessibilityService}.
@@ -734,12 +657,8 @@ public static class IAccessibilityServiceClientWrapper extends IAccessibilitySer
         }
     }
 }
-</code></pre>
-
-<p>IAccessibilityServiceClientWrapper中保存了一个HandlerCaller和Callbacks对象，其中HandlerCaller主要是将SystemServer进程中AccessibilityServiceConnection的binder call的binder线程调研切换到AccessibilityService的主线程调用。Callbacks对象则将IAccessibilityServiceClientWrapper中的调用回调到AccessibilityService中。</p>
-
+</code></pre><p>IAccessibilityServiceClientWrapper中保存了一个HandlerCaller和Callbacks对象，其中HandlerCaller主要是将SystemServer进程中AccessibilityServiceConnection的binder call的binder线程调研切换到AccessibilityService的主线程调用。Callbacks对象则将IAccessibilityServiceClientWrapper中的调用回调到AccessibilityService中。</p>
 <p>AccessibilityService返回binder后会走到AccessibilityServiceConnection的onServiceConnected调用中:</p>
-
 <pre><code>com.android.server.accessibility.AccessibilityServiceConnection.java
 
 @Override
@@ -756,9 +675,7 @@ public void onServiceConnected(ComponentName componentName, IBinder service) {
                 AccessibilityServiceConnection::initializeService, this));
     }
 }
-</code></pre>
-
-<pre><code>private void initializeService() {
+</code></pre><pre><code>private void initializeService() {
     IAccessibilityServiceClient serviceInterface = null;
     ...
     try {
@@ -767,42 +684,232 @@ public void onServiceConnected(ComponentName componentName, IBinder service) {
         ...
     }
 }
-</code></pre>
-
-<p>在serviceInterface.init方法中（binder调用）将这个AccessibilityServiceConnection、mId和mOverlayWindowToken传给AccessibilityService完成初始化工作。</p>
-
+</code></pre><p>在serviceInterface.init方法中（binder调用）将这个AccessibilityServiceConnection、mId和mOverlayWindowToken传给AccessibilityService完成初始化工作。</p>
 <p>初始化时会调用</p>
-
 <pre><code>AccessibilityInteractionClient.getInstance().addConnection(mConnectionId,
         connection);
-</code></pre>
+</code></pre><p>将AccessibilityServiceConnection保存到AccessibilityInteractionClient中。</p>
+<h3 id="42无障碍模式下视图状态初始化流程">4.2、无障碍模式下视图状态初始化流程。</h3>
+<p><img src="/Users/xuanliang/road/accessibility_learn/findAccessibilityNodeInfoByAccessibilityId.jpg" alt=""></p>
+<h5 id="分析该流程原因">分析该流程原因：</h5>
+<h5 id="为了辅助理解如下方法">为了辅助理解如下方法：</h5>
+<h5 id="1getaccessibilitynodeprovider">1、getAccessibilityNodeProvider</h5>
+<h5 id="2oninitializeaccessibilitynodeinfo">2、onInitializeAccessibilityNodeInfo</h5>
+<p>1、talkback打开状态下，新的应用打开时，TalkbackService会接收到类型为TYPE_WINDOWS_CHANGED的无障碍事件，这个事件是SystemServer进程接收到其他进程发出的TYPE_VIEW_ACCESSIBILITY_FOCUSED事件时附带发出的，应用发出TYPE_VIEW_ACCESSIBILITY_FOCUSED事件的流程在下一节分析，暂时跳过。</p>
+<p>2、当tailback收到TYPE_WINDOWS_CHANGED事件时，会间接调用调用父类AccessibilityService的getRootInActiveWindow方法，如上图，经过SystemServer进程中转后会调用到DecorView的getAccessibilityNodeProvider，由于DecorView没有重写getAccessibilityNodeProvider方法，因此会调用到View的createAccessibilityNodeInfo方法，进一步会调用到<strong>onInitializeAccessibilityNodeInfo</strong>方法，如果没有重写该方法，则默认实现在onInitializeAccessibilityNodeInfoInternal中。</p>
+<p>3、AccessibilityNodePrefetcher在取出DecorView的无障碍节点后，会进一步通过prefetchDescendantsOfRealNode方法取子view的无障碍节点。同理，如果我们重写了<strong>getAccessibilityNodeProvider</strong>方法（一些特殊的自定义view需要自己重写该方法，比如webview，android.widget.NumberPicker等），重写getAccessibilityNodeProvider，需要我们实现一个AccessibilityNodeProvider的子类，来实现虚拟的view来支持无障碍模式。通常实现比较复杂的view时会重写这两个方法</p>
+<h3 id="43无障碍事件分发流程重要app适配无障碍以及处理无障碍相关问题主要通过该流程入手">4.3、无障碍事件分发流程（重要，app适配无障碍以及处理无障碍相关问题主要通过该流程入手）。</h3>
+<p>流程：被辅助app将无障碍事件发送给辅助app，systemserver进程作为中转，接口为IAccessibilityManager.aidl和IAccessibilityServiceClient.aidl</p>
+<p><img src="/Users/xuanliang/road/accessibility_learn/sendaccessibilityevent.jpg" alt=""></p>
+<h5 id="分析该流程原因-1">分析该流程原因：</h5>
+<h5 id="为了辅助理解如下方法-1">为了辅助理解如下方法：</h5>
+<h5 id="1sendaccessibilityevent"><strong>1、sendAccessibilityEvent</strong></h5>
+<p><strong>2、sendAccessibilityEventUnchecked</strong></p>
+<p><strong>3、onInitializeAccessibilityEvent</strong></p>
+<p><strong>4、dispatchPopulateAccessibilityEvent</strong></p>
+<p><strong>5、onPopulateAccessibilityEvent</strong></p>
+<p><strong>6、onRequestSendAccessibilityEvent</strong></p>
+<p>talkback开启触摸浏览（Explore by Touch）模式下输入事件的传递</p>
+<p>1、由于talkback的无障碍服务中声明了android:canRequestTouchExplorationMode=&quot;true&rdquo;，因此开启talkback后AccessibilityManagerService会更新AccessibilityInputFilter成员变量的触摸浏览（FLAG_FEATURE_TOUCH_EXPLORATION）的特性为true。</p>
+<pre><code>com.android.server.accessibility.AccessibilityInputFilter
 
-<p>将AccessibilityServiceConnection保存到AccessibilityInteractionClient中。</p>
+private void enableFeatures() {
+    ...
+    if ((mEnabledFeatures &amp; FLAG_FEATURE_TOUCH_EXPLORATION) != 0) {
+        mTouchExplorer = new TouchExplorer(mContext, mAms);
+        addFirstEventHandler(mTouchExplorer);
+    }
+    ...
+}
+</code></pre><p>触摸浏览特性开启后会创建一个TouchExplorer对象。AccessibilityInputFilter继承自InputFilter，对输入事件进行过滤，通过和TouchExplorer配合从而实现talkback模式下的触摸浏览手势。</p>
+<pre><code>/**
+ * This class is a strategy for performing touch exploration. It
+ * transforms the motion event stream by modifying, adding, replacing,
+ * and consuming certain events. The interaction model is:
+ *
+ * &lt;ol&gt;
+ *   &lt;li&gt;1. One finger moving slow around performs touch exploration.&lt;/li&gt;
+ *   &lt;li&gt;2. One finger moving fast around performs gestures.&lt;/li&gt;
+ *   &lt;li&gt;3. Two close fingers moving in the same direction perform a drag.&lt;/li&gt;
+ *   &lt;li&gt;4. Multi-finger gestures are delivered to view hierarchy.&lt;/li&gt;
+ *   &lt;li&gt;5. Two fingers moving in different directions are considered a multi-finger gesture.&lt;/li&gt;
+ *   &lt;li&gt;7. Double tapping clicks on the on the last touch explored location if it was in
+ *          a window that does not take focus, otherwise the click is within the accessibility
+ *          focused rectangle.&lt;/li&gt;
+ *   &lt;li&gt;7. Tapping and holding for a while performs a long press in a similar fashion
+ *          as the click above.&lt;/li&gt;
+ * &lt;ol&gt;
+ *
+ * @hide
+ */
+class TouchExplorer extends BaseEventStreamTransformation
+        implements AccessibilityGestureDetector.Listener {
+...
+</code></pre><p>该类负责将普通的触摸事件转换为触摸浏览手势，比如将MotionEvent.ACTION_DOWN事件转换为悬停事件）（MotionEvent.ACTION_HOVER_ENTER）。因此在talkback模式下，当我们点击一次view上的控件时，应用收到的是（ACTION_HOVER_ENTER）事件，而只有双击才会传递我们熟悉的ACTION_DOWN事件</p>
+<p>*ViewRootImpl:View层次结构的根。View的<strong>绘制流程</strong>（测量measure、布局layout、绘制draw）和输入<strong>事件的分发流程</strong>都是从ViewRootImp开始。</p>
+<p>1、ViewRootImpl的内部类WindowInputEventReceiver从native方法调起dispatchInputEvent方法。</p>
+<p>2、ViewRootImpl调用deliverInputEvent传递事件输入事件。</p>
+<p>3、从顶层的DecorView的dispatchPointerEvent开始分发输入事件。</p>
+<pre><code>android.view.View.java
 
-<h3 id="2-触摸事件出发到焦点绘制过程">2、触摸事件出发到焦点绘制过程。</h3>
+/**
+ * Dispatch a pointer event.
+ * &lt;p&gt;
+ * Dispatches touch related pointer events to {@link #onTouchEvent(MotionEvent)} and all
+ * other events to {@link #onGenericMotionEvent(MotionEvent)}.  This separation of concerns
+ * reinforces the invariant that {@link #onTouchEvent(MotionEvent)} is really about touches
+ * and should not be expected to handle other pointing device features.
+ * &lt;/p&gt;
+ *
+ * @param event The motion event to be dispatched.
+ * @return True if the event was handled by the view, false otherwise.
+ * @hide
+ */
+public final boolean dispatchPointerEvent(MotionEvent event) {
+    if (event.isTouchEvent()) {
+        return dispatchTouchEvent(event);
+    } else {
+        return dispatchGenericMotionEvent(event);
+    }
+}
 
-<p>2.1 触摸事件发出到AccessibilityService接收到onAccessibilityEvent事件流程</p>
+...
 
-<p><img src="https://ws2.sinaimg.cn/large/006tNc79gy1g1t16x2ozmj313g0u0x0h.jpg" alt="accessibilitytouch" /></p>
+/**
+ * Returns true if this motion event is a touch event.
+ * &lt;p&gt;
+ * Specifically excludes pointer events with action {@link #ACTION_HOVER_MOVE},
+ * {@link #ACTION_HOVER_ENTER}, {@link #ACTION_HOVER_EXIT}, or {@link #ACTION_SCROLL}
+ * because they are not actually touch events (the pointer is not down).
+ * &lt;/p&gt;
+ * @return True if this motion event is a touch event.
+ * @hide
+ */
+public final boolean isTouchEvent() {
+    return nativeIsTouchEvent(mNativePtr);
+}
+</code></pre><p>在dispatchPointerEvent方法中会有event.isTouchEvent()的判断，如果talkback模式下，由于收到的是ACTION_HOVER_ENTER事件，因此不会走dispatchTouchEvent方法而是dispatchGenericMotionEvent方法。</p>
+<pre><code>android.view.View.java
+/**
+ * Dispatch a generic motion event.
+ * &lt;p&gt;
+ * Generic motion events with source class {@link InputDevice#SOURCE_CLASS_POINTER}
+ * are delivered to the view under the pointer.  All other generic motion events are
+ * delivered to the focused view.  Hover events are handled specially and are delivered
+ * to {@link #onHoverEvent(MotionEvent)}.
+ * &lt;/p&gt;
+ *
+ * @param event The motion event to be dispatched.
+ * @return True if the event was handled by the view, false otherwise.
+ */
+public boolean dispatchGenericMotionEvent(MotionEvent event) {
+...
+    final int source = event.getSource();
+    if ((source &amp; InputDevice.SOURCE_CLASS_POINTER) != 0) {
+        final int action = event.getAction();
+        if (action == MotionEvent.ACTION_HOVER_ENTER
+                || action == MotionEvent.ACTION_HOVER_MOVE
+                || action == MotionEvent.ACTION_HOVER_EXIT) {
+            if (dispatchHoverEvent(event)) {
+                return true;
+            }
+        } else if (dispatchGenericPointerEvent(event)) {
+            return true;
+        }
+    } else if (dispatchGenericFocusedEvent(event)) {
+        return true;
+    }
+	...
+    return false;
+}
+</code></pre><p>在dispatchGenericMotionEvent中，如果是Hover events，则会走到dispatchHoverEvent方法中。这个方法的机制类似dispatchTouchEvent的流程，是一个责任链模式的实现，不详细展开，默认会传到最后一个子节点的onHoverEvent方法。接着该方法会调用到sendAccessibilityHoverEvent里。</p>
+<p><strong>6、sendAccessibilityHoverEvent方法接着会调用以下方法。</strong></p>
+<p>​     <strong>sendAccessibilityEvent</strong></p>
+<p>​       <strong>-&gt;sendAccessibilityEventUnchecked</strong></p>
+<p>​           <strong>-&gt;onInitializeAccessibilityEvent</strong></p>
+<p>​           <strong>-&gt;dispatchPopulateAccessibilityEvent</strong></p>
+<p>​                <strong>-&gt;onPopulateAccessibilityEvent</strong></p>
+<p>​           <strong>-&gt;onRequestSendAccessibilityEvent</strong>（只在ViewGroup中有默认实现）</p>
+<p>*<strong>重要：以上六个方法为当我们自定义view时适配无障碍模式可以覆盖实现的方法，可以重写view的这些方法或者实现View.AccessibilityDelegate来解决一些特殊场景下talkback播报的问题。更详细的用法可以参考官方文档。</strong></p>
+<p>以talkback模式下朗读一个textview上的文字为例，textview重写了view中的onPopulateAccessibilityEventInternal方法</p>
+<pre><code>android.widget.TextView.java
 
-<p>2.2 talkback发出focus事件通知ViewRootImpl绘制绿框焦点过程。</p>
+/** @hide */
+@Override
+public void onPopulateAccessibilityEventInternal(AccessibilityEvent event) {
+    super.onPopulateAccessibilityEventInternal(event);
 
-<h3 id="3-talkback调用tts发出声音过程">3、talkback调用TTS发出声音过程。</h3>
+    final CharSequence text = getTextForAccessibility();
+    if (!TextUtils.isEmpty(text)) {
+        event.getText().add(text);
+    }
+}
+</code></pre><p>getTextForAccessibility方法会取到当前textview中显示的text，然后将该text的内容填充到AccessibilityEvent中发送出去。后面talkback会取出这个text并朗读出来。</p>
+<pre><code>android.view.View
 
-<h1 id="四-解疑">四、解疑</h1>
+public void onPopulateAccessibilityEvent(AccessibilityEvent event) {
+    if (mAccessibilityDelegate != null) {
+        mAccessibilityDelegate.onPopulateAccessibilityEvent(this, event);
+    } else {
+        onPopulateAccessibilityEventInternal(event);
+    }
+}
+</code></pre><p>因此如果我们需要自定义textview在talkback模式下朗读的内容，或者不让某个view的内容在talkback模式下被朗读出来，可以考虑重写onPopulateAccessibilityEvent方法。</p>
+<p>7、当我们通过第6步修改view中无障碍节点的信息后，被点击的View的sendAccessibilityEventUnchecked方法会向上通过DecorView传递到ViewRootImpl的requestSendAccessibilityEvent方法中，</p>
+<pre><code>android.view.ViewRootImpl
 
-<p>1.无障碍机制涉及哪些模块？答案如上分析</p>
+public boolean requestSendAccessibilityEvent(View child, AccessibilityEvent event) {
+    ...
+    final int eventType = event.getEventType();
+    switch (eventType) {
+        case AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED: {
+            final long sourceNodeId = event.getSourceNodeId();
+            final int accessibilityViewId = AccessibilityNodeInfo.getAccessibilityViewId(
+                    sourceNodeId);
+            View source = mView.findViewByAccessibilityId(accessibilityViewId);
+            if (source != null) {
+                AccessibilityNodeProvider provider = source.getAccessibilityNodeProvider();
+                if (provider != null) {
+                    final int virtualNodeId = AccessibilityNodeInfo.getVirtualDescendantId(
+                            sourceNodeId);
+                    final AccessibilityNodeInfo node;
+                    node = provider.createAccessibilityNodeInfo(virtualNodeId);
+                    setAccessibilityFocus(source, node);
+                }
+            }
+        } break;
+        ...
+    }
+    mAccessibilityManager.sendAccessibilityEvent(event);
+    return true;
+}
+</code></pre><p>接着无障碍事件会通过AccessibilityManager的sendAccessibilityEvent方法跨进程调用systemserver进程的AccessibilityManagerService，将类型为TYPE_VIEW_HOVER_ENTER的AccessibilityEvent事件传递到talkback的的TalkBackService（继承自AccessibilityService）的onAccessibilityEvent方法中（或者其他实现了AccessibilityService的应用）。</p>
+<h3 id="44执行无障碍事件流程以talkback发出focus无障碍事件到被辅助的app端通过viewrootimpl绘制绿框焦点过程进行分析">4.4、执行无障碍事件流程（以talkback发出focus无障碍事件，到被辅助的app端通过ViewRootImpl绘制绿框焦点过程进行分析）。</h3>
+<p>流程：辅助app（talkback）将无障碍事件发送给被辅助app，systemserver进程作为中转，接口为IAccessibilityServiceConnection.aidl和IAccessibilityInteractionConnection.aidl</p>
+<p><img src="/Users/xuanliang/road/accessibility_learn/requesfocus.jpg" alt=""></p>
+<h5 id="分析该流程原因-2">分析该流程原因：</h5>
+<h5 id="为了辅助理解如下方法-2">为了辅助理解如下方法：</h5>
+<h5 id="accessibilitynodeinfoperformaction">AccessibilityNodeInfo.performAction</h5>
+<p>1、在talkback中有个AccessibilityEventProcessor类对无障碍事件进行集中处理，根据无障碍事件的不同类型分发到不同的处理器进行处理，比如ProcessorFocusAndSingleTap这个处理器会对类型为TYPE_VIEW_HOVER_ENTER的无障碍事件进行处理，ProcessorEventQueue（主要用于tts朗读，后面分析）这个处理器会处理所有的无障碍事件。</p>
+<p>2、在前面一节4.2中，触摸事件TYPE_VIEW_HOVER_ENTER传递到了TalkBackService，而ProcessorFocusAndSingleTap这个类会对TYPE_VIEW_HOVER_ENTER这个事件进行处理，tryFocusing函数中会调用AccessibilityNodeInfo的performAction方法，AccessibilityNodeInfo的节点信息就是4.2节中触摸到的view的信息，因此通过AccessibilityManagerService进程中转后，会最终调用到我们触摸到的view的<strong>performAccessibilityAction</strong>方法中去（我们也可以通过调用这个方法处理一些无障碍焦点的问题）。</p>
+<p>3、在performAccessibilityAction会调用到performAccessibilityActionInternal，接着如果判断到是ACTION_ACCESSIBILITY_FOCUS事件，则会调用requestAccessibilityFocus函数</p>
+<pre><code>android.view.View
 
-<p>2.开启talkback后talkback手势生效原理？</p>
-
-<p>答：service的xml配置中android:canRequestTouchExplorationMode=&ldquo;true&rdquo;</p>
-
-<p>配上这个属性时com.android.server.accessibility.TouchExplorer会生效，该类会处理无障碍手势。</p>
-
-<p>3.无障碍焦点的方框如何产生？</p>
-
-<p>答：ViewRootImp进行绘制</p>
-
+public boolean requestAccessibilityFocus() {
+    ...
+    if ((mPrivateFlags2 &amp; PFLAG2_ACCESSIBILITY_FOCUSED) == 0) {
+        mPrivateFlags2 |= PFLAG2_ACCESSIBILITY_FOCUSED;
+        ViewRootImpl viewRootImpl = getViewRootImpl();
+        if (viewRootImpl != null) {
+            viewRootImpl.setAccessibilityFocus(this, null);
+        }
+        invalidate();
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
+        return true;
+    }
+    return false;
+}
+</code></pre><p>这个函数里有两个重要的操作，一是调用ViewRootImpl的setAccessibilityFocus将自身设置为focus的view，然后调用invalidate触发重绘操作，ViewRootImpl会在onPostDraw中执行drawAccessibilityFocusedDrawableIfNeeded来绘制出绿框。</p>
 <pre><code>android.view.ViewRootImpl.java
 
 /**
@@ -859,17 +966,96 @@ private boolean getAccessibilityFocusedRect(Rect bounds) {
     }
     return !bounds.isEmpty();
 }
-</code></pre>
+</code></pre><p>第二个操作是调用sendAccessibilityEvent方法，将TYPE_VIEW_ACCESSIBILITY_FOCUSED事件发送出去，这个事件会被talkback处理，从而调用tts引擎读出view的内容，这个流程分析如下。</p>
+<h3 id="45talkback调用tts读出view中的text的过程">4.5、talkback调用TTS读出view中的text的过程。</h3>
+<p>由于talkback最新版本属于google维护，没有开源代码，网上公开的只有talkback6.0版本的代码，因此基于6.0版本的概要分析如下</p>
+<p>无障碍事件的分发跟4.2节流程一样，talkback处理TYPE_VIEW_ACCESSIBILITY_FOCUSED事件大致流程如下：</p>
+<p><img src="/Users/xuanliang/road/accessibility_learn/talkbacktts.jpg" alt=""></p>
+<p>talkback调用tts进行朗读主要通过com.google.android.accessibility.compositor.Compositor这个类来控制，这个类中又有一个ParseTree的类来管理朗读的内容，ParseTree通过一个compositor.json的文件来定义朗读的内容的规则，比如一个简单的按钮，在talkback模式下不仅需要读出按钮的内容，还需要读出按钮的状态（比如disabled），因此朗读的内容是一个拼接起来的结果，比如下面就是通过解析compositor.json来读出一个按钮内容的大概流程。</p>
+<p>以下在compositor.json中某几个节点类型的定义，</p>
+<p>$开头会被解析成ParseTreeVariableNode，比如 &ldquo;node.text&quot;经过ParseTreeVariableNode的处理会取出Button中text（也就是AccessibilityEvent中AccessibilityNodeInfo中的mText）</p>
+<p>@开头会被解析成ParseTreeResourceNode，最后会通过Resource取出字段的内容，比如&rdquo;@string/value_button&quot;中文下会被解析为“按钮”，</p>
+<p>&ldquo;@string/value_disabled&quot;中文下会被解析为“已停用”。</p>
+<pre><code>     &quot;notify_disabled&quot;: {
+      &quot;if&quot;: &quot;$node.isActionable &amp;&amp; !$node.isEnabled&quot;,
+      &quot;then&quot;: &quot;@string/value_disabled&quot;
+     },
 
-<p>可以看出，绿框出现的条件有AccessibilityManager可用（isEnabled）、开启了TouchExploration模式（同上第二点）等。</p>
+....
 
-<p>4.talkback如何获取view的内容从而调用tts进行朗读？</p>
-
-<p>5.为什么实现了AccessibilityService的apk安装后设置无障碍就会出现相关的开关？</p>
-
-<p>有待研究，猜测是从PKMS中查询。</p>
-
-<p>6.打开某个页面时talkback的默认焦点怎么来的？</p>
+     &quot;get_node_text&quot;: {  // AccessibilityNodeInfoUtils.getNodeText()
+      &quot;fallback&quot;: [
+        {
+          // If focusing on-screen keyboard key... apply speak-passwords policy to hide key name.
+          &quot;if&quot;: &quot;$event.sourceIsKeyboard &amp;&amp; $global.lastTextEditIsPassword &amp;&amp; !$global.speakPasswordOnAndroidShowingPasswords&quot;,
+          &quot;then&quot;: &quot;@string/symbol_bullet&quot;,
+          &quot;else&quot;: &quot;$node.contentDescription&quot;
+        },
+        &quot;$node.text&quot;
+      ]
+    },
+    &quot;get_role_description_or_default&quot;: {
+      &quot;fallback&quot;: [
+        &quot;$node.roleDescription&quot;,
+        &quot;%node_role&quot;
+      ]
+    },
+    &quot;node_role&quot;: {
+      &quot;switch&quot;: &quot;$node.role&quot;,
+      &quot;cases&quot;: {
+        &quot;button&quot;: &quot;@string/value_button&quot;,
+        &quot;check_box&quot;: &quot;@string/value_checkbox&quot;,
+        &quot;drop_down_list&quot;: &quot;@string/value_spinner&quot;,
+        &quot;edit_text&quot;: &quot;@string/value_edit_box&quot;,
+        &quot;grid&quot;: &quot;@string/value_gridview&quot;,
+        &quot;image&quot;: &quot;@string/value_image&quot;,
+        &quot;image_button&quot;: &quot;@string/value_button&quot;, // Same as |button|
+        &quot;list&quot;: &quot;@string/value_listview&quot;,
+        &quot;pager&quot;: &quot;@string/value_pager&quot;,
+        &quot;progress_bar&quot;: &quot;@string/value_progress_bar&quot;,
+        &quot;radio_button&quot;: &quot;@string/value_radio_button&quot;,
+        &quot;seek_control&quot;: &quot;@string/value_seek_bar&quot;,
+        &quot;switch&quot;: &quot;@string/value_switch&quot;,
+        &quot;tab_bar&quot;: &quot;@string/value_tabwidget&quot;,
+        &quot;toggle_button&quot;: &quot;@string/value_switch&quot;, // Same as |switch|
+        &quot;view_group&quot;: &quot;&quot;, // None
+        &quot;web_view&quot;: &quot;@string/value_webview&quot;,
+        &quot;checked_text_view&quot;: &quot;&quot; // None
+      }
+    },
+</code></pre><p>ttsOutput</p>
+<p>TYPE_VIEW_ACCESSIBILITY_FOCUSED</p>
+<p>​     get_description_for_tree</p>
+<p>​        StateNameRolePosition</p>
+<p>​              tree_description_with_label</p>
+<p>​                 append_description_for_tree</p>
+<p>​                 |  &ldquo;conditionalPrepend(%description_for_tree_status, %description_for_tree_nodes)&rdquo;</p>
+<p>​                 |      description_for_tree_nodes</p>
+<p>​                 |           get_description_for_node</p>
+<p>​                 |             rule_default</p>
+<p>​                 |                node_text_and_role</p>
+<p>​                 |                    rule_view_group（%get_node_text）</p>
+<p>​                 |                    |    &ldquo;$node.text&rdquo;&mdash;&mdash;&mdash;&ndash;取出“Button的text”</p>
+<p>​                 |                    get_role_description_or_default</p>
+<p>​                 |                    |     %node_role&mdash;&mdash;&mdash;&mdash;-取出“按钮的String资源”</p>
+<p>​                  notify_disabled&mdash;&mdash;&mdash;&mdash;-取出“已停用的String资源”</p>
+<p>最后talkback朗读“xxx，按钮，已停用”</p>
+<h2 id="五webview下的无障碍分析">五、WebView下的无障碍分析</h2>
+<p>参考资料：</p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/Accessibility">MDN Web 文档</a></p>
+<p><a href="https://www.w3.org/WAI/standards-guidelines/aria/">WAI-ARIA</a></p>
+<p><a href="https://w3c.github.io/WCAG21-zh/index.html">Web Content Accessibility Guidelines (WCAG) 2.1</a></p>
+<p><a href="https://www.w3.org/WAI/fundamentals/accessibility-intro/zh-hans">Web无障碍简介</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/web/1106_yucm_web20access/index.html">基于 Web 2.0 开发无障碍访问 Web 应用的最佳实践</a></p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/learn/Accessibility/HTML:%E4%B8%BA%E5%8F%AF%E8%AE%BF%E9%97%AE%E6%80%A7%E6%8F%90%E4%BE%9B%E4%B8%80%E4%B8%AA%E8%89%AF%E5%A5%BD%E7%9A%84%E5%9F%BA%E7%A1%80">HTML: A good basis for accessibility</a></p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/Cross_browser_testing/%E5%8F%AF%E8%AE%BF%E9%97%AE%E6%80%A7">Handling common accessibility problems</a></p>
+<p><a href="https://fae.disability.illinois.edu/">Functional Accessibility Evaluator 2.1</a></p>
+<p><a href="https://tenon.io/">https://tenon.io/</a></p>
+<p><a href="https://www.deque.com/products/axe/">https://www.deque.com/products/axe/</a></p>
+<p>主要用到WAI-ARIA技术，是Web Accessibility Initiative - Accessible Rich Internet Applications 的缩写，主要解决的一个问题：让残障人士能无障碍地访问网页上的动态内容。         ——百度百科</p>
+<p>mSupportedHtmlElementTypes值为</p>
+<p>“ARTICLE,BUTTON,CHECKBOX,COMBOBOX,CONTROL,FOCUSABLE,FRAME,GRAPHIC,H1,H2,H3,H4,H5,H6,HEADING,LANDMARK,LINK,LIST,LIST_ITEM,MAIN,MEDIA,RADIO,SECTION,TABLE,TEXT_FIELD,UNVISITED_LINK,VISITED_LINK”</p>
+<p>​</p>
 
     </div>
 
@@ -941,6 +1127,8 @@ private boolean getAccessibilityFocusedRect(Rect bounds) {
 
     
 
+  
+
         </div>
       </div>
     </main>
@@ -986,7 +1174,7 @@ private boolean getAccessibilityFocusedRect(Rect bounds) {
     &copy;
     
       2017 -
-    2019
+    2020
     <span class="heart">
       
       <i class="iconfont">
@@ -1031,6 +1219,12 @@ private boolean getAccessibilityFocusedRect(Rect bounds) {
 
 
 <script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
 
 
 
