@@ -765,7 +765,7 @@ public int displaySearchResults() {
 &lt;p&gt;&lt;a href=&#34;https://developer.android.google.cn/guide/topics/ui/accessibility&#34;&gt;无障碍开发google官方文档&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&#34;三无障碍服务框架结构分析&#34;&gt;三、无障碍服务框架结构分析&lt;/h2&gt;
 &lt;h3 id=&#34;31结构&#34;&gt;3.1.结构&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/%E6%97%A0%E9%9A%9C%E7%A2%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/accessibility/%E6%97%A0%E9%9A%9C%E7%A2%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h3 id=&#34;32相关类图&#34;&gt;3.2、相关类图&lt;/h3&gt;
 &lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/accessibilityclass.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;整个talkback机制涉及了4个进程，SystemServer（蓝色部分）、Talkback（黄色部分）、被辅助app进程（绿色部分），TTS引擎进程（暂不分析）&lt;/p&gt;
