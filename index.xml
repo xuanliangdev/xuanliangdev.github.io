@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>关于</title>
+      <title>About</title>
       <link>https://xuanliangdev.github.io/about/</link>
       <pubDate>Sat, 03 Aug 2019 00:00:00 +0000</pubDate>
       
@@ -765,18 +765,20 @@ public int displaySearchResults() {
 &lt;p&gt;&lt;a href=&#34;https://developer.android.google.cn/guide/topics/ui/accessibility&#34;&gt;无障碍开发google官方文档&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&#34;三无障碍服务框架结构分析&#34;&gt;三、无障碍服务框架结构分析&lt;/h2&gt;
 &lt;h3 id=&#34;31结构&#34;&gt;3.1.结构&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&#34;https://xuanliangdev.github.io/Users/xuanliang/road/accessibility_learn/%E6%97%A0%E9%9A%9C%E7%A2%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/%E6%97%A0%E9%9A%9C%E7%A2%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h3 id=&#34;32相关类图&#34;&gt;3.2、相关类图&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&#34;https://xuanliangdev.github.io/Users/xuanliang/road/accessibility_learn/accessibilityclass.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/accessibilityclass.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;整个talkback机制涉及了4个进程，SystemServer（蓝色部分）、Talkback（黄色部分）、被辅助app进程（绿色部分），TTS引擎进程（暂不分析）&lt;/p&gt;
 &lt;p&gt;四个AIDL接口，图上红色部分&lt;/p&gt;
 &lt;h4 id=&#34;321talkback辅助app实现了accessibilityservice的app&#34;&gt;3.2.1、talkback（辅助app，实现了AccessibilityService的app）&lt;/h4&gt;
-&lt;p&gt;&lt;img src=&#34;https://xuanliangdev.github.io/Users/xuanliang/road/accessibility_learn/a11yservice.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;p&gt;talkback实现了AccessiblityService用于接收系统传过来的无障碍事件。&lt;/p&gt;
+&lt;p&gt;辅助app需要用到的最framewors目录中相关的类，主要是继承AccessibilityService从而接收SystemServer进程发送过来的无障碍事件并进行相关处理&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/a11yservice.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h4 id=&#34;322被辅助app进程被辅助app&#34;&gt;3.2.2、被辅助app进程（被辅助app）&lt;/h4&gt;
-&lt;p&gt;&lt;img src=&#34;https://xuanliangdev.github.io/Users/xuanliang/road/accessibility_learn/viewaccessibility.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;被辅助的app的无障碍特性主要是通过扩展Android的View框架的功能对外提供，因此无障碍相关的类主要放在view包中，如下。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/viewaccessibility.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h4 id=&#34;323system_process&#34;&gt;3.2.3、system_process&lt;/h4&gt;
-&lt;p&gt;&lt;img src=&#34;https://xuanliangdev.github.io/Users/xuanliang/road/accessibility_learn/a11yms.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;SystemServer进程中的无障碍服务管理类如下所示，比如核心的AccessibilityManagerService，用于协调辅助app进程和被辅助app进程的交互；TouchExpolorer用于实现“触摸浏览”手势功能等。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/a11yms.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;系统进程SystemServer中的AccessibilityManagerService，用来管理所有的无障碍服务，类似AMS，SystemServer启动时会在startOtherServices方法中启动AccessibilityManagerService，startOtherServices方法在ActivityManagerService、PackageManagerService等一些核心服务的后面启动。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;com.android.server.SystemServer.java
 
@@ -797,7 +799,7 @@ private void startOtherServices() {
 ...
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;334tts&#34;&gt;3.3.4、TTS&lt;/h5&gt;
-&lt;p&gt;&lt;img src=&#34;https://xuanliangdev.github.io/Users/xuanliang/road/accessibility_learn/tts.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/tts.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;暂不分析&lt;/p&gt;
 &lt;h3 id=&#34;33-无障碍框架aidl接口&#34;&gt;3.3 无障碍框架AIDL接口&lt;/h3&gt;
 &lt;p&gt;理解无障碍框架的aidl的设计是理解无障碍框架的关键。&lt;/p&gt;
@@ -1104,7 +1106,7 @@ public void onServiceConnected(ComponentName componentName, IBinder service) {
         connection);
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;将AccessibilityServiceConnection保存到AccessibilityInteractionClient中。&lt;/p&gt;
 &lt;h3 id=&#34;42无障碍模式下视图状态初始化流程&#34;&gt;4.2、无障碍模式下视图状态初始化流程。&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&#34;https://xuanliangdev.github.io/Users/xuanliang/road/accessibility_learn/findAccessibilityNodeInfoByAccessibilityId.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/findAccessibilityNodeInfoByAccessibilityId.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h5 id=&#34;分析该流程原因&#34;&gt;分析该流程原因：&lt;/h5&gt;
 &lt;h5 id=&#34;为了辅助理解如下方法&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
 &lt;h5 id=&#34;1getaccessibilitynodeprovider&#34;&gt;1、getAccessibilityNodeProvider&lt;/h5&gt;
@@ -1114,7 +1116,7 @@ public void onServiceConnected(ComponentName componentName, IBinder service) {
 &lt;p&gt;3、AccessibilityNodePrefetcher在取出DecorView的无障碍节点后，会进一步通过prefetchDescendantsOfRealNode方法取子view的无障碍节点。同理，如果我们重写了&lt;strong&gt;getAccessibilityNodeProvider&lt;/strong&gt;方法（一些特殊的自定义view需要自己重写该方法，比如webview，android.widget.NumberPicker等），重写getAccessibilityNodeProvider，需要我们实现一个AccessibilityNodeProvider的子类，来实现虚拟的view来支持无障碍模式。通常实现比较复杂的view时会重写这两个方法&lt;/p&gt;
 &lt;h3 id=&#34;43无障碍事件分发流程重要app适配无障碍以及处理无障碍相关问题主要通过该流程入手&#34;&gt;4.3、无障碍事件分发流程（重要，app适配无障碍以及处理无障碍相关问题主要通过该流程入手）。&lt;/h3&gt;
 &lt;p&gt;流程：被辅助app将无障碍事件发送给辅助app，systemserver进程作为中转，接口为IAccessibilityManager.aidl和IAccessibilityServiceClient.aidl&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://xuanliangdev.github.io/Users/xuanliang/road/accessibility_learn/sendaccessibilityevent.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/sendaccessibilityevent.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h5 id=&#34;分析该流程原因-1&#34;&gt;分析该流程原因：&lt;/h5&gt;
 &lt;h5 id=&#34;为了辅助理解如下方法-1&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
 &lt;h5 id=&#34;1sendaccessibilityevent&#34;&gt;&lt;strong&gt;1、sendAccessibilityEvent&lt;/strong&gt;&lt;/h5&gt;
@@ -1300,7 +1302,7 @@ public boolean requestSendAccessibilityEvent(View child, AccessibilityEvent even
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;接着无障碍事件会通过AccessibilityManager的sendAccessibilityEvent方法跨进程调用systemserver进程的AccessibilityManagerService，将类型为TYPE_VIEW_HOVER_ENTER的AccessibilityEvent事件传递到talkback的的TalkBackService（继承自AccessibilityService）的onAccessibilityEvent方法中（或者其他实现了AccessibilityService的应用）。&lt;/p&gt;
 &lt;h3 id=&#34;44执行无障碍事件流程以talkback发出focus无障碍事件到被辅助的app端通过viewrootimpl绘制绿框焦点过程进行分析&#34;&gt;4.4、执行无障碍事件流程（以talkback发出focus无障碍事件，到被辅助的app端通过ViewRootImpl绘制绿框焦点过程进行分析）。&lt;/h3&gt;
 &lt;p&gt;流程：辅助app（talkback）将无障碍事件发送给被辅助app，systemserver进程作为中转，接口为IAccessibilityServiceConnection.aidl和IAccessibilityInteractionConnection.aidl&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://xuanliangdev.github.io/Users/xuanliang/road/accessibility_learn/requesfocus.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/requesfocus.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h5 id=&#34;分析该流程原因-2&#34;&gt;分析该流程原因：&lt;/h5&gt;
 &lt;h5 id=&#34;为了辅助理解如下方法-2&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
 &lt;h5 id=&#34;accessibilitynodeinfoperformaction&#34;&gt;AccessibilityNodeInfo.performAction&lt;/h5&gt;
@@ -1384,7 +1386,7 @@ private boolean getAccessibilityFocusedRect(Rect bounds) {
 &lt;h3 id=&#34;45talkback调用tts读出view中的text的过程&#34;&gt;4.5、talkback调用TTS读出view中的text的过程。&lt;/h3&gt;
 &lt;p&gt;由于talkback最新版本属于google维护，没有开源代码，网上公开的只有talkback6.0版本的代码，因此基于6.0版本的概要分析如下&lt;/p&gt;
 &lt;p&gt;无障碍事件的分发跟4.2节流程一样，talkback处理TYPE_VIEW_ACCESSIBILITY_FOCUSED事件大致流程如下：&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://xuanliangdev.github.io/Users/xuanliang/road/accessibility_learn/talkbacktts.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/talkbacktts.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;talkback调用tts进行朗读主要通过com.google.android.accessibility.compositor.Compositor这个类来控制，这个类中又有一个ParseTree的类来管理朗读的内容，ParseTree通过一个compositor.json的文件来定义朗读的内容的规则，比如一个简单的按钮，在talkback模式下不仅需要读出按钮的内容，还需要读出按钮的状态（比如disabled），因此朗读的内容是一个拼接起来的结果，比如下面就是通过解析compositor.json来读出一个按钮内容的大概流程。&lt;/p&gt;
 &lt;p&gt;以下在compositor.json中某几个节点类型的定义，&lt;/p&gt;
 &lt;p&gt;$开头会被解析成ParseTreeVariableNode，比如 &amp;ldquo;node.text&amp;quot;经过ParseTreeVariableNode的处理会取出Button中text（也就是AccessibilityEvent中AccessibilityNodeInfo中的mText）&lt;/p&gt;
@@ -1454,21 +1456,6 @@ private boolean getAccessibilityFocusedRect(Rect bounds) {
 &lt;p&gt;​                 |                    |     %node_role&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;-取出“按钮的String资源”&lt;/p&gt;
 &lt;p&gt;​                  notify_disabled&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;-取出“已停用的String资源”&lt;/p&gt;
 &lt;p&gt;最后talkback朗读“xxx，按钮，已停用”&lt;/p&gt;
-&lt;h2 id=&#34;五webview下的无障碍分析&#34;&gt;五、WebView下的无障碍分析&lt;/h2&gt;
-&lt;p&gt;参考资料：&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://developer.mozilla.org/zh-CN/docs/Web/Accessibility&#34;&gt;MDN Web 文档&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://www.w3.org/WAI/standards-guidelines/aria/&#34;&gt;WAI-ARIA&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://w3c.github.io/WCAG21-zh/index.html&#34;&gt;Web Content Accessibility Guidelines (WCAG) 2.1&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://www.w3.org/WAI/fundamentals/accessibility-intro/zh-hans&#34;&gt;Web无障碍简介&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://www.ibm.com/developerworks/cn/web/1106_yucm_web20access/index.html&#34;&gt;基于 Web 2.0 开发无障碍访问 Web 应用的最佳实践&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://developer.mozilla.org/zh-CN/docs/learn/Accessibility/HTML:%E4%B8%BA%E5%8F%AF%E8%AE%BF%E9%97%AE%E6%80%A7%E6%8F%90%E4%BE%9B%E4%B8%80%E4%B8%AA%E8%89%AF%E5%A5%BD%E7%9A%84%E5%9F%BA%E7%A1%80&#34;&gt;HTML: A good basis for accessibility&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/Cross_browser_testing/%E5%8F%AF%E8%AE%BF%E9%97%AE%E6%80%A7&#34;&gt;Handling common accessibility problems&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://fae.disability.illinois.edu/&#34;&gt;Functional Accessibility Evaluator 2.1&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://tenon.io/&#34;&gt;https://tenon.io/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://www.deque.com/products/axe/&#34;&gt;https://www.deque.com/products/axe/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;主要用到WAI-ARIA技术，是Web Accessibility Initiative - Accessible Rich Internet Applications 的缩写，主要解决的一个问题：让残障人士能无障碍地访问网页上的动态内容。         ——百度百科&lt;/p&gt;
-&lt;p&gt;mSupportedHtmlElementTypes值为&lt;/p&gt;
-&lt;p&gt;“ARTICLE,BUTTON,CHECKBOX,COMBOBOX,CONTROL,FOCUSABLE,FRAME,GRAPHIC,H1,H2,H3,H4,H5,H6,HEADING,LANDMARK,LINK,LIST,LIST_ITEM,MAIN,MEDIA,RADIO,SECTION,TABLE,TEXT_FIELD,UNVISITED_LINK,VISITED_LINK”&lt;/p&gt;
 &lt;p&gt;​&lt;/p&gt;
 </description>
       
