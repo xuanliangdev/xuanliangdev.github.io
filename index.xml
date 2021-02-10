@@ -19,7 +19,7 @@
       <guid>https://xuanliangdev.github.io/about/</guid>
       
         <description>&lt;h3 id=&#34;小米android程序员&#34;&gt;小米android程序员&lt;/h3&gt;
-&lt;p&gt;在职天数505天。&lt;/p&gt;
+&lt;p&gt;在职天数878天。&lt;/p&gt;
 </description>
       
     </item>
@@ -33,7 +33,7 @@
       
         <description>&lt;h1 id=&#34;1preference体系学习总结&#34;&gt;1.preference体系学习总结&lt;/h1&gt;
 &lt;p&gt;类图&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws2.sinaimg.cn/large/006tNbRwgy1fx3akmgz13j31cg133k17.jpg&#34; alt=&#34;preferenceclass&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/preferenceclass.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分）&lt;/p&gt;
 &lt;h2 id=&#34;11-数据结构描述&#34;&gt;1.1 数据结构描述&lt;/h2&gt;
 &lt;p&gt;&lt;strong&gt;1.1.1&lt;/strong&gt; &lt;strong&gt;preference&lt;/strong&gt;：&lt;/p&gt;
@@ -81,7 +81,7 @@
 &lt;p&gt;从这个adapter和layout布局(preference_header_item.xml)可以看出一个header只有这三项。&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2 id=&#34;12-preferencefragment加载xml源码分析旧&#34;&gt;1.2 PreferenceFragment加载xml源码分析（旧）&lt;/h2&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws3.sinaimg.cn/large/006tNbRwgy1fwwaqbe99dj30ul14l76u.jpg&#34; alt=&#34;PreferenceFragmentBuild&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/fragmentaddxml.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;重要流程说明：&lt;/p&gt;
 &lt;p&gt;第8步：PreferenceInflater是一个xml解析器，通过解析xml取出节点，然后反射生成PreferenceScreen对象&lt;/p&gt;
 &lt;h2 id=&#34;13--preferencefragment点击事件触发流程旧&#34;&gt;1.3  PreferenceFragment点击事件触发流程（旧）&lt;/h2&gt;
@@ -92,7 +92,7 @@
                 PreferenceManager.OnPreferenceTreeClickListener的onPreferenceTreeClick
 &lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id=&#34;14-preferenceactivity加载xml源码分析&#34;&gt;1.4 PreferenceActivity加载xml源码分析&lt;/h2&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws1.sinaimg.cn/large/006tNbRwgy1fwgb5lgqgfj30ol0ktab8.jpg&#34; alt=&#34;preferenceActivityonCreate&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/preferenceactivityaddxml.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;重要流程说明：&lt;/p&gt;
 &lt;p&gt;第4步：生成Header的方式也是通过xml解析器解析xml的header节点然后反射生成Header对象。&lt;/p&gt;
 &lt;hr&gt;
@@ -108,10 +108,10 @@
 &lt;hr&gt;
 &lt;h1 id=&#34;2aosp中setting模块学习总结&#34;&gt;2.aosp中Setting模块学习总结&lt;/h1&gt;
 &lt;p&gt;类图&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws2.sinaimg.cn/large/006tNbRwgy1fx3akmgz13j31cg133k17.jpg&#34; alt=&#34;preferenceclass&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/preferenceclass.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;主要分析只在系统Settings中使用的部分（除去上面分析过的蓝色和绿色部分）&lt;/p&gt;
 &lt;h4 id=&#34;21-settings主页面的显示分析&#34;&gt;2.1 Settings主页面的显示分析：&lt;/h4&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws2.sinaimg.cn/large/006tNbRwgy1fwv0gkkantj309c0ibmz4.jpg&#34; alt=&#34;pscreen&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/aospsettings.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;aosp中P版本设置界面如上图所示，除去没显示的，主界面中一共展示了12个列表项，先分析列表项，后面再分析搜索和suggestion项。&lt;/p&gt;
 &lt;p&gt;主Activity为Settings，继承于SettingsActivity，内部包含一个DashboardSummary的Fragment，从类图上看出DashboardSummary并没有用到preference的那一套东西。布局也相对简单，只有一个FocusRecyclerView，页面的布局由DashboardAdapter负责，DashboardAdapter用到的所有数据由DashboardData进行描述。这里只分析DashboardData中的DashboardCategory，也就是12个列表项所属的DashboardCategory，对于设置主界面来说只有一个DashboardCategory，如下：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;meta-data android:name=&amp;quot;com.android.settings.category&amp;quot;
@@ -133,7 +133,7 @@
 &lt;p&gt;&lt;strong&gt;SuggestionFeatureProviderImpl&lt;/strong&gt;实现了&lt;strong&gt;SuggestionFeatureProvider&lt;/strong&gt;接口，应该是用于获取推荐信息，后面再分析。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;FeatureFactoryImpl&lt;/strong&gt;实现了&lt;strong&gt;FeatureFactory&lt;/strong&gt;接口，通过反射生成，用于生成DashboardFeatureProviderImpl和SuggestionFeatureProviderImpl等一些FeatureProvider对象。&lt;/p&gt;
 &lt;p&gt;整个设置主界面加载流程大致如图所示&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws4.sinaimg.cn/large/006tNbRwgy1fww0pjn6xtj31kw1oewmo.jpg&#34; alt=&#34;dashboardsummary&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/dashboardsummary.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;图中绿色为主线程，其他线程为后台线程。&lt;/p&gt;
 &lt;p&gt;对于流程做个简单的分析。&lt;/p&gt;
 &lt;h5 id=&#34;1-settingsactivity的oncreate流程&#34;&gt;1. SettingsActivity的onCreate流程&lt;/h5&gt;
@@ -205,7 +205,7 @@ void updateSummaryIfNeeded(Tile tile, CharSequence summary) {
 &lt;h3 id=&#34;22-securitysettings页面的显示流程分析&#34;&gt;2.2 SecuritySettings页面的显示流程分析：&lt;/h3&gt;
 &lt;p&gt;Settings主界面的显示完全是动态的，而除去主界面其他的Fragment的显示则是动态和静态相结合，以要分析的SecuritySettings来说明。SecuritySettings的继承于DashboardFragment，而DashboardFragment主要就是用来加载动态和静态的item。DashboardFragment最终继承于PreferenceFragment，因此可以解析xml中配置的preference来进行显示，而且持有DashboardFeatureProviderImpl对象，因此也可以加载DashboardCategory中的Tile进行显示。&lt;/p&gt;
 &lt;p&gt;SecuritySettings界面显示是这个样子的：&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws3.sinaimg.cn/large/006tNbRwgy1fww1moiavmj30990icwgc.jpg&#34; alt=&#34;securitysettings&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/securitysettings.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;layout文件R.xml.security_dashboard_settings如下所示：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;PreferenceScreen
     xmlns:android=&amp;quot;http://schemas.android.com/apk/res/android&amp;quot;
@@ -430,7 +430,7 @@ void refreshDashboardTiles(final String TAG) {
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在SummaryLoader的getSummaryProvider方法第二行中当前包名为com.android.settings，而tile的包名为com.google.android.gms，因此返回空，从注释也可以看出，如果当前的tile不在Settings应用中，是不能获取到SummaryProvider的。因此后面的通知Adapter进行Summary的刷新操作也就不会执行了，&lt;/p&gt;
 &lt;h1 id=&#34;3aosp-80-settingssearch分析&#34;&gt;3.aosp 8.0 SettingsSearch分析&lt;/h1&gt;
 &lt;p&gt;类图&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws4.sinaimg.cn/large/006tNbRwgy1fx3eqhh74zj30u017aqc3.jpg&#34; alt=&#34;aospsearchclass&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/aospsettingsdatabase.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h2 id=&#34;31搜索的数据源&#34;&gt;3.1搜索的数据源&lt;/h2&gt;
 &lt;p&gt;SearchIndexableData:用于搜索的可索引数据&lt;/p&gt;
 &lt;p&gt;SearchIndexableResource：xml资源&lt;/p&gt;
@@ -448,7 +448,7 @@ void refreshDashboardTiles(final String TAG) {
 &lt;p&gt;IndexDatabaseHelper：提供数据库的操作，数据库文件位于data/user_de/0/com.android.settings/databases/search_index.db&lt;/p&gt;
 &lt;h2 id=&#34;32数据库构建过程&#34;&gt;3.2数据库构建过程&lt;/h2&gt;
 &lt;p&gt;设置中的界面大部分都是通过xml文件中声明的Preference类的各种子类构建而成，页面打开时通过解析xml文件中的各个节点从而构建成listview中的各个item从而进行显示，以日期和时间页面DateTimeSettings为例:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws1.sinaimg.cn/large/006tNbRwgy1fx11cudlk5j307g0chjru.jpg&#34; alt=&#34;datatimephone&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/datatimephone.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;构成这个界面的文件date_time_prefs.xml如下&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;utf-8&amp;quot;?&amp;gt;
 
@@ -497,9 +497,9 @@ void refreshDashboardTiles(final String TAG) {
 &lt;p&gt;title为显示的标题，summary为摘要，keywords为关键词（不直接显示，用于搜索），留意上面的settings:keywords=&amp;rdquo;@string/keywords_date_and_time&amp;quot;中keywords_date_and_time的值为&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;string name=&amp;quot;keywords_date_and_time&amp;quot; msgid=&amp;quot;758325881602648204&amp;quot;&amp;gt;&amp;quot;时钟, 军用&amp;quot;&amp;lt;/string&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;上面写的是界面跟xml的关系，搜索过程是一个数据库的检索过程，因此搜索需要用到数据库，数据库数据的来源就是上面的xml文件，从模拟器取出search_index.db数据库观察，如下图&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws2.sinaimg.cn/large/006tNbRwgy1fx1282l0m3j30t40fpq77.jpg&#34; alt=&#34;searchdb&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/seachdb.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;可见xml的数据跟数据库中的记录也是一一对应的，因此搜索过程就是数据库的检索过程，输入搜索的字符串最终会转换成SQL数据库查询语句从而返回查询结果。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws1.sinaimg.cn/large/006tNbRwgy1fx12ff9u4tj307j0d8aal.jpg&#34; alt=&#34;军用&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/searchdemo.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;之所以搜索军用能出现日期和时间的结果，是因为“军用”是keyword的一部分&lt;/p&gt;
 &lt;p&gt;设置中也能搜索其他app的数据，只要其实现了SearchIndexablesProvider，以phone的app为例，&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;public class PhoneSearchIndexablesProvider extends SearchIndexablesProvider {
@@ -520,10 +520,10 @@ void refreshDashboardTiles(final String TAG) {
    ...
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这样实现后（还需要在AndroidManifest里面做些配置），设置app就能跨进程取到network_setting_fragment.xml中的数据并加入search_index.db数据库，如下&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws2.sinaimg.cn/large/006tNbRwgy1fx12zl3typj30u30cc41w.jpg&#34; alt=&#34;phonedb&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/phonedb.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;下面简单分析下数据库的创建过程：&lt;/p&gt;
 &lt;p&gt;刚进入设置创建数据库流程如下：&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://ws1.sinaimg.cn/large/006tNbRwgy1fx2a2t9qhzj31050t9gnq.jpg&#34; alt=&#34;aospsearchcreatedb&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/aospsearchcreatedb.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;当点击搜索按钮后会启动SearchFragment&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;@Override
 public void onAttach(Context context) {
@@ -771,7 +771,7 @@ public int displaySearchResults() {
 &lt;p&gt;整个talkback机制涉及了4个进程，SystemServer（蓝色部分）、Talkback（黄色部分）、被辅助app进程（绿色部分），TTS引擎进程（暂不分析）&lt;/p&gt;
 &lt;p&gt;四个AIDL接口，图上红色部分&lt;/p&gt;
 &lt;h4 id=&#34;321talkback辅助app实现了accessibilityservice的app&#34;&gt;3.2.1、talkback（辅助app，实现了AccessibilityService的app）&lt;/h4&gt;
-&lt;p&gt;辅助app需要用到的最framewors目录中相关的类，主要是继承AccessibilityService从而接收SystemServer进程发送过来的无障碍事件并进行相关处理&lt;/p&gt;
+&lt;p&gt;辅助app需要用到的在framewors目录中相关的类，主要是继承AccessibilityService从而接收SystemServer进程发送过来的无障碍事件并进行相关处理&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/a11yservice.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h4 id=&#34;322被辅助app进程被辅助app&#34;&gt;3.2.2、被辅助app进程（被辅助app）&lt;/h4&gt;
 &lt;p&gt;被辅助的app的无障碍特性主要是通过扩展Android的View框架的功能对外提供，因此无障碍相关的类主要放在view包中，如下。&lt;/p&gt;
@@ -1109,8 +1109,9 @@ public void onServiceConnected(ComponentName componentName, IBinder service) {
 &lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/findAccessibilityNodeInfoByAccessibilityId.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h5 id=&#34;分析该流程原因&#34;&gt;分析该流程原因：&lt;/h5&gt;
 &lt;h5 id=&#34;为了辅助理解如下方法&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
-&lt;h5 id=&#34;1getaccessibilitynodeprovider&#34;&gt;1、getAccessibilityNodeProvider&lt;/h5&gt;
-&lt;h5 id=&#34;2oninitializeaccessibilitynodeinfo&#34;&gt;2、onInitializeAccessibilityNodeInfo&lt;/h5&gt;
+&lt;h5 id=&#34;getaccessibilitynodeprovider&#34;&gt;getAccessibilityNodeProvider&lt;/h5&gt;
+&lt;h5 id=&#34;oninitializeaccessibilitynodeinfo&#34;&gt;onInitializeAccessibilityNodeInfo&lt;/h5&gt;
+&lt;p&gt;主要流程分析：&lt;/p&gt;
 &lt;p&gt;1、talkback打开状态下，新的应用打开时，TalkbackService会接收到类型为TYPE_WINDOWS_CHANGED的无障碍事件，这个事件是SystemServer进程接收到其他进程发出的TYPE_VIEW_ACCESSIBILITY_FOCUSED事件时附带发出的，应用发出TYPE_VIEW_ACCESSIBILITY_FOCUSED事件的流程在下一节分析，暂时跳过。&lt;/p&gt;
 &lt;p&gt;2、当tailback收到TYPE_WINDOWS_CHANGED事件时，会间接调用调用父类AccessibilityService的getRootInActiveWindow方法，如上图，经过SystemServer进程中转后会调用到DecorView的getAccessibilityNodeProvider，由于DecorView没有重写getAccessibilityNodeProvider方法，因此会调用到View的createAccessibilityNodeInfo方法，进一步会调用到&lt;strong&gt;onInitializeAccessibilityNodeInfo&lt;/strong&gt;方法，如果没有重写该方法，则默认实现在onInitializeAccessibilityNodeInfoInternal中。&lt;/p&gt;
 &lt;p&gt;3、AccessibilityNodePrefetcher在取出DecorView的无障碍节点后，会进一步通过prefetchDescendantsOfRealNode方法取子view的无障碍节点。同理，如果我们重写了&lt;strong&gt;getAccessibilityNodeProvider&lt;/strong&gt;方法（一些特殊的自定义view需要自己重写该方法，比如webview，android.widget.NumberPicker等），重写getAccessibilityNodeProvider，需要我们实现一个AccessibilityNodeProvider的子类，来实现虚拟的view来支持无障碍模式。通常实现比较复杂的view时会重写这两个方法&lt;/p&gt;
@@ -1119,14 +1120,13 @@ public void onServiceConnected(ComponentName componentName, IBinder service) {
 &lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/sendaccessibilityevent.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;h5 id=&#34;分析该流程原因-1&#34;&gt;分析该流程原因：&lt;/h5&gt;
 &lt;h5 id=&#34;为了辅助理解如下方法-1&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
-&lt;h5 id=&#34;1sendaccessibilityevent&#34;&gt;&lt;strong&gt;1、sendAccessibilityEvent&lt;/strong&gt;&lt;/h5&gt;
-&lt;p&gt;&lt;strong&gt;2、sendAccessibilityEventUnchecked&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;3、onInitializeAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;4、dispatchPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;5、onPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;6、onRequestSendAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;talkback开启触摸浏览（Explore by Touch）模式下输入事件的传递&lt;/p&gt;
-&lt;p&gt;1、由于talkback的无障碍服务中声明了android:canRequestTouchExplorationMode=&amp;quot;true&amp;rdquo;，因此开启talkback后AccessibilityManagerService会更新AccessibilityInputFilter成员变量的触摸浏览（FLAG_FEATURE_TOUCH_EXPLORATION）的特性为true。&lt;/p&gt;
+&lt;h5 id=&#34;sendaccessibilityevent&#34;&gt;&lt;strong&gt;sendAccessibilityEvent&lt;/strong&gt;&lt;/h5&gt;
+&lt;p&gt;&lt;strong&gt;sendAccessibilityEventUnchecked&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;onInitializeAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;dispatchPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;onPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;onRequestSendAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;由于talkback的无障碍服务中声明了android:canRequestTouchExplorationMode=&amp;quot;true&amp;rdquo;，因此开启talkback后AccessibilityManagerService会更新AccessibilityInputFilter成员变量的触摸浏览（FLAG_FEATURE_TOUCH_EXPLORATION）的特性为true。&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityInputFilter
 
 private void enableFeatures() {
@@ -1163,6 +1163,7 @@ class TouchExplorer extends BaseEventStreamTransformation
 ...
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;该类负责将普通的触摸事件转换为触摸浏览手势，比如将MotionEvent.ACTION_DOWN事件转换为悬停事件）（MotionEvent.ACTION_HOVER_ENTER）。因此在talkback模式下，当我们点击一次view上的控件时，应用收到的是（ACTION_HOVER_ENTER）事件，而只有双击才会传递我们熟悉的ACTION_DOWN事件&lt;/p&gt;
 &lt;p&gt;*ViewRootImpl:View层次结构的根。View的&lt;strong&gt;绘制流程&lt;/strong&gt;（测量measure、布局layout、绘制draw）和输入&lt;strong&gt;事件的分发流程&lt;/strong&gt;都是从ViewRootImp开始。&lt;/p&gt;
+&lt;p&gt;主要流程分析：&lt;/p&gt;
 &lt;p&gt;1、ViewRootImpl的内部类WindowInputEventReceiver从native方法调起dispatchInputEvent方法。&lt;/p&gt;
 &lt;p&gt;2、ViewRootImpl调用deliverInputEvent传递事件输入事件。&lt;/p&gt;
 &lt;p&gt;3、从顶层的DecorView的dispatchPointerEvent开始分发输入事件。&lt;/p&gt;
@@ -1239,7 +1240,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     return false;
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在dispatchGenericMotionEvent中，如果是Hover events，则会走到dispatchHoverEvent方法中。这个方法的机制类似dispatchTouchEvent的流程，是一个责任链模式的实现，不详细展开，默认会传到最后一个子节点的onHoverEvent方法。接着该方法会调用到sendAccessibilityHoverEvent里。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;6、sendAccessibilityHoverEvent方法接着会调用以下方法。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;3、sendAccessibilityHoverEvent方法接着会调用以下方法。&lt;/p&gt;
 &lt;p&gt;​     &lt;strong&gt;sendAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;​       &lt;strong&gt;-&amp;gt;sendAccessibilityEventUnchecked&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;​           &lt;strong&gt;-&amp;gt;onInitializeAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
@@ -1271,7 +1272,7 @@ public void onPopulateAccessibilityEvent(AccessibilityEvent event) {
     }
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;因此如果我们需要自定义textview在talkback模式下朗读的内容，或者不让某个view的内容在talkback模式下被朗读出来，可以考虑重写onPopulateAccessibilityEvent方法。&lt;/p&gt;
-&lt;p&gt;7、当我们通过第6步修改view中无障碍节点的信息后，被点击的View的sendAccessibilityEventUnchecked方法会向上通过DecorView传递到ViewRootImpl的requestSendAccessibilityEvent方法中，&lt;/p&gt;
+&lt;p&gt;4、当我们通过第3步修改view中无障碍节点的信息后，被点击的View的sendAccessibilityEventUnchecked方法会向上通过DecorView传递到ViewRootImpl的requestSendAccessibilityEvent方法中，&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;android.view.ViewRootImpl
 
 public boolean requestSendAccessibilityEvent(View child, AccessibilityEvent event) {
@@ -1306,6 +1307,7 @@ public boolean requestSendAccessibilityEvent(View child, AccessibilityEvent even
 &lt;h5 id=&#34;分析该流程原因-2&#34;&gt;分析该流程原因：&lt;/h5&gt;
 &lt;h5 id=&#34;为了辅助理解如下方法-2&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
 &lt;h5 id=&#34;accessibilitynodeinfoperformaction&#34;&gt;AccessibilityNodeInfo.performAction&lt;/h5&gt;
+&lt;p&gt;主要流程分析：&lt;/p&gt;
 &lt;p&gt;1、在talkback中有个AccessibilityEventProcessor类对无障碍事件进行集中处理，根据无障碍事件的不同类型分发到不同的处理器进行处理，比如ProcessorFocusAndSingleTap这个处理器会对类型为TYPE_VIEW_HOVER_ENTER的无障碍事件进行处理，ProcessorEventQueue（主要用于tts朗读，后面分析）这个处理器会处理所有的无障碍事件。&lt;/p&gt;
 &lt;p&gt;2、在前面一节4.2中，触摸事件TYPE_VIEW_HOVER_ENTER传递到了TalkBackService，而ProcessorFocusAndSingleTap这个类会对TYPE_VIEW_HOVER_ENTER这个事件进行处理，tryFocusing函数中会调用AccessibilityNodeInfo的performAction方法，AccessibilityNodeInfo的节点信息就是4.2节中触摸到的view的信息，因此通过AccessibilityManagerService进程中转后，会最终调用到我们触摸到的view的&lt;strong&gt;performAccessibilityAction&lt;/strong&gt;方法中去（我们也可以通过调用这个方法处理一些无障碍焦点的问题）。&lt;/p&gt;
 &lt;p&gt;3、在performAccessibilityAction会调用到performAccessibilityActionInternal，接着如果判断到是ACTION_ACCESSIBILITY_FOCUS事件，则会调用requestAccessibilityFocus函数&lt;/p&gt;
@@ -1441,7 +1443,7 @@ private boolean getAccessibilityFocusedRect(Rect bounds) {
     },
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ttsOutput&lt;/p&gt;
 &lt;p&gt;TYPE_VIEW_ACCESSIBILITY_FOCUSED&lt;/p&gt;
-&lt;p&gt;​     get_description_for_tree&lt;/p&gt;
+&lt;p&gt;get_description_for_tree&lt;/p&gt;
 &lt;p&gt;​        StateNameRolePosition&lt;/p&gt;
 &lt;p&gt;​              tree_description_with_label&lt;/p&gt;
 &lt;p&gt;​                 append_description_for_tree&lt;/p&gt;

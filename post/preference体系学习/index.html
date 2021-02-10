@@ -347,7 +347,7 @@
     <div class="post-content">
       <h1 id="1preference体系学习总结">1.preference体系学习总结</h1>
 <p>类图</p>
-<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx3akmgz13j31cg133k17.jpg" alt="preferenceclass"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/preferenceclass.png" alt=""></p>
 <p>第一部分主要学习了preference体系的相关知识（类图中蓝色和绿色部分）</p>
 <h2 id="11-数据结构描述">1.1 数据结构描述</h2>
 <p><strong>1.1.1</strong> <strong>preference</strong>：</p>
@@ -395,7 +395,7 @@
 <p>从这个adapter和layout布局(preference_header_item.xml)可以看出一个header只有这三项。</p>
 <hr>
 <h2 id="12-preferencefragment加载xml源码分析旧">1.2 PreferenceFragment加载xml源码分析（旧）</h2>
-<p><img src="https://ws3.sinaimg.cn/large/006tNbRwgy1fwwaqbe99dj30ul14l76u.jpg" alt="PreferenceFragmentBuild"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/fragmentaddxml.png" alt=""></p>
 <p>重要流程说明：</p>
 <p>第8步：PreferenceInflater是一个xml解析器，通过解析xml取出节点，然后反射生成PreferenceScreen对象</p>
 <h2 id="13--preferencefragment点击事件触发流程旧">1.3  PreferenceFragment点击事件触发流程（旧）</h2>
@@ -406,7 +406,7 @@
                 PreferenceManager.OnPreferenceTreeClickListener的onPreferenceTreeClick
 </code></pre>
 <h2 id="14-preferenceactivity加载xml源码分析">1.4 PreferenceActivity加载xml源码分析</h2>
-<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fwgb5lgqgfj30ol0ktab8.jpg" alt="preferenceActivityonCreate"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/preferenceactivityaddxml.png" alt=""></p>
 <p>重要流程说明：</p>
 <p>第4步：生成Header的方式也是通过xml解析器解析xml的header节点然后反射生成Header对象。</p>
 <hr>
@@ -422,10 +422,10 @@
 <hr>
 <h1 id="2aosp中setting模块学习总结">2.aosp中Setting模块学习总结</h1>
 <p>类图</p>
-<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx3akmgz13j31cg133k17.jpg" alt="preferenceclass"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/preferenceclass.png" alt=""></p>
 <p>主要分析只在系统Settings中使用的部分（除去上面分析过的蓝色和绿色部分）</p>
 <h4 id="21-settings主页面的显示分析">2.1 Settings主页面的显示分析：</h4>
-<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fwv0gkkantj309c0ibmz4.jpg" alt="pscreen"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/aospsettings.jpg" alt=""></p>
 <p>aosp中P版本设置界面如上图所示，除去没显示的，主界面中一共展示了12个列表项，先分析列表项，后面再分析搜索和suggestion项。</p>
 <p>主Activity为Settings，继承于SettingsActivity，内部包含一个DashboardSummary的Fragment，从类图上看出DashboardSummary并没有用到preference的那一套东西。布局也相对简单，只有一个FocusRecyclerView，页面的布局由DashboardAdapter负责，DashboardAdapter用到的所有数据由DashboardData进行描述。这里只分析DashboardData中的DashboardCategory，也就是12个列表项所属的DashboardCategory，对于设置主界面来说只有一个DashboardCategory，如下：</p>
 <pre><code>&lt;meta-data android:name=&quot;com.android.settings.category&quot;
@@ -447,7 +447,7 @@
 <p><strong>SuggestionFeatureProviderImpl</strong>实现了<strong>SuggestionFeatureProvider</strong>接口，应该是用于获取推荐信息，后面再分析。</p>
 <p><strong>FeatureFactoryImpl</strong>实现了<strong>FeatureFactory</strong>接口，通过反射生成，用于生成DashboardFeatureProviderImpl和SuggestionFeatureProviderImpl等一些FeatureProvider对象。</p>
 <p>整个设置主界面加载流程大致如图所示</p>
-<p><img src="https://ws4.sinaimg.cn/large/006tNbRwgy1fww0pjn6xtj31kw1oewmo.jpg" alt="dashboardsummary"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/dashboardsummary.png" alt=""></p>
 <p>图中绿色为主线程，其他线程为后台线程。</p>
 <p>对于流程做个简单的分析。</p>
 <h5 id="1-settingsactivity的oncreate流程">1. SettingsActivity的onCreate流程</h5>
@@ -519,7 +519,7 @@ void updateSummaryIfNeeded(Tile tile, CharSequence summary) {
 <h3 id="22-securitysettings页面的显示流程分析">2.2 SecuritySettings页面的显示流程分析：</h3>
 <p>Settings主界面的显示完全是动态的，而除去主界面其他的Fragment的显示则是动态和静态相结合，以要分析的SecuritySettings来说明。SecuritySettings的继承于DashboardFragment，而DashboardFragment主要就是用来加载动态和静态的item。DashboardFragment最终继承于PreferenceFragment，因此可以解析xml中配置的preference来进行显示，而且持有DashboardFeatureProviderImpl对象，因此也可以加载DashboardCategory中的Tile进行显示。</p>
 <p>SecuritySettings界面显示是这个样子的：</p>
-<p><img src="https://ws3.sinaimg.cn/large/006tNbRwgy1fww1moiavmj30990icwgc.jpg" alt="securitysettings"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/securitysettings.png" alt=""></p>
 <p>layout文件R.xml.security_dashboard_settings如下所示：</p>
 <pre><code>&lt;PreferenceScreen
     xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
@@ -744,7 +744,7 @@ void refreshDashboardTiles(final String TAG) {
 </code></pre><p>在SummaryLoader的getSummaryProvider方法第二行中当前包名为com.android.settings，而tile的包名为com.google.android.gms，因此返回空，从注释也可以看出，如果当前的tile不在Settings应用中，是不能获取到SummaryProvider的。因此后面的通知Adapter进行Summary的刷新操作也就不会执行了，</p>
 <h1 id="3aosp-80-settingssearch分析">3.aosp 8.0 SettingsSearch分析</h1>
 <p>类图</p>
-<p><img src="https://ws4.sinaimg.cn/large/006tNbRwgy1fx3eqhh74zj30u017aqc3.jpg" alt="aospsearchclass"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/aospsettingsdatabase.jpg" alt=""></p>
 <h2 id="31搜索的数据源">3.1搜索的数据源</h2>
 <p>SearchIndexableData:用于搜索的可索引数据</p>
 <p>SearchIndexableResource：xml资源</p>
@@ -762,7 +762,7 @@ void refreshDashboardTiles(final String TAG) {
 <p>IndexDatabaseHelper：提供数据库的操作，数据库文件位于data/user_de/0/com.android.settings/databases/search_index.db</p>
 <h2 id="32数据库构建过程">3.2数据库构建过程</h2>
 <p>设置中的界面大部分都是通过xml文件中声明的Preference类的各种子类构建而成，页面打开时通过解析xml文件中的各个节点从而构建成listview中的各个item从而进行显示，以日期和时间页面DateTimeSettings为例:</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx11cudlk5j307g0chjru.jpg" alt="datatimephone"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/datatimephone.png" alt=""></p>
 <p>构成这个界面的文件date_time_prefs.xml如下</p>
 <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 
@@ -811,9 +811,9 @@ void refreshDashboardTiles(final String TAG) {
 <p>title为显示的标题，summary为摘要，keywords为关键词（不直接显示，用于搜索），留意上面的settings:keywords=&rdquo;@string/keywords_date_and_time&quot;中keywords_date_and_time的值为</p>
 <pre><code>string name=&quot;keywords_date_and_time&quot; msgid=&quot;758325881602648204&quot;&gt;&quot;时钟, 军用&quot;&lt;/string&gt;
 </code></pre><p>上面写的是界面跟xml的关系，搜索过程是一个数据库的检索过程，因此搜索需要用到数据库，数据库数据的来源就是上面的xml文件，从模拟器取出search_index.db数据库观察，如下图</p>
-<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx1282l0m3j30t40fpq77.jpg" alt="searchdb"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/seachdb.png" alt=""></p>
 <p>可见xml的数据跟数据库中的记录也是一一对应的，因此搜索过程就是数据库的检索过程，输入搜索的字符串最终会转换成SQL数据库查询语句从而返回查询结果。</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx12ff9u4tj307j0d8aal.jpg" alt="军用"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/searchdemo.png" alt=""></p>
 <p>之所以搜索军用能出现日期和时间的结果，是因为“军用”是keyword的一部分</p>
 <p>设置中也能搜索其他app的数据，只要其实现了SearchIndexablesProvider，以phone的app为例，</p>
 <pre><code>public class PhoneSearchIndexablesProvider extends SearchIndexablesProvider {
@@ -834,10 +834,10 @@ void refreshDashboardTiles(final String TAG) {
    ...
 }
 </code></pre><p>这样实现后（还需要在AndroidManifest里面做些配置），设置app就能跨进程取到network_setting_fragment.xml中的数据并加入search_index.db数据库，如下</p>
-<p><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fx12zl3typj30u30cc41w.jpg" alt="phonedb"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/phonedb.png" alt=""></p>
 <p>下面简单分析下数据库的创建过程：</p>
 <p>刚进入设置创建数据库流程如下：</p>
-<p><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fx2a2t9qhzj31050t9gnq.jpg" alt="aospsearchcreatedb"></p>
+<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/systemsettings/aospsearchcreatedb.png" alt=""></p>
 <p>当点击搜索按钮后会启动SearchFragment</p>
 <pre><code>@Override
 public void onAttach(Context context) {
@@ -1180,7 +1180,7 @@ public int displaySearchResults() {
     &copy;
     
       2017 -
-    2020
+    2021
     <span class="heart">
       
       <i class="iconfont">

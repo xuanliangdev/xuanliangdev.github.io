@@ -69,7 +69,7 @@
 <meta itemprop="description" content="一、整理原因： 为了辅助理解无障碍google官方开发文档api的原理。 二、参考文档 无障碍开发google官方文档 三、无障碍服务框架结构分析 3">
 <meta itemprop="datePublished" content="2019-08-03T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-08-03T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="10317">
+<meta itemprop="wordCount" content="10051">
 
 
 
@@ -356,7 +356,7 @@
 <p>整个talkback机制涉及了4个进程，SystemServer（蓝色部分）、Talkback（黄色部分）、被辅助app进程（绿色部分），TTS引擎进程（暂不分析）</p>
 <p>四个AIDL接口，图上红色部分</p>
 <h4 id="321talkback辅助app实现了accessibilityservice的app">3.2.1、talkback（辅助app，实现了AccessibilityService的app）</h4>
-<p>辅助app需要用到的最framewors目录中相关的类，主要是继承AccessibilityService从而接收SystemServer进程发送过来的无障碍事件并进行相关处理</p>
+<p>辅助app需要用到的在framewors目录中相关的类，主要是继承AccessibilityService从而接收SystemServer进程发送过来的无障碍事件并进行相关处理</p>
 <p><img src="https://github.com/xuanliangdev/blogpic/blob/master/accessibility/a11yservice.png?raw=true" alt=""></p>
 <h4 id="322被辅助app进程被辅助app">3.2.2、被辅助app进程（被辅助app）</h4>
 <p>被辅助的app的无障碍特性主要是通过扩展Android的View框架的功能对外提供，因此无障碍相关的类主要放在view包中，如下。</p>
@@ -694,8 +694,9 @@ public void onServiceConnected(ComponentName componentName, IBinder service) {
 <p><img src="https://github.com/xuanliangdev/blogpic/blob/master/accessibility/findAccessibilityNodeInfoByAccessibilityId.jpg?raw=true" alt=""></p>
 <h5 id="分析该流程原因">分析该流程原因：</h5>
 <h5 id="为了辅助理解如下方法">为了辅助理解如下方法：</h5>
-<h5 id="1getaccessibilitynodeprovider">1、getAccessibilityNodeProvider</h5>
-<h5 id="2oninitializeaccessibilitynodeinfo">2、onInitializeAccessibilityNodeInfo</h5>
+<h5 id="getaccessibilitynodeprovider">getAccessibilityNodeProvider</h5>
+<h5 id="oninitializeaccessibilitynodeinfo">onInitializeAccessibilityNodeInfo</h5>
+<p>主要流程分析：</p>
 <p>1、talkback打开状态下，新的应用打开时，TalkbackService会接收到类型为TYPE_WINDOWS_CHANGED的无障碍事件，这个事件是SystemServer进程接收到其他进程发出的TYPE_VIEW_ACCESSIBILITY_FOCUSED事件时附带发出的，应用发出TYPE_VIEW_ACCESSIBILITY_FOCUSED事件的流程在下一节分析，暂时跳过。</p>
 <p>2、当tailback收到TYPE_WINDOWS_CHANGED事件时，会间接调用调用父类AccessibilityService的getRootInActiveWindow方法，如上图，经过SystemServer进程中转后会调用到DecorView的getAccessibilityNodeProvider，由于DecorView没有重写getAccessibilityNodeProvider方法，因此会调用到View的createAccessibilityNodeInfo方法，进一步会调用到<strong>onInitializeAccessibilityNodeInfo</strong>方法，如果没有重写该方法，则默认实现在onInitializeAccessibilityNodeInfoInternal中。</p>
 <p>3、AccessibilityNodePrefetcher在取出DecorView的无障碍节点后，会进一步通过prefetchDescendantsOfRealNode方法取子view的无障碍节点。同理，如果我们重写了<strong>getAccessibilityNodeProvider</strong>方法（一些特殊的自定义view需要自己重写该方法，比如webview，android.widget.NumberPicker等），重写getAccessibilityNodeProvider，需要我们实现一个AccessibilityNodeProvider的子类，来实现虚拟的view来支持无障碍模式。通常实现比较复杂的view时会重写这两个方法</p>
@@ -704,14 +705,13 @@ public void onServiceConnected(ComponentName componentName, IBinder service) {
 <p><img src="https://github.com/xuanliangdev/blogpic/blob/master/accessibility/sendaccessibilityevent.jpg?raw=true" alt=""></p>
 <h5 id="分析该流程原因-1">分析该流程原因：</h5>
 <h5 id="为了辅助理解如下方法-1">为了辅助理解如下方法：</h5>
-<h5 id="1sendaccessibilityevent"><strong>1、sendAccessibilityEvent</strong></h5>
-<p><strong>2、sendAccessibilityEventUnchecked</strong></p>
-<p><strong>3、onInitializeAccessibilityEvent</strong></p>
-<p><strong>4、dispatchPopulateAccessibilityEvent</strong></p>
-<p><strong>5、onPopulateAccessibilityEvent</strong></p>
-<p><strong>6、onRequestSendAccessibilityEvent</strong></p>
-<p>talkback开启触摸浏览（Explore by Touch）模式下输入事件的传递</p>
-<p>1、由于talkback的无障碍服务中声明了android:canRequestTouchExplorationMode=&quot;true&rdquo;，因此开启talkback后AccessibilityManagerService会更新AccessibilityInputFilter成员变量的触摸浏览（FLAG_FEATURE_TOUCH_EXPLORATION）的特性为true。</p>
+<h5 id="sendaccessibilityevent"><strong>sendAccessibilityEvent</strong></h5>
+<p><strong>sendAccessibilityEventUnchecked</strong></p>
+<p><strong>onInitializeAccessibilityEvent</strong></p>
+<p><strong>dispatchPopulateAccessibilityEvent</strong></p>
+<p><strong>onPopulateAccessibilityEvent</strong></p>
+<p><strong>onRequestSendAccessibilityEvent</strong></p>
+<p>由于talkback的无障碍服务中声明了android:canRequestTouchExplorationMode=&quot;true&rdquo;，因此开启talkback后AccessibilityManagerService会更新AccessibilityInputFilter成员变量的触摸浏览（FLAG_FEATURE_TOUCH_EXPLORATION）的特性为true。</p>
 <pre><code>com.android.server.accessibility.AccessibilityInputFilter
 
 private void enableFeatures() {
@@ -748,6 +748,7 @@ class TouchExplorer extends BaseEventStreamTransformation
 ...
 </code></pre><p>该类负责将普通的触摸事件转换为触摸浏览手势，比如将MotionEvent.ACTION_DOWN事件转换为悬停事件）（MotionEvent.ACTION_HOVER_ENTER）。因此在talkback模式下，当我们点击一次view上的控件时，应用收到的是（ACTION_HOVER_ENTER）事件，而只有双击才会传递我们熟悉的ACTION_DOWN事件</p>
 <p>*ViewRootImpl:View层次结构的根。View的<strong>绘制流程</strong>（测量measure、布局layout、绘制draw）和输入<strong>事件的分发流程</strong>都是从ViewRootImp开始。</p>
+<p>主要流程分析：</p>
 <p>1、ViewRootImpl的内部类WindowInputEventReceiver从native方法调起dispatchInputEvent方法。</p>
 <p>2、ViewRootImpl调用deliverInputEvent传递事件输入事件。</p>
 <p>3、从顶层的DecorView的dispatchPointerEvent开始分发输入事件。</p>
@@ -824,7 +825,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     return false;
 }
 </code></pre><p>在dispatchGenericMotionEvent中，如果是Hover events，则会走到dispatchHoverEvent方法中。这个方法的机制类似dispatchTouchEvent的流程，是一个责任链模式的实现，不详细展开，默认会传到最后一个子节点的onHoverEvent方法。接着该方法会调用到sendAccessibilityHoverEvent里。</p>
-<p><strong>6、sendAccessibilityHoverEvent方法接着会调用以下方法。</strong></p>
+<p>3、sendAccessibilityHoverEvent方法接着会调用以下方法。</p>
 <p>​     <strong>sendAccessibilityEvent</strong></p>
 <p>​       <strong>-&gt;sendAccessibilityEventUnchecked</strong></p>
 <p>​           <strong>-&gt;onInitializeAccessibilityEvent</strong></p>
@@ -856,7 +857,7 @@ public void onPopulateAccessibilityEvent(AccessibilityEvent event) {
     }
 }
 </code></pre><p>因此如果我们需要自定义textview在talkback模式下朗读的内容，或者不让某个view的内容在talkback模式下被朗读出来，可以考虑重写onPopulateAccessibilityEvent方法。</p>
-<p>7、当我们通过第6步修改view中无障碍节点的信息后，被点击的View的sendAccessibilityEventUnchecked方法会向上通过DecorView传递到ViewRootImpl的requestSendAccessibilityEvent方法中，</p>
+<p>4、当我们通过第3步修改view中无障碍节点的信息后，被点击的View的sendAccessibilityEventUnchecked方法会向上通过DecorView传递到ViewRootImpl的requestSendAccessibilityEvent方法中，</p>
 <pre><code>android.view.ViewRootImpl
 
 public boolean requestSendAccessibilityEvent(View child, AccessibilityEvent event) {
@@ -891,6 +892,7 @@ public boolean requestSendAccessibilityEvent(View child, AccessibilityEvent even
 <h5 id="分析该流程原因-2">分析该流程原因：</h5>
 <h5 id="为了辅助理解如下方法-2">为了辅助理解如下方法：</h5>
 <h5 id="accessibilitynodeinfoperformaction">AccessibilityNodeInfo.performAction</h5>
+<p>主要流程分析：</p>
 <p>1、在talkback中有个AccessibilityEventProcessor类对无障碍事件进行集中处理，根据无障碍事件的不同类型分发到不同的处理器进行处理，比如ProcessorFocusAndSingleTap这个处理器会对类型为TYPE_VIEW_HOVER_ENTER的无障碍事件进行处理，ProcessorEventQueue（主要用于tts朗读，后面分析）这个处理器会处理所有的无障碍事件。</p>
 <p>2、在前面一节4.2中，触摸事件TYPE_VIEW_HOVER_ENTER传递到了TalkBackService，而ProcessorFocusAndSingleTap这个类会对TYPE_VIEW_HOVER_ENTER这个事件进行处理，tryFocusing函数中会调用AccessibilityNodeInfo的performAction方法，AccessibilityNodeInfo的节点信息就是4.2节中触摸到的view的信息，因此通过AccessibilityManagerService进程中转后，会最终调用到我们触摸到的view的<strong>performAccessibilityAction</strong>方法中去（我们也可以通过调用这个方法处理一些无障碍焦点的问题）。</p>
 <p>3、在performAccessibilityAction会调用到performAccessibilityActionInternal，接着如果判断到是ACTION_ACCESSIBILITY_FOCUS事件，则会调用requestAccessibilityFocus函数</p>
@@ -1026,7 +1028,7 @@ private boolean getAccessibilityFocusedRect(Rect bounds) {
     },
 </code></pre><p>ttsOutput</p>
 <p>TYPE_VIEW_ACCESSIBILITY_FOCUSED</p>
-<p>​     get_description_for_tree</p>
+<p>get_description_for_tree</p>
 <p>​        StateNameRolePosition</p>
 <p>​              tree_description_with_label</p>
 <p>​                 append_description_for_tree</p>
@@ -1160,7 +1162,7 @@ private boolean getAccessibilityFocusedRect(Rect bounds) {
     &copy;
     
       2017 -
-    2020
+    2021
     <span class="heart">
       
       <i class="iconfont">
