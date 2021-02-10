@@ -6,7 +6,7 @@
     <description>Recent content on xuanliang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 03 Aug 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 16 Aug 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://xuanliangdev.github.io/index.xml" rel="self" type="application/rss+xml" />
     
@@ -19,8 +19,247 @@
       <guid>https://xuanliangdev.github.io/about/</guid>
       
         <description>&lt;h3 id=&#34;小米android程序员&#34;&gt;小米android程序员&lt;/h3&gt;
-&lt;p&gt;在职天数878天。&lt;/p&gt;
+&lt;p&gt;在职天数505天。&lt;/p&gt;
 </description>
+      
+    </item>
+    
+    <item>
+      <title>Fragment机制原理溯源</title>
+      <link>https://xuanliangdev.github.io/post/fragment%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/</link>
+      <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://xuanliangdev.github.io/post/fragment%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/</guid>
+      
+        <description>&lt;h2 id=&#34;1概述fragment机制&#34;&gt;1、概述Fragment机制&lt;/h2&gt;
+&lt;p&gt;1、Android3.0引入，可以给大屏幕动态界面设计提供支持。&lt;/p&gt;
+&lt;p&gt;2、现在主要用在一个页面内嵌多个Tab时使用。&lt;/p&gt;
+&lt;h2 id=&#34;2fragment机制原理总结&#34;&gt;2、Fragment机制原理总结&lt;/h2&gt;
+&lt;h4 id=&#34;初版fragment机制三个核心类&#34;&gt;初版Fragment机制，三个核心类：&lt;/h4&gt;
+&lt;p&gt;**1）FragmentManager：**控制Fragment的生命周期，核心是控制Fragment的view状态，比如将fragment中的view添加到Activity中或者将view从Activity中移除，第一版时FragmentManager是放在Activity里的。&lt;/p&gt;
+&lt;p&gt;**2）Fragment：**应用的一个UI片段或行为，可以在Activity中被替换，持有自己的View，定义了自己的生命周期，但是生命周期依赖于依附的Activity的生命周期，当Activity销毁时，Fragment同时也会被销毁。&lt;/p&gt;
+&lt;p&gt;**3）FragmentTransactionImpl（FragmentTransaction的实现类）：**对外提供控制Fragment操作的接口，初版只有添加、移除和comit操作，添加和移除只是对添加队列和移除队列操作，commit时委托FragmentManager真正执行操作，设置Fragment的生命周期状态。&lt;/p&gt;
+&lt;h4 id=&#34;当前最新的fragment机制&#34;&gt;当前最新的Fragment机制：&lt;/h4&gt;
+&lt;p&gt;为了将Activity和FragmentManager解耦，方便其他地方也可以使用Fragment，比如我们其实可以在service中使用Fragment，虽然场景不是很多。&lt;/p&gt;
+&lt;p&gt;比如如下博客：&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://blog.csdn.net/mjlong123123/article/details/104156953&#34;&gt;https://blog.csdn.net/mjlong123123/article/details/104156953&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;**4）FragmentController：**FragmentController中的“所有”动作真正执行者都是FragmentHostCallback，绝大部分大部分的动作真正执行者是FragmentHostCallback中的FragmentManager。&lt;/p&gt;
+&lt;p&gt;**5）HostCallbacks（FragmentHostCallback）：**为了将FragmentManager于FragmentManager解耦，必须有一个中间类来真正持有FragmentManager对象，这个类就是FragmentHostCallback，Activity中的实现是HostCallbacks，当然，如果我们想要在service中使用Fragment，可以自定义类来继承FragmentHostCallback类来实现。&lt;/p&gt;
+&lt;p&gt;实际调用链&lt;/p&gt;
+&lt;p&gt;Activity-&amp;gt;FragmentController-&amp;gt;FragmentHostCallback-&amp;gt;FragmentManager，&lt;/p&gt;
+&lt;p&gt;BackStackRecord（FragmentTransaction的实现类）：第一版时叫FragmentTransactionImpl，对外提供控制Fragment操作的接口，比如添加或移除。&lt;/p&gt;
+&lt;h2 id=&#34;3细节&#34;&gt;3、细节&lt;/h2&gt;
+&lt;p&gt;当前Android最新版本已经是R，Fragment机制也增加了不少改动，复杂了很多，为了单纯了解核心机制，最快的方法可以直接从最初的代码入手。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/fragmentlearn/inifragmentversion.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;初版类图&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/fragmentlearn/inifragmentclass.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;初版时序图&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/fragmentlearn/inifragmentseq.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;P版本Fragment机制&lt;/p&gt;
+&lt;p&gt;类图&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/fragmentlearn/lastestfragmentclass.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;时序图，以下面的代码为例&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    FragmentManager fragmentManager = getFragmentManager();
+    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+    LearnFragment fragment = new LearnFragment();
+    fragmentTransaction.add(R.id.fragment_contain, fragment);
+    fragmentTransaction.commit();
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/fragmentlearn/lastestfragmentseq.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;    void moveToState(Fragment f, int newState, int transit, int transitionStyle,
+            boolean keepActive) {
+        ...
+        if (f.mState &amp;lt;= newState) {
+            ...
+            switch (f.mState) {
+                case Fragment.INITIALIZING:
+                    if (newState &amp;gt; Fragment.INITIALIZING) {
+                        ...
+                        f.onAttach(mHost.getContext());
+                        ...
+                        if (f.mParentFragment == null) {
+                            mHost.onAttachFragment(f);
+                        } 
+                      ...
+                        if (!f.mIsCreated) {
+...
+                            f.performCreate(f.mSavedFragmentState);
+                            dispatchOnFragmentCreated(f, f.mSavedFragmentState, false);
+                        } ...
+                    }
+                    // fall through
+                case Fragment.CREATED:
+                    ...
+                    if (newState &amp;gt; Fragment.CREATED) {
+                        if (DEBUG) Log.v(TAG, &amp;quot;moveto ACTIVITY_CREATED: &amp;quot; + f);
+                        if (!f.mFromLayout) {
+                            ViewGroup container = null;
+                            ...
+                            f.mView = f.performCreateView(f.performGetLayoutInflater(
+                                    f.mSavedFragmentState), container, f.mSavedFragmentState);
+                            if (f.mView != null) {
+                                ...
+                                    container.addView(f.mView);
+                                ...
+                                f.onViewCreated(f.mView, f.mSavedFragmentState);
+                                ....
+                            }
+                        }
+
+                        f.performActivityCreated(f.mSavedFragmentState);
+                        ...
+                    }
+                    // fall through
+                case Fragment.ACTIVITY_CREATED:
+                    ...
+                    // fall through
+                case Fragment.STOPPED:
+...
+                        f.performStart();
+...
+                    // fall through
+                case Fragment.STARTED:
+...
+                        f.performResume();
+...
+            }
+        } else if (f.mState &amp;gt; newState) {
+            switch (f.mState) {
+                case Fragment.RESUMED:
+...
+                        f.performPause();
+...
+                    // fall through
+                case Fragment.STARTED:
+...
+                        f.performStop();
+...
+                    // fall through
+                case Fragment.STOPPED:
+                case Fragment.ACTIVITY_CREATED:
+...
+                        f.performDestroyView();
+...
+                            f.mContainer.removeView(f.mView);
+...
+                    // fall through
+                case Fragment.CREATED:
+...
+                                f.performDestroy();
+...
+                            f.performDetach();
+                            ...
+            }
+        }
+...
+            f.mState = newState;
+...
+    }
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;FragmentTransaction：是接口类型，实现类在Activity中，为FragmentTransactionImpl&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;private final class FragmentTransactionImpl implements FragmentTransaction {
+    ArrayList&amp;lt;Fragment&amp;gt; mAdded;
+    ArrayList&amp;lt;Fragment&amp;gt; mRemoved;
+    
+    public FragmentTransaction add(Fragment fragment, int containerViewId) {
+        return add(fragment, null, containerViewId);
+    }
+
+    public FragmentTransaction add(Fragment fragment, String name, int containerViewId) {
+        if (fragment.mActivity != null) {
+            throw new IllegalStateException(&amp;quot;Fragment already added: &amp;quot; + fragment);
+        }
+        if (name != null) {
+            fragment.mName = name;
+        }
+        if (mRemoved != null) {
+            mRemoved.remove(fragment);
+        }
+        if (mAdded == null) {
+            mAdded = new ArrayList&amp;lt;Fragment&amp;gt;();
+        }
+        fragment.mContainerId = containerViewId;
+        mAdded.add(fragment);
+        return this;
+    }
+
+    public FragmentTransaction remove(Fragment fragment) {
+        if (fragment.mActivity == null) {
+            throw new IllegalStateException(&amp;quot;Fragment not added: &amp;quot; + fragment);
+        }
+        if (mAdded != null) {
+            mAdded.remove(fragment);
+        }
+        if (mRemoved == null) {
+            mRemoved = new ArrayList&amp;lt;Fragment&amp;gt;();
+        }
+        mRemoved.add(fragment);
+        return this;
+    }
+
+    public void commit() {
+        if (mRemoved != null) {
+            for (int i=mRemoved.size()-1; i&amp;gt;=0; i--) {
+                mFragments.removeFragment(mRemoved.get(i));
+            }
+        }
+        if (mAdded != null) {
+            for (int i=mAdded.size()-1; i&amp;gt;=0; i--) {
+                mFragments.addFragment(mAdded.get(i));
+            }
+        }
+        if (mFragments != null) {
+            mFragments.moveToState(mFragments.mCurState);
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Activity：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;final void performCreate(Bundle icicle) {
+    onCreate(icicle);
+    mFragments.dispatchCreate(icicle);
+}
+    
+final void performStart() {
+    mCalled = false;
+    mInstrumentation.callActivityOnStart(this);
+。。。
+    mFragments.dispatchStart();
+}
+    
+final void performResume() {
+    performRestart();
+。。。
+    mInstrumentation.callActivityOnResume(this);
+。。。
+        
+    mFragments.dispatchResume();
+        
+    onPostResume();
+。。。
+}
+
+final void performPause() {
+    mFragments.dispatchPause();
+    onPause();
+}
+    
+final void performStop() {
+。。。
+     mFragments.dispatchStop();
+。。。
+     mInstrumentation.callActivityOnStop(this);
+。。。
+}
+    
+final void performDestroy() {
+    mFragments.dispatchDestroy();
+    onDestroy();
+}
+
+&lt;/code&gt;&lt;/pre&gt;</description>
       
     </item>
     
