@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>一次MIUI桌面编辑模式焦点浏览顺序错乱分析 - xuanliang</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="xuanliang" />
+  <meta name="description" content="一个MIUI桌面编辑模式焦点浏览顺序错乱的问题分析 开启无障碍（talkback）模式，桌面编辑模式下右滑切换各个应用的launcher图标焦" />
+
+  <meta name="keywords" content="Hugo, theme, jane" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.63.2" />
+
+
+<link rel="canonical" href="https://xuanliangdev.github.io/post/miui%E6%A1%8C%E9%9D%A2%E7%BC%96%E8%BE%91%E6%A8%A1%E5%BC%8F%E7%84%A6%E7%82%B9%E9%A1%BA%E5%BA%8F%E9%94%99%E4%B9%B1%E5%88%86%E6%9E%90/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.0995afa14b62cd93e93cfc066b646c4c17a3eddca0e9d52a1d9dcf5d90aaacd3.css" integrity="sha256-CZWvoUtizZPpPPwGa2RsTBej7dyg6dUqHZ3PXZCqrNM=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="一次MIUI桌面编辑模式焦点浏览顺序错乱分析" />
+<meta property="og:description" content="一个MIUI桌面编辑模式焦点浏览顺序错乱的问题分析 开启无障碍（talkback）模式，桌面编辑模式下右滑切换各个应用的launcher图标焦" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://xuanliangdev.github.io/post/miui%E6%A1%8C%E9%9D%A2%E7%BC%96%E8%BE%91%E6%A8%A1%E5%BC%8F%E7%84%A6%E7%82%B9%E9%A1%BA%E5%BA%8F%E9%94%99%E4%B9%B1%E5%88%86%E6%9E%90/" />
+<meta property="article:published_time" content="2020-12-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-12-12T00:00:00+00:00" />
+<meta itemprop="name" content="一次MIUI桌面编辑模式焦点浏览顺序错乱分析">
+<meta itemprop="description" content="一个MIUI桌面编辑模式焦点浏览顺序错乱的问题分析 开启无障碍（talkback）模式，桌面编辑模式下右滑切换各个应用的launcher图标焦">
+<meta itemprop="datePublished" content="2020-12-12T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-12-12T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2421">
+
+
+
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="一次MIUI桌面编辑模式焦点浏览顺序错乱分析"/>
+<meta name="twitter:description" content="一个MIUI桌面编辑模式焦点浏览顺序错乱的问题分析 开启无障碍（talkback）模式，桌面编辑模式下右滑切换各个应用的launcher图标焦"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">XuanLiang</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/">This is Home</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/post/">Archives</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/tags/">Tags</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/categories/">Categories</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+          
+        
+      </li>
+    
+
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      XuanLiang
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/">This is Home</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/post/">Archives</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/tags/">Tags</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/categories/">Categories</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+          
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">一次MIUI桌面编辑模式焦点浏览顺序错乱分析</h1>
+      
+      <div class="post-meta">
+        <time datetime="2020-12-12" class="post-time">
+          2020-12-12
+        </time>
+        
+        
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#一个miui桌面编辑模式焦点浏览顺序错乱的问题分析">一个MIUI桌面编辑模式焦点浏览顺序错乱的问题分析</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <h2 id="一个miui桌面编辑模式焦点浏览顺序错乱的问题分析">一个MIUI桌面编辑模式焦点浏览顺序错乱的问题分析</h2>
+<p>开启无障碍（talkback）模式，桌面编辑模式下右滑切换各个应用的launcher图标焦点时顺序错乱，没有按照正常的从左到右，从上到下顺序。</p>
+<p>此问题分析难点是由于无障碍模式涉及到talkback进程，系统进程，以及焦点所在的应用进程，无法确定焦点的顺序是哪个进程决定的，因此只能从talkback进程入手进行分析，调试切换焦点时talkback的执行逻辑。</p>
+<pre><code>/**
+ * Window could have its content views hierarchy. Views in that hierarchy could be traversed one
+ * after another. Every view inside that hierarchy could change its natural traverse order by
+ * setting traversal before/after view. See {@link android.view.View.getTraversalBefore()}, {@link
+ * android.view.View.getTraversalAfter()}.
+ *
+ * &lt;p&gt;This strategy considers changes in the traverse order according to after/before view movements
+ */
+@SuppressWarnings(&quot;JavadocReference&quot;)
+public class OrderedTraversalStrategy implements TraversalStrategy {
+
+  private @Nullable AccessibilityNodeInfoCompat focusNext(AccessibilityNodeInfoCompat node) {
+    AccessibilityNodeInfoCompat rootNode = AccessibilityNodeInfoCompat.obtain(node);
+    AccessibilityNodeInfoCompat targetNode;
+    try {
+      targetNode = mController.findNext(rootNode);
+    } finally {
+      AccessibilityNodeInfoUtils.recycleNodes(rootNode);
+    }
+
+    return targetNode;
+  }
+  ...
+</code></pre><p>调试发现talkback切换焦点时会走focusNext上面的函数</p>
+<pre><code>public class OrderedTraversalController {
+
+  public @Nullable AccessibilityNodeInfoCompat findNext(AccessibilityNodeInfoCompat node) {
+    WorkingTree tree = mNodeTreeMap.get(node);
+    if (tree == null) {
+      LogUtils.w(TAG, &quot;findNext(), can't find WorkingTree for AccessibilityNodeInfo&quot;);
+      return null;
+    }
+
+    WorkingTree nextTree = tree.getNext();
+    if (nextTree != null) {
+      return AccessibilityNodeInfoCompat.obtain(nextTree.getNode());
+    }
+
+    return null;
+  }
+</code></pre><p>发现直接从WorkingTree里取下一个节点了，此时的节点已经是乱的了，所以再看WorkingTree的构建过程</p>
+<pre><code>public class OrderedTraversalController {
+
+/**
+   * before start next traversal node search the controller must be initialized. The initialisation
+   * step includes traversal through all accessibility nodes hierarchy to collect information about
+   * traversal order of separate subtrees and moving subtries that has custom befor/after traverse
+   * view order
+   *
+   * @param compatRoot - accessibility node that serves as root node for tree hierarchy the
+   *     controller works with
+   * @param includeChildrenOfNodesWithWebActions whether to calculator order for nodes that support
+   *     web actions. Although TalkBack uses the naviagation order specified by the nodes, Switch
+   *     Access needs to know about all nodes at the time the tree is being created.
+   */
+  public void initOrder(
+      AccessibilityNodeInfoCompat compatRoot, boolean includeChildrenOfNodesWithWebActions) {
+...
+    mTree =
+        createWorkingTree(
+            AccessibilityNodeInfoCompat.obtain(compatRoot),
+            null,
+            boundsCalculator,
+            includeChildrenOfNodesWithWebActions);
+    reorderTree();
+  }
+
+  /**
+   * Creates tree that reproduces AccessibilityNodeInfoCompat tree hierarchy
+   *
+   * @param rootNode root node that is starting point for tree reproduction
+   * @param parent parent WorkingTree node for subtree that would be returned in this method
+   * @param includeChildrenOfNodesWithWebActions whether to calculator order for nodes that support
+   *     web actions. Although TalkBack uses the naviagation order specified by the nodes, Switch
+   *     Access needs to know about all nodes at the time the tree is being created.
+   * @return subtree that reproduces accessibility node hierarchy
+   */
+  private @Nullable WorkingTree createWorkingTree(
+      AccessibilityNodeInfoCompat rootNode,
+      @Nullable WorkingTree parent,
+      NodeCachedBoundsCalculator boundsCalculator,
+      boolean includeChildrenOfNodesWithWebActions) {
+   ....
+
+    WorkingTree tree = new WorkingTree(rootNode, parent);
+    mNodeTreeMap.put(rootNode, tree);
+
+....
+    ReorderedChildrenIterator iterator =
+        ReorderedChildrenIterator.createAscendingIterator(rootNode, boundsCalculator);
+    while (iterator != null &amp;&amp; iterator.hasNext()) {
+      AccessibilityNodeInfoCompat child = iterator.next();
+      WorkingTree childSubTree =
+          createWorkingTree(child, tree, boundsCalculator, includeChildrenOfNodesWithWebActions);
+      if (childSubTree != null) {
+        tree.addChild(childSubTree);
+      }
+    }
+
+    if (iterator != null) {
+      iterator.recycle();
+    }
+    return tree;
+  }
+</code></pre><p>上面值得注意的是ReorderedChildrenIterator</p>
+<pre><code>/**
+ * Children nodes iterator that iterates its children according the order of AccessibilityNodeInfo
+ * hierarchy. But for nodes that are not considered to be focused according to
+ * AccessibilityNodeInfoUtils.shouldFocusNode() rules we calculate new bounds that is minimum
+ * rectangle that contains all focusable children nodes. If that rectangle differs from real node
+ * bounds that node is reordered according needSwapNodeOrder() logic and could be traversed later.
+ *
+ * &lt;p&gt;This class obtains new instances of AccessibilityNodeCompat. Call recycle to recycle those
+ * instances. Do not use the iterator once it's been recycled.
+ */
+public class ReorderedChildrenIterator implements Iterator&lt;AccessibilityNodeInfoCompat&gt; {
+
+  public static ReorderedChildrenIterator createAscendingIterator(
+      AccessibilityNodeInfoCompat parent) {
+    return createAscendingIterator(parent, null);
+  }
+  
+    private ReorderedChildrenIterator(
+      AccessibilityNodeInfoCompat parent,
+      boolean isAscending,
+      @Nullable NodeCachedBoundsCalculator boundsCalculator) {
+    ...
+    init(mParent);
+...
+  }
+  
+    private void init(AccessibilityNodeInfoCompat node) {
+    fillNodesFromParent();
+    if (!WebInterfaceUtils.isWebContainer(node) &amp;&amp; needReordering(mNodes)) {
+      reorder(mNodes);
+    }
+  }
+  
+  private void fillNodesFromParent() {
+    int count = mParent.getChildCount();
+    for (int i = 0; i &lt; count; i++) {
+      AccessibilityNodeInfoCompat node = mParent.getChild(i);
+      if (node != null) {
+        mNodes.add(node);
+      }
+    }
+  }
+  
+    private void reorder(List&lt;AccessibilityNodeInfoCompat&gt; nodes) {
+    if (nodes == null || nodes.size() == 1) {
+      return;
+    }
+
+    int size = nodes.size();
+    AccessibilityNodeInfoCompat[] nodeArray = new AccessibilityNodeInfoCompat[size];
+    nodes.toArray(nodeArray);
+
+    int currentIndex = size - 2;
+    while (currentIndex &gt;= 0) {
+      AccessibilityNodeInfoCompat currentNode = nodeArray[currentIndex];
+      if (mBoundsCalculator.usesChildrenBounds(currentNode)) {
+        moveNodeIfNecessary(nodeArray, currentIndex);
+      }
+
+      currentIndex--;
+    }
+
+    nodes.clear();
+    nodes.addAll(Arrays.asList(nodeArray));
+  }
+  
+</code></pre><p>调试到reorder函数，发现只是简单把nodes转换为了Array，没有做什么特殊排序，而且nodes里各个焦点的顺序也是错乱的顺序，所以还得找这个nodes的来源才能得到顺序是在哪里排的。猜测从桌面应用中取到viewGroup时，子view顺序就已经定了。由于无障碍焦点的信息会通过桌面进程（com.miui.home）经由SystemProcess进程传递给talkback应用，因此直接调试桌面进程,</p>
+<p>在AccessibilityNodeInfo的addChild方法打断点</p>
+<pre><code>public class AccessibilityNodeInfo implements Parcelable {
+
+    public void addChild(View child) {
+        addChildInternal(child, AccessibilityNodeProvider.HOST_VIEW_ID, true);
+    }
+    
+    public void addChildUnchecked(View child) {
+        addChildInternal(child, AccessibilityNodeProvider.HOST_VIEW_ID, false);
+    }
+</code></pre><p>发现AccessibilityNodeInfo的addChildUnchecked方法ViewGroup会调用</p>
+<pre><code>public abstract class ViewGroup extends View implements ViewParent, ViewManager {
+
+    public void onInitializeAccessibilityNodeInfoInternal(AccessibilityNodeInfo info) {
+        super.onInitializeAccessibilityNodeInfoInternal(info);
+。。。
+        if (mAttachInfo != null) {
+            final ArrayList&lt;View&gt; childrenForAccessibility = mAttachInfo.mTempArrayList;
+            childrenForAccessibility.clear();
+            addChildrenForAccessibility(childrenForAccessibility);
+            final int childrenForAccessibilityCount = childrenForAccessibility.size();
+            for (int i = 0; i &lt; childrenForAccessibilityCount; i++) {
+                final View child = childrenForAccessibility.get(i);
+                info.addChildUnchecked(child);
+            }
+            childrenForAccessibility.clear();
+        }
+。。。
+    }
+</code></pre><p>断点到addChildrenForAccessibility发现mTempArrayList的顺序已经是错乱的顺序了，所以要继续找mTempArrayList是怎么排序的，</p>
+<pre><code>@Override
+public void addChildrenForAccessibility(ArrayList&lt;View&gt; outChildren) {
+。。。
+    ChildListForAccessibility children = ChildListForAccessibility.obtain(this, true);
+    try {
+        final int childrenCount = children.getChildCount();
+        for (int i = 0; i &lt; childrenCount; i++) {
+            View child = children.getChildAt(i);
+            if ((child.mViewFlags &amp; VISIBILITY_MASK) == VISIBLE) {
+                if (child.includeForAccessibility()) {
+                    outChildren.add(child);
+                } else {
+                    child.addChildrenForAccessibility(outChildren);
+                }
+            }
+        }
+    } 。。。
+}
+</code></pre><pre><code>static class ChildListForAccessibility {
+
+        public static ChildListForAccessibility obtain(ViewGroup parent, boolean sort) {
+            ChildListForAccessibility list = sPool.acquire();
+            if (list == null) {
+                list = new ChildListForAccessibility();
+            }
+            list.init(parent, sort);
+            return list;
+        }
+        
+        private void init(ViewGroup parent, boolean sort) {
+            ArrayList&lt;View&gt; children = mChildren;
+            final int childCount = parent.getChildCount();
+            for (int i = 0; i &lt; childCount; i++) {
+                View child = parent.getChildAt(i);
+                children.add(child);
+            }
+            if (sort) {
+                ArrayList&lt;ViewLocationHolder&gt; holders = mHolders;
+                for (int i = 0; i &lt; childCount; i++) {
+                    View child = children.get(i);
+                    ViewLocationHolder holder = ViewLocationHolder.obtain(parent, child);
+                    holders.add(holder);
+                }
+                sort(holders);
+                for (int i = 0; i &lt; childCount; i++) {
+                    ViewLocationHolder holder = holders.get(i);
+                    children.set(i, holder.mView);
+                    holder.recycle();
+                }
+                holders.clear();
+            }
+        }
+        
+       private void sort(ArrayList&lt;ViewLocationHolder&gt; holders) {
+            // This is gross but the least risky solution. The current comparison
+            // strategy breaks transitivity but produces very good results. Coming
+            // up with a new strategy requires time which we do not have, so ...
+            try {
+                ViewLocationHolder.setComparisonStrategy(
+                        ViewLocationHolder.COMPARISON_STRATEGY_STRIPE);
+                Collections.sort(holders);
+            } 。。。
+        }
+</code></pre><p>最终调试发现sort(holders)前顺序虽然也是乱的，但是并不是焦点滑动的错乱顺序，调用sort后才是焦点滑动的错乱顺序，Collections.sort是针对的ViewLocationHolder，进一步查看ViewLocationHolder的compareTo方法，得到结果，无障碍焦点的排序大致是根据焦点的上下左右边距进行对比，首先比较上边界和下边界，如果一个view的焦点下边界比另一个view焦点的上边界高，那么前者顺序优先，否则就根据左右边界比较，靠左的优先。</p>
+<pre><code>/**
+ * Pooled class that holds a View and its location with respect to
+ * a specified root. This enables sorting of views based on their
+ * coordinates without recomputing the position relative to the root
+ * on every comparison.
+ */
+static class ViewLocationHolder implements Comparable&lt;ViewLocationHolder&gt; {
+
+        @Override
+        public int compareTo(ViewLocationHolder another) {
+。。。。
+
+            int boundsResult = compareBoundsOfTree(this, another);
+            if (boundsResult != 0) {
+                return boundsResult;
+            }
+。。。
+            return mView.getAccessibilityViewId() - another.mView.getAccessibilityViewId();
+        }
+        
+        /**
+         * Compare two views based on their bounds. Use the bounds of their children to break ties.
+         *
+         * @param holder1 Holder of first view to compare
+         * @param holder2 Holder of second view to compare. Must have the same root as holder1.
+         * @return The compare result, with equality if no good comparison was found.
+         */
+        private static int compareBoundsOfTree(
+                ViewLocationHolder holder1, ViewLocationHolder holder2) {
+            if (sComparisonStrategy == COMPARISON_STRATEGY_STRIPE) {
+                // First is above second.
+                if (holder1.mLocation.bottom - holder2.mLocation.top &lt;= 0) {
+                    return -1;
+                }
+                // First is below second.
+                if (holder1.mLocation.top - holder2.mLocation.bottom &gt;= 0) {
+                    return 1;
+                }
+            }
+
+            // We are ordering left-to-right, top-to-bottom.
+            if (holder1.mLayoutDirection == LAYOUT_DIRECTION_LTR) {
+                final int leftDifference = holder1.mLocation.left - holder2.mLocation.left;
+                if (leftDifference != 0) {
+                    return leftDifference;
+                }
+            } else { // RTL
+                final int rightDifference = holder1.mLocation.right - holder2.mLocation.right;
+                if (rightDifference != 0) {
+                    return -rightDifference;
+                }
+            }
+            // We are ordering left-to-right, top-to-bottom.
+            final int topDifference = holder1.mLocation.top - holder2.mLocation.top;
+            if (topDifference != 0) {
+                return topDifference;
+            }
+            // Break tie by height.
+            final int heightDiference = holder1.mLocation.height() - holder2.mLocation.height();
+            if (heightDiference != 0) {
+                return -heightDiference;
+            }
+            // Break tie by width.
+            final int widthDifference = holder1.mLocation.width() - holder2.mLocation.width();
+            if (widthDifference != 0) {
+                return -widthDifference;
+            }
+
+            // Find a child of each view with different screen bounds.
+            final Rect view1Bounds = new Rect();
+            final Rect view2Bounds = new Rect();
+            final Rect tempRect = new Rect();
+            holder1.mView.getBoundsOnScreen(view1Bounds, true);
+            holder2.mView.getBoundsOnScreen(view2Bounds, true);
+            final View child1 = holder1.mView.findViewByPredicateTraversal((view) -&gt; {
+                view.getBoundsOnScreen(tempRect, true);
+                return !tempRect.equals(view1Bounds);
+            }, null);
+            final View child2 = holder2.mView.findViewByPredicateTraversal((view) -&gt; {
+                view.getBoundsOnScreen(tempRect, true);
+                return !tempRect.equals(view2Bounds);
+            }, null);
+
+
+            // Compare the children recursively
+            if ((child1 != null) &amp;&amp; (child2 != null)) {
+                final ViewLocationHolder childHolder1 =
+                        ViewLocationHolder.obtain(holder1.mRoot, child1);
+                final ViewLocationHolder childHolder2 =
+                        ViewLocationHolder.obtain(holder1.mRoot, child2);
+                return compareBoundsOfTree(childHolder1, childHolder2);
+            }
+
+            // If only one has a child, use that one
+            if (child1 != null) {
+                return 1;
+            }
+
+            if (child2 != null) {
+                return -1;
+            }
+
+            // Give up
+            return 0;
+        }
+</code></pre><h5 id="分析结果无障碍焦点的顺序定义在viewgroup中在该问题中也就是桌面编辑模式的自定义view中最终把该问题转交给了miui桌面的同事处理了后面相关同学分析结果是因为桌面编辑模式下桌面图标行与行之间的图标的view有重叠导致的问题">分析结果：无障碍焦点的顺序定义在ViewGroup中，在该问题中也就是桌面编辑模式的自定义View中，最终把该问题转交给了MIUI桌面的同事处理了，后面相关同学分析结果是因为桌面编辑模式下，桌面图标行与行之间的图标的View有重叠导致的问题。</h5>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">xuanliang</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2020-12-12
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%8D%A1%E9%A1%BF%E5%88%86%E6%9E%90%E6%80%BB%E7%BB%93/">
+            <span class="next-text nav-default">一次列表卡顿分析</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="https://github.com/xuanliangdev" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://xuanliangdev.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2021
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        xuanliang
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

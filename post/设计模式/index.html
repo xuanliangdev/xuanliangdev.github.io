@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>从Android项目学习设计模式 - xuanliang</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="xuanliang" />
+  <meta name="description" content="从Android项目学习设计模式 这个月看了一遍《Android源码设计模式解析与实战》，又一次被android中framework层的设计震" />
+
+  <meta name="keywords" content="Hugo, theme, jane" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.63.2" />
+
+
+<link rel="canonical" href="https://xuanliangdev.github.io/post/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.0995afa14b62cd93e93cfc066b646c4c17a3eddca0e9d52a1d9dcf5d90aaacd3.css" integrity="sha256-CZWvoUtizZPpPPwGa2RsTBej7dyg6dUqHZ3PXZCqrNM=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="从Android项目学习设计模式" />
+<meta property="og:description" content="从Android项目学习设计模式 这个月看了一遍《Android源码设计模式解析与实战》，又一次被android中framework层的设计震" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://xuanliangdev.github.io/post/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" />
+<meta property="article:published_time" content="2018-04-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-04-12T00:00:00+00:00" />
+<meta itemprop="name" content="从Android项目学习设计模式">
+<meta itemprop="description" content="从Android项目学习设计模式 这个月看了一遍《Android源码设计模式解析与实战》，又一次被android中framework层的设计震">
+<meta itemprop="datePublished" content="2018-04-12T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2018-04-12T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="5515">
+
+
+
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="从Android项目学习设计模式"/>
+<meta name="twitter:description" content="从Android项目学习设计模式 这个月看了一遍《Android源码设计模式解析与实战》，又一次被android中framework层的设计震"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">XuanLiang</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/">This is Home</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/post/">Archives</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/tags/">Tags</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/categories/">Categories</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+          
+        
+      </li>
+    
+
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      XuanLiang
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/">This is Home</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/post/">Archives</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/tags/">Tags</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/categories/">Categories</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+          
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">从Android项目学习设计模式</h1>
+      
+      <div class="post-meta">
+        <time datetime="2018-04-12" class="post-time">
+          2018-04-12
+        </time>
+        
+        
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#面向对象六大原则">面向对象六大原则</a>
+      <ul>
+        <li><a href="#一创建型模式">一、创建型模式</a></li>
+        <li><a href="#二结构型模式">二、结构型模式</a></li>
+        <li><a href="#三行为模式">三、行为模式</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <h1 id="从android项目学习设计模式">从Android项目学习设计模式</h1>
+<p>这个月看了一遍《Android源码设计模式解析与实战》，又一次被android中framework层的设计震惊了，也得到了一些学习的心得体会，“想要理解一个概念，要先理解why，然后才深入how，不能深入细节而忘了初衷”。</p>
+<h2 id="面向对象六大原则">面向对象六大原则</h2>
+<p>设计模式其实就是面向对象的六大原则的体现。</p>
+<p>S:单一职责（Single Responsibility Principle）一个类的职责应该只有一个。</p>
+<p>O：开闭原则（Open Close Principle）一个对象应该对修改是封闭的，对扩展是开放的。（使用接口实现）</p>
+<p>L：里氏替换（Liskov Substitution Principle）（子类能替换父类）</p>
+<p>I：接口隔离（Interface Segregation Principle）(类依赖应该建立在最小接口上)</p>
+<p>D：依赖倒置（Dependence Inversion Principle）（参考UML图，使用类指向被依赖的类，倒置后使用类指向接口，实现类也指向接口）</p>
+<p>迪米特原则(Law of Demeter)一个对象应该与其他对象有最少的了解（参考中介模式，）</p>
+<h3 id="一创建型模式">一、创建型模式</h3>
+<h4 id="1singleton单例">1、Singleton（单例）</h4>
+<p>实际应用：ImageLoader（双重校验锁DCL），ActivityThread，ActivityManagerNative（懒汉式），WindowManagerGlobal（懒汉式）</p>
+<p>懒汉式：</p>
+<pre><code>public abstract class Singleton&lt;T&gt; {
+    private T mInstance;
+
+    protected abstract T create();
+
+    public final T get() {
+        synchronized (this) {
+           if (mInstance == null) {
+               mInstance = create();
+           }
+           return mInstance;
+        }
+    }
+}
+</code></pre>
+<p>DCL</p>
+<pre><code>class Singleton {
+    private static volatile Singleton mInstance = null;
+    private Singleton() {}
+    public static Singleton getInstance() {
+        if (mInstance == null) {
+            synchronized(Singleton.class) {
+                if (mInstance == null) {
+                    mInstance = new Singleton();
+                }
+            }
+        }
+        return mInstance;
+    }
+}
+</code></pre>
+<p>静态内部类</p>
+<pre><code>class Singleton {
+    private Singleton() {}
+    private static class SingletonHolder {
+        private static Singleton mInstance = new Singleton();
+    }
+    public static Singleton getInstance() {
+        return SingletonHolder.mInstance;
+    }
+}
+</code></pre>
+<h4 id="2factory-method工厂方法">2、Factory Method（工厂方法）</h4>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/fc9a8e83d034a89a71476498c9846d97.png" alt=""></p>
+<p>实际应用：BitmapFactory（简单工厂或静态工厂），Iterable</p>
+<p>有的书上说简单工厂并不算工厂模式，真正意义上的工厂方法模式里，“工厂方法”其实是一个抽象方法，该模式拥有不同的工厂类，不同的工厂类实现了各自的工厂方法，例如ArrayListIterator，LinkIterator都可以算是一个工厂，next方法，previous方法都可以看做是一个工厂方法。</p>
+<pre><code>public class FactoryMethon {
+    public static void main(String[] args) {
+        // 简单工厂
+        Product p = SimpleFactory.create(&quot;A&quot;);
+        p.method();
+        // 工厂方法
+        Factory f = new ConreteFactoryA();
+        p = f.create();
+        p.method();
+        f = new ConreteFactoryB();
+        p = f.create();
+        p.method();
+    }
+}
+
+abstract class Product {
+    abstract void method();
+}
+
+class ConcreteProductA extends Product {
+
+    @Override
+    void method() {
+        System.out.println(&quot;ConcreteProductA&quot;);
+    }
+}
+
+class ConcreteProductB extends Product {
+
+    @Override
+    void method() {
+        System.out.println(&quot;ConcreteProductB&quot;);
+    }
+}
+
+// 简单工厂
+class SimpleFactory {
+    public static Product create(String s) {
+        if (&quot;A&quot;.equals(s))
+            return new ConcreteProductA();
+        if (&quot;B&quot;.equals(s))
+            return new ConcreteProductB();
+        else
+            return null;
+    }
+
+}
+
+// 工厂方法
+abstract class Factory {
+    abstract Product create();
+}
+
+class ConreteFactoryA extends Factory {
+    Product create() {
+        return new ConcreteProductA();
+    }
+}
+
+class ConreteFactoryB extends Factory {
+    Product create() {
+        return new ConcreteProductB();
+    }
+}
+
+//ouput:
+ConcreteProductA
+ConcreteProductA
+ConcreteProductB
+</code></pre>
+<h4 id="3abstract-factory抽象工厂">3、Abstract Factory（抽象工厂）</h4>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/91e85c0c1e75112413c4223aa29efd0e.png" alt=""></p>
+<p>实际应用：MediaPlayerFactory</p>
+<p>抽象工厂相比于工厂方法，多了产品簇的概念，工厂方法是为了当出现新的工厂时可以用很小的代价进行扩展（比如生产智能手机实现了一个createPhone的抽象工厂方法，一开始只有ios和android的工厂实现该方法，当出现新的winphone系统时，只要新建一个winphone工厂来实现createPhone方法就行，代价很小），第一层抽象是根据手机系统的不同，但是如果产品之间也有关联，比如三种系统生产的手机都各自分为高端机型，中端机型，低端机型，这时出现了第二个层次的抽象，高、中、低分别可以抽象出一个接口，再实现三个抽象工厂方法分别生产高、中、低端的手机。</p>
+<p>抽象工厂有利于交换产品系列（从一个系统的高端机换到另一系统的高端机），有利于产品一致性（当一个系列的产品被设计成一起工作时）。</p>
+<p>抽象工厂不利于接入新的工厂，因为如果新工厂只打算生产低端机，也必须实现生产中端、高端机的接口。</p>
+<p>（和工厂方法的明显区别，抽象工厂生产的产品比工厂方法生产的产品多了一层抽象，工厂方法：手机&lt;-android手机，抽象工厂：手机&lt;-高端机&lt;-android手机）</p>
+<h4 id="4builder创建者">4、Builder（创建者）</h4>
+<p>实际应用：ImageLoader(ImageLoaderConfiguration.Builder) AlertDialog（AlertDialog.Builder）</p>
+<p>builder中链式调用进行配置，最后通过build方法或create方法生成对象并返回。其实就是通过builder对象的相关方法对各个配置项进行配置。</p>
+<pre><code>public class BulderPattern {
+
+    public static void main(String[] args) {
+        new Dialog.Builder().setTitle(&quot;Title&quot;).setMessage(&quot;Message&quot;).build().show();
+    }
+}
+
+class Dialog {
+    String title = &quot;defaultTitle&quot;;
+    String message = &quot;defaultMessage&quot;;
+
+    public void show() {
+        System.out.println(title + &quot; &quot; + message);
+    }
+
+    public static class Builder {
+        private Dialog mD;
+
+        Builder() {
+            mD = new Dialog();
+        }
+
+        Builder setTitle(String title) {
+            mD.title = title;
+            return this;
+        }
+
+        Builder setMessage(String message) {
+            mD.message = message;
+            return this;
+        }
+
+        Dialog build() {
+            return mD;
+        }
+    }
+}
+</code></pre>
+<h4 id="5prototype原型">5、Prototype（原型）</h4>
+<p>实际应用：clone方法 Intent的clone方法是通过new自身来实现的</p>
+<pre><code>@Override
+public Object clone() {
+    return new Intent(this);
+}
+</code></pre>
+<hr>
+<h3 id="二结构型模式">二、结构型模式</h3>
+<h4 id="6adapter适配器">6、Adapter（适配器）</h4>
+<p>实际应用：ListView中的Adapter</p>
+<pre><code>public class AdapterPettern {
+
+    public static void main(String[] args) {
+        Target t = new Adapter();
+        t.method();
+    }
+}
+
+interface Target {
+    void method();
+}
+
+class Adaptee {
+    public void methodA() {
+        System.out.println(&quot;Adaptee Menthod&quot;);
+    };
+}
+
+class Adapter implements Target {
+    Adaptee a = new Adaptee();
+
+    @Override
+    public void method() {
+        a.methodA();
+    }
+}
+</code></pre>
+<h4 id="7bridge桥接">7、Bridge（桥接）</h4>
+<p>实际应用：经常用在一些imp类中，比如WindowManagerImp（感觉其实没必要设计WindowManager接口）</p>
+<p>*这个设计模式对于理解android framework的很多设计相当有帮助，可以扩展到其他一些框架的接口类和相关的Imp类进行分析。 用于多维度变化类或者多个树状类之间的耦合的解耦。一个类存在两个独立变化的维度，并且两个维度都需要扩展。</p>
+<p>（想到了一个问题，只被一个类继承的接口到底有没有必要把接口抽象出来，比如WindowManagerImpl和WindowManager，有没有必要把WindowManager接口提取出来）</p>
+<p>这个模式诠释了（多用组合，少用继承）的好处</p>
+<pre><code>public class Bridge {
+
+    public static void main(String[] args) {
+        //两个维度，Size和Additive
+        LargeCoffee lc = new LargeCoffee(new Additives() {
+        });
+        lc.makeCoffee();
+		
+        Suger suger = new Suger();
+        lc = new LargeCoffee(suger);
+        lc.makeCoffee();
+    }
+}
+
+abstract class Coffee {
+    Additives add;
+
+    Coffee(Additives add) {
+        this.add = add;
+    }
+
+    abstract void makeCoffee();
+}
+
+abstract class Additives {
+    String addSomething() {
+        return &quot;Nothing&quot;;
+    };
+}
+
+class Suger extends Additives {
+
+    @Override
+    String addSomething() {
+        return &quot;Suger&quot;;
+    }
+}
+
+class LargeCoffee extends Coffee {
+    LargeCoffee(Additives add) {
+        super(add);
+    }
+
+    @Override
+    void makeCoffee() {
+        System.out.println(&quot;Large &quot; + add.addSomething());
+    }
+}
+</code></pre>
+<h4 id="8composite组成">8、Composite（组成）</h4>
+<p>实际应用：View和ViewGroup</p>
+<p>ViewGrop继承于View，并且已聚合的方式包含View</p>
+<pre><code>class View {
+    public void create() {
+    };
+}
+
+abstract class ViewGroup extends View {
+    private ArrayList&lt;View&gt; views = new ArrayList&lt;View&gt;();
+
+    public void addView(View v) {
+        views.add(v);
+    };
+
+    public void removeView(View v) {
+        views.remove(v);
+    };
+}
+</code></pre>
+<h4 id="9decorator装饰">9、Decorator（装饰）</h4>
+<p>实际应用：Context和ContextWrapper，java中的各种输入输出流</p>
+<p>包装器Wrapper中包含实际对象的引用，并调用实际对象引用的方法，并对实际对象进行功能扩展。</p>
+<pre><code>public class Decorator {
+
+    public static void main(String[] args) {
+        ContextImpl ctImp = new ContextImpl();
+        new ContextThemeWrapper(ctImp).doSomething();
+    }
+}
+
+abstract class Context {
+    abstract void doSomething();
+}
+
+class ContextImpl extends Context {
+    void doSomething() {
+        System.out.println(&quot;ContextImpl doSomething&quot;);
+    };
+}
+
+class ContextWrapper extends Context {
+    Context mBase;
+
+    ContextWrapper(Context context) {
+        mBase = context;
+    }
+
+    void doSomething() {
+        mBase.doSomething();
+    }
+}
+
+class ContextThemeWrapper extends ContextWrapper {
+
+    ContextThemeWrapper(Context context) {
+        super(context);
+    }
+
+    void doSomething() {
+        super.doSomething();
+        System.out.println(&quot;ContextThemeWrapper doSomething&quot;);
+    }
+}
+//output:
+ContextImpl doSomething
+ContextThemeWrapper doSomething
+</code></pre>
+<h4 id="10facade外观">10、Facade（外观）</h4>
+<p>实际应用：ContextImpl（管理ActivityManagerNative，PackageManager，ResourcesManager等子系统）</p>
+<p>提供了一个高层次接口，方便各个子系统的使用</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/166ddb9730698785966723efb3d8b8a8.png" alt=""></p>
+<pre><code>class ContextImpl {
+    AMS ams;
+    PKMS pkms;
+
+    void startActivities() {
+        ams.startActivity();
+    };
+
+    void getPackageManager() {
+        pkms.getPackageManager();
+    }
+
+}
+
+class AMS {
+    void startActivity() {
+        System.out.println(&quot;startActivity&quot;);
+    };
+}
+
+class PKMS {
+    void getPackageManager() {
+        System.out.println(&quot;getPackageManager&quot;);
+    }
+}
+</code></pre>
+<p>ContextImpl相当于一个外观模式，Wrapper类是装饰器模式</p>
+<h4 id="11flyweight享元">11、Flyweight（享元）</h4>
+<p>实际应用：Message的重用，JDK中的String对象的常量池</p>
+<p>对象池的一种实现，比如一篇word文档中有一万个字符，创建一万个字符对象代价就太大了。通常和state模式或strategy模式一起使用</p>
+<h4 id="12proxy代理">12、Proxy（代理）</h4>
+<p>实际应用：Binder</p>
+<p>对于理解Binder机制很有帮助。</p>
+<pre><code>public class Proxy {
+
+    public static void main(String[] args) {
+        RealSub rs = new RealSub();
+        ProxySub ps = new ProxySub(rs);
+        ps.visit();
+    }
+}
+
+abstract class Sub {
+    abstract void visit();
+}
+
+class RealSub extends Sub {
+    @Override
+    void visit() {
+        System.out.println(&quot;RealVisit&quot;);
+    }
+}
+
+class ProxySub extends Sub {
+    RealSub sub;
+
+    ProxySub(RealSub sub) {
+        this.sub = sub;
+    }
+
+    @Override
+    void visit() {
+        sub.visit();
+    }
+}
+</code></pre>
+<hr>
+<h3 id="三行为模式">三、行为模式</h3>
+<h4 id="13chain-of-responsibility责任链对象行为">13、chain of responsibility（责任链）（对象行为）</h4>
+<p>实际应用：事件分发机制，比如屏幕的触摸事件</p>
+<p>要点是当前Handler保持一个下一节点Handler的引用，当前节点处理不了则把消息分发给下一节点。</p>
+<pre><code>public class ChainOfResponsibility {
+
+    public static void main(String[] args) {
+        Request1 r1 = new Request1();
+        Request2 r2 = new Request2();
+
+        Handler1 h1 = new Handler1();
+        Handler2 h2 = new Handler2();
+        h1.next = h2;
+        h1.handlerRequest(r1);
+        h1.handlerRequest(r2);
+    }
+
+}
+
+abstract class AbsHandler {
+    AbsHandler next;
+
+    void handlerRequest(AbsRequest req) {
+        if (getHanlderLevel() == req.getRequestLevel()) {
+            handle(req);
+        } else {
+            next.handle(req);
+        }
+    }
+
+    abstract String getHanlderLevel();
+
+    abstract void handle(AbsRequest req);
+}
+
+class Handler1 extends AbsHandler {
+
+    @Override
+    String getHanlderLevel() {
+        return &quot;1&quot;;
+    }
+
+    @Override
+    void handle(AbsRequest req) {
+        System.out.println(&quot;Handler1 handle&quot;);
+
+    }
+}
+
+class Handler2 extends AbsHandler {
+
+    @Override
+    String getHanlderLevel() {
+        return &quot;2&quot;;
+    }
+
+    @Override
+    void handle(AbsRequest req) {
+        System.out.println(&quot;Handler2 handle&quot;);
+    }
+
+}
+
+abstract class AbsRequest {
+    abstract String getRequestLevel();
+}
+
+class Request1 extends AbsRequest {
+
+    @Override
+    String getRequestLevel() {
+        return &quot;1&quot;;
+    }
+}
+
+class Request2 extends AbsRequest {
+
+    @Override
+    String getRequestLevel() {
+        return &quot;2&quot;;
+    }
+
+}
+//output:
+Handler1 handle
+Handler2 handle
+</code></pre>
+<h4 id="14command命令对象行为">14、command（命令）（对象行为）</h4>
+<p>实际应用：PackageManagerService中的MeasureParams、InstallParams和MoveParams</p>
+<p>通过把请求封装成对象，不同的命令对象子类持有各自的接收者，接受者可以相同也可以不同，然后不同的命令对象中，接收者执行不同的具体操作。</p>
+<p>command模式是过程语言中回调（callback）机制的一个面向对象的替代品</p>
+<pre><code>public class CommandPattern {
+
+    public static void main(String[] args) {
+        Car car = new Car();
+        LeftCommand left = new LeftCommand(car);
+        RightCommand right = new RightCommand(car);
+        BackCommand back = new BackCommand(car);
+        ForwardCommand forward = new ForwardCommand(car);
+
+        Handler h = new Handler(car);
+        h.setBack(back);
+        h.setForward(forward);
+        h.setLeft(left);
+        h.setRight(right);
+
+        h.toBack();
+        h.toLeft();
+        h.toForward();
+        h.toRight();
+		
+        h.undo();
+        h.undo();
+        h.undo();
+        h.undo();
+    }
+}
+
+class Car {
+
+    void toLeft() {
+        System.out.println(&quot;toLeft&quot;);
+    }
+
+    void toRight() {
+        System.out.println(&quot;toRight&quot;);
+    }
+
+    void toForward() {
+        System.out.println(&quot;toForward&quot;);
+    }
+
+    void toBack() {
+        System.out.println(&quot;toBack&quot;);
+    }
+}
+
+interface Command {
+    void execute();
+    void undo();
+}
+
+class LeftCommand implements Command {
+    Car car;
+
+    public LeftCommand(Car car) {
+        super();
+        this.car = car;
+    }
+
+    @Override
+    public void execute() {
+        car.toLeft();
+    }
+
+    @Override
+    public void undo() {
+        car.toRight();
+		
+    }
+}
+
+class RightCommand implements Command {
+    Car car;
+
+    public RightCommand(Car car) {
+        super();
+        this.car = car;
+    }
+
+    @Override
+    public void execute() {
+        car.toRight();
+    }
+
+    @Override
+    public void undo() {
+        car.toLeft();
+		
+    }
+}
+
+class ForwardCommand implements Command {
+    Car car;
+
+    public ForwardCommand(Car car) {
+        super();
+        this.car = car;
+    }
+
+    @Override
+    public void execute() {
+        car.toForward();
+    }
+
+    @Override
+    public void undo() {
+        car.toBack();
+		
+    }
+}
+
+class BackCommand implements Command {
+    Car car;
+
+    public BackCommand(Car car) {
+        super();
+        this.car = car;
+    }
+
+    @Override
+    public void execute() {
+        car.toBack();
+    }
+
+    @Override
+    public void undo() {
+        car.toForward();
+		
+    }
+}
+
+class Handler {
+    Car car;
+    LeftCommand left;
+    RightCommand right;
+    BackCommand back;
+    ForwardCommand forward;
+    ArrayList&lt;Command&gt; commandList = new ArrayList&lt;&gt;();
+    Handler(Car car) {
+        this.car = car;
+    }
+
+    public void setLeft(LeftCommand left) {
+        this.left = left;
+    }
+
+    public void setRight(RightCommand right) {
+        this.right = right;
+    }
+
+    public void setBack(BackCommand back) {
+        this.back = back;
+    }
+
+    public void setForward(ForwardCommand forward) {
+        this.forward = forward;
+    }
+
+    void toLeft() {
+        left.execute();
+        commandList.add(left);
+    }
+
+    void toRight() {
+        right.execute();
+        commandList.add(right);
+    }
+
+    void toBack() {
+        back.execute();
+        commandList.add(back);
+    }
+
+    void toForward() {
+        forward.execute();
+        commandList.add(forward);
+    }
+	
+    void undo(){
+        if(commandList.size() &gt; 0){
+            commandList.get(commandList.size() - 1).undo();
+            commandList.remove(commandList.size() - 1);
+        }
+    }
+}
+//output:
+toBack
+toLeft
+toForward
+toRight
+toLeft
+toBack
+toRight
+toForward
+</code></pre>
+<h4 id="15interpreter解释器类行为">15、interpreter（解释器）（类行为）</h4>
+<p>实际应用：xml解释器</p>
+<p>经常会用到一些正则表达式进行字符串匹配，比较复杂</p>
+<h4 id="16iterator迭代器对象行为">16、iterator（迭代器）（对象行为）</h4>
+<p>实际应用：容器对象的遍历</p>
+<h4 id="17mediator中介者对象行为">17、mediator（中介者）（对象行为）</h4>
+<p>实际应用：KeyguardViewMediator</p>
+<p>将两个对象直接的操作通过实现一个中介者进行解耦。具体客户类都持有一个中介者对象，中介者持有具体客户类对象。缺点是中介者封装了协议，比任何一个客户类都复杂，业务太多的话会变得难以维护。</p>
+<pre><code>public class MediatorPattern {
+
+    public static void main(String[] args) {
+        ConcreteMediator mediator = new ConcreteMediator();
+        Owner owner = new Owner(mediator);
+        Render render = new Render(mediator);
+        System.out.println(&quot;mediator has money : &quot; + mediator.money);
+        render.action();
+        System.out.println(&quot;mediator has money : &quot; + mediator.money);
+        owner.action();
+        System.out.println(&quot;mediator has money : &quot; + mediator.money);
+    }
+
+}
+
+abstract class Trader {
+    Mediator m;
+
+    abstract void action();
+}
+
+class Owner extends Trader {
+
+    public Owner(ConcreteMediator m) {
+        this.m = m;
+    }
+
+    @Override
+    void action() {
+        m.giveMoney(100);
+        System.out.println(&quot;Owner receive money from mediator&quot;);
+    }
+
+}
+
+class Render extends Trader {
+
+    public Render(ConcreteMediator m) {
+        this.m = m;
+    }
+
+    @Override
+    void action() {
+        m.receiveMoney(100);
+        System.out.println(&quot;Render give money to mediator&quot;);
+
+    }
+
+}
+
+abstract class Mediator {
+    Owner owner;
+    Render render;
+
+    abstract void receiveMoney(int money);
+
+    abstract void giveMoney(int money);
+}
+
+class ConcreteMediator extends Mediator {
+    int money = 0;
+
+    @Override
+    void receiveMoney(int money) {
+        this.money += money;
+    }
+
+    @Override
+    void giveMoney(int money) {
+        this.money -= money;
+
+    }
+}
+//output:
+mediator has money : 0
+Render give money to mediator
+mediator has money : 100
+Owner receive money from mediator
+mediator has money : 0
+</code></pre>
+<h4 id="18memento备忘录对象行为">18、memento（备忘录）（对象行为）</h4>
+<p>实际应用：onSaveInstanceState（activity相当于caretaker，Bundle相当于memento，各种UI信息相当于originator）</p>
+<p>通过实现一个备忘录（memento）对象，保存原发器（originator）的状态，caretaker负责管理memento。</p>
+<p>*变量以及状态封装成对象进行保存</p>
+<h4 id="19observer观察者对象行为">19、observer（观察者）（对象行为）</h4>
+<p>实际应用：ListView</p>
+<p>BaseAdapter创建的时候会同时创建一个DataSetObservable（被观察者），当listview调用setAdapter时会创建一个AdapterDataSetObserver（观察者），当Adapter调用notifyDataSetChanged时，被观察者调用notifyChanged遍历通知所有观察者执行onChanged方法，然后观察者会执行重新布局的操作。</p>
+<pre><code>public class ObserverPattern {
+    public static void main(String[] args) {
+        ConcreteObserver osr1 = new ConcreteObserver(&quot;osr1&quot;);
+        ConcreteObserver osr2 = new ConcreteObserver(&quot;osr2&quot;);
+        ConcreteSubject sub = new ConcreteSubject();
+        sub.attach(osr1);
+        sub.attach(osr2);
+        sub.notifyObservers();
+    }
+}
+
+interface Observer {
+    void update(Subject o, String arg);
+}
+
+class ConcreteObserver implements Observer {
+    String name;
+
+    public ConcreteObserver(String name) {
+        super();
+        this.name = name;
+    }
+
+    @Override
+    public void update(Subject o, String arg) {
+        System.out.println(name + &quot; receive: &quot; + arg);
+    }
+}
+
+abstract class Subject {
+    abstract void attach(Observer observer);
+
+    abstract void detach(Observer observer);
+
+    abstract void notifyObservers();
+}
+
+class ConcreteSubject extends Subject {
+    ArrayList&lt;Observer&gt; list = new ArrayList&lt;&gt;();
+
+    @Override
+    void attach(Observer observer) {
+        list.add(observer);
+    }
+
+    @Override
+    void detach(Observer observer) {
+        list.remove(observer);
+    }
+
+    @Override
+    void notifyObservers() {
+        for (Observer observer : list) {
+            observer.update(this, &quot;new content!&quot;);
+        }
+    }
+}
+//output:
+osr1 receive: new content!
+osr2 receive: new content!
+</code></pre>
+<h4 id="20state状态对象行为">20、state（状态）（对象行为）</h4>
+<p>实际应用：WifiStateMachine</p>
+<p>状态模式把对象行为包装在不同的状态对象里，意图是让一个对象在内部状态改变的时候行为也跟着改变。</p>
+<p>*状态封装成接口</p>
+<pre><code>public class State {
+
+    public static void main(String[] args) {
+        TvController tvController = new TvController();
+        tvController.downVolme();
+        tvController.powerOn();
+        tvController.downVolme();
+        tvController.powerOff();
+        tvController.preChannel();
+        tvController.powerOn();
+        tvController.nextChannel();
+    }
+}
+
+interface TvState{
+    void upVolume();
+    void downVolme();
+    void nextChannel();
+    void preChannel();
+}
+
+class PowerOffState implements TvState{
+
+    @Override
+    public void upVolume() {
+        System.out.println(&quot;TV is PowerOff&quot;);
+    }
+
+    @Override
+    public void downVolme() {
+        System.out.println(&quot;TV is PowerOff&quot;);
+    }
+
+    @Override
+    public void nextChannel() {
+        System.out.println(&quot;TV is PowerOff&quot;);
+    }
+
+    @Override
+    public void preChannel() {
+        System.out.println(&quot;TV is PowerOff&quot;);
+    }
+}
+
+class PowerOnState implements TvState{
+
+    @Override
+    public void upVolume() {
+        System.out.println(&quot;upVolume&quot;);
+    }
+
+    @Override
+    public void downVolme() {
+        System.out.println(&quot;downVolme&quot;);
+    }
+
+    @Override
+    public void nextChannel() {
+        System.out.println(&quot;nextChannel&quot;);
+    }
+
+    @Override
+    public void preChannel() {
+        System.out.println(&quot;preChannel&quot;);
+    }
+}
+
+class TvController implements TvState{
+    TvState tvState = new PowerOffState();;
+    public void powerOn(){
+        tvState = new PowerOnState();
+        System.out.println(&quot;PowerOn TV!&quot;);
+    }
+	
+    public void powerOff(){
+        tvState = new PowerOffState();
+        System.out.println(&quot;PowerOff TV!&quot;);
+    }
+
+    @Override
+    public void upVolume() {
+        tvState.upVolume();
+    }
+
+    @Override
+    public void downVolme() {
+        tvState.downVolme();
+    }
+
+    @Override
+    public void nextChannel() {
+        tvState.nextChannel();
+    }
+
+    @Override
+    public void preChannel() {
+        tvState.preChannel();
+    }
+}
+//output:
+TV is PowerOff
+PowerOn TV!
+downVolme
+PowerOff TV!
+TV is PowerOff
+PowerOn TV!
+nextChannel
+</code></pre>
+<h4 id="21strategy策略对象行为">21、strategy（策略）（对象行为）</h4>
+<p>实际应用：ImageLoader中的各种MemoryCache算法，android实现动画效果的各种插值器算法。</p>
+<p>对算法进行封装，让各个算法直接可以相互替换。</p>
+<p>*方法封装成对象</p>
+<h4 id="22template-method模板方法类行为">22、template method（模板方法）（类行为）</h4>
+<p>实际应用：asyncTask，Activity（生命周期方法）</p>
+<p>定义一个算法框架，让其实现延迟到子类。</p>
+<h4 id="23visitor访问者对象行为">23、visitor（访问者）（对象行为）</h4>
+<p>实际应用：注解框架的实现（ButterKnife）</p>
+<p>是为了将数据操作与数据结构分离的模式。</p>
+<pre><code>public class VisitorPattern {
+
+    public static void main(String[] args) {
+        Report report = new Report();
+        report.showReport(new VisitorA());
+        System.out.println(&quot;----------------&quot;);
+        report.showReport(new VisitorB());
+    }
+}
+
+abstract class Staff {
+    String name;
+    String sex;
+
+    public Staff(String name, String sex) {
+        super();
+        this.name = name;
+        this.sex = sex;
+    }
+
+    abstract void accept(Visitor visitor);
+}
+
+class StaffA extends Staff {
+
+    public StaffA(String name, String sex) {
+        super(name, sex);
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visitStaffA(this);
+    }
+}
+
+class StaffB extends Staff {
+
+    public StaffB(String name, String sex) {
+        super(name, sex);
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visitStaffB(this);
+    }
+}
+
+interface Visitor {
+    void visitStaffA(StaffA staffA);
+
+    void visitStaffB(StaffB staffB);
+}
+
+class VisitorA implements Visitor {
+
+    @Override
+    public void visitStaffA(StaffA staffA) {
+        System.out.println(staffA.name);
+    }
+
+    @Override
+    public void visitStaffB(StaffB staffB) {
+        System.out.println(staffB.name);
+    }
+}
+
+class VisitorB implements Visitor {
+
+    @Override
+    public void visitStaffA(StaffA staffA) {
+        System.out.println(staffA.sex);
+    }
+
+    @Override
+    public void visitStaffB(StaffB staffB) {
+        System.out.println(staffB.sex);
+    }
+}
+
+class Report {
+    List&lt;Staff&gt; list = new ArrayList&lt;Staff&gt;();
+
+    public Report() {
+        list.add(new StaffA(&quot;AA&quot;, &quot;MALE&quot;));
+        list.add(new StaffA(&quot;AB&quot;, &quot;FEMALE&quot;));
+        list.add(new StaffB(&quot;BA&quot;, &quot;MALE&quot;));
+        list.add(new StaffB(&quot;BB&quot;, &quot;FEMALE&quot;));
+    }
+
+    public void showReport(Visitor visitor) {
+        for (Staff staff : list) {
+            staff.accept(visitor);
+        }
+    }
+}
+//output：
+A
+A
+B
+B
+----------------
+MALE
+FEMALE
+MALE
+FEMALE</code></pre>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">xuanliang</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2018-04-12
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/">
+            
+            <i class="iconfont">
+              <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M691.908486 949.511495l75.369571-89.491197c10.963703-12.998035 10.285251-32.864502-1.499144-44.378743L479.499795 515.267417 757.434875 204.940602c11.338233-12.190647 11.035334-32.285311-0.638543-44.850487l-80.46666-86.564541c-11.680017-12.583596-30.356378-12.893658-41.662889-0.716314L257.233596 494.235404c-11.332093 12.183484-11.041474 32.266891 0.657986 44.844348l80.46666 86.564541c1.772366 1.910513 3.706415 3.533476 5.750981 4.877077l306.620399 321.703933C662.505829 963.726242 680.945807 962.528973 691.908486 949.511495z"></path>
+</svg>
+
+            </i>
+            <span class="prev-text nav-default">无障碍学习整理（基于talkback）</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        
+          <a class="next" href="/post/activitymanagerservice%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93/">
+            <span class="next-text nav-default">ActivityManagerService流程总结</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="https://github.com/xuanliangdev" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://xuanliangdev.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2021
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        xuanliang
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>一次列表卡顿分析 - xuanliang</title>
+  <title>ActivityManagerService流程总结 - xuanliang</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -23,7 +23,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="xuanliang" />
-  <meta name="description" content="内存专项测试问题发现：小米闻声第一版时自测发现，当连续识别时间过长超过半小时，界面列表滑动出现明显卡顿，重启应用后卡顿不复现。 1、问题定位 卡" />
+  <meta name="description" content="ActivityManagerService流程总结 ActivityManagerService是一个Binder服务，用来负责系统中四大组" />
 
   <meta name="keywords" content="Hugo, theme, jane" />
 
@@ -35,7 +35,7 @@
 <meta name="generator" content="Hugo 0.63.2" />
 
 
-<link rel="canonical" href="https://xuanliangdev.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%8D%A1%E9%A1%BF%E5%88%86%E6%9E%90%E6%80%BB%E7%BB%93/" />
+<link rel="canonical" href="https://xuanliangdev.github.io/post/activitymanagerservice%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93/" />
 
 
 
@@ -59,23 +59,23 @@
 
 
 
-<meta property="og:title" content="一次列表卡顿分析" />
-<meta property="og:description" content="内存专项测试问题发现：小米闻声第一版时自测发现，当连续识别时间过长超过半小时，界面列表滑动出现明显卡顿，重启应用后卡顿不复现。 1、问题定位 卡" />
+<meta property="og:title" content="ActivityManagerService流程总结" />
+<meta property="og:description" content="ActivityManagerService流程总结 ActivityManagerService是一个Binder服务，用来负责系统中四大组" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://xuanliangdev.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%8D%A1%E9%A1%BF%E5%88%86%E6%9E%90%E6%80%BB%E7%BB%93/" />
-<meta property="article:published_time" content="2020-09-03T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-09-03T00:00:00+00:00" />
-<meta itemprop="name" content="一次列表卡顿分析">
-<meta itemprop="description" content="内存专项测试问题发现：小米闻声第一版时自测发现，当连续识别时间过长超过半小时，界面列表滑动出现明显卡顿，重启应用后卡顿不复现。 1、问题定位 卡">
-<meta itemprop="datePublished" content="2020-09-03T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-09-03T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="680">
+<meta property="og:url" content="https://xuanliangdev.github.io/post/activitymanagerservice%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93/" />
+<meta property="article:published_time" content="2018-02-08T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-02-08T00:00:00+00:00" />
+<meta itemprop="name" content="ActivityManagerService流程总结">
+<meta itemprop="description" content="ActivityManagerService流程总结 ActivityManagerService是一个Binder服务，用来负责系统中四大组">
+<meta itemprop="datePublished" content="2018-02-08T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2018-02-08T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="3696">
 
 
 
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="一次列表卡顿分析"/>
-<meta name="twitter:description" content="内存专项测试问题发现：小米闻声第一版时自测发现，当连续识别时间过长超过半小时，界面列表滑动出现明显卡顿，重启应用后卡顿不复现。 1、问题定位 卡"/>
+<meta name="twitter:title" content="ActivityManagerService流程总结"/>
+<meta name="twitter:description" content="ActivityManagerService流程总结 ActivityManagerService是一个Binder服务，用来负责系统中四大组"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -295,11 +295,11 @@
           <article class="post bg-white">
     
     <header class="post-header">
-      <h1 class="post-title">一次列表卡顿分析</h1>
+      <h1 class="post-title">ActivityManagerService流程总结</h1>
       
       <div class="post-meta">
-        <time datetime="2020-09-03" class="post-time">
-          2020-09-03
+        <time datetime="2018-02-08" class="post-time">
+          2018-02-08
         </time>
         
         
@@ -319,11 +319,22 @@
   <div class="post-toc-content">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#1问题定位">1、问题定位</a></li>
-    <li><a href="#2原理分析">2、原理分析</a>
+    <li><a href="#activitymanagerservice流程总结">ActivityManagerService流程总结</a>
       <ul>
-        <li><a href="#21-android刷新机制">2.1 Android刷新机制</a></li>
-        <li><a href="#22-recyclerview源码分析">2.2 RecyclerView源码分析</a></li>
+        <li><a href="#1activitymanagerservice启动流程分析">1.ActivityManagerService启动流程分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#2startactivity流程分析">2.startActivity流程分析</a>
+      <ul>
+        <li><a href="#1-911步在amsactivitymanagerservice进程中执行">1-9、11步在AMS（ActivityManagerService）进程中执行；</a></li>
+        <li><a href="#1012-14在launcher所在进程中执行">10、12-14在launcher所在进程中执行；</a></li>
+        <li><a href="#15-22在ams进程中执行">15-22在AMS进程中执行；</a></li>
+        <li><a href="#23-26在新开的应用进程中执行">23-26在新开的应用进程中执行；</a></li>
+        <li><a href="#27-28在ams进程中执行">27-28在AMS进程中执行；</a></li>
+        <li><a href="#29-31在新开的应用进程中执行">29-31在新开的应用进程中执行；</a></li>
+        <li><a href="#32-33在ams进程中执行">32-33在AMS进程中执行；</a></li>
+        <li><a href="#34-44在新开的应用进程中执行">34-44在新开的应用进程中执行；</a></li>
+        <li><a href="#参考资料">参考资料</a></li>
       </ul>
     </li>
   </ul>
@@ -333,40 +344,87 @@
 
     
     <div class="post-content">
-      <p>内存专项测试问题发现：小米闻声第一版时自测发现，当连续识别时间过长超过半小时，界面列表滑动出现明显卡顿，重启应用后卡顿不复现。</p>
-<h2 id="1问题定位">1、问题定位</h2>
-<p>卡顿分析工具：</p>
-<p>1、开发者选项-GPU呈现模式分析（或者叫HWUI呈现模式分析）</p>
-<p>参考资料：</p>
-<p><a href="https://developer.android.com/studio/profile/inspect-gpu-rendering?hl=zh-cn">https://developer.android.com/studio/profile/inspect-gpu-rendering?hl=zh-cn</a></p>
-<p><a href="https://developer.android.com/topic/performance/rendering/profile-gpu">https://developer.android.com/topic/performance/rendering/profile-gpu</a></p>
-<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/renderinganalysis/gpurendering.jpg" alt=""></p>
-<p>开发者选项开启GPU呈现分析，卡顿产生后可以明显看出来，每个竖条表示一帧渲染时间，很多都超过了水平线16ms，正常流畅情况下是如下图这样的</p>
-<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/renderinganalysis/gpurenderingnormal.jpg" alt=""></p>
-<p>以上这个图只能帮助我们大概定位卡顿的位置，为绿色部分。根据google开发文档</p>
-<p>深蓝区域为绘制流程，往前一个浅绿区域为测量/布局流程，再往前为动画流程。这个工具并不能帮助我们定位到具体的代码段。只是大致的一个范围</p>
-<p>2、Android Studio工具CPU Profiler</p>
-<p>参考资料：https://developer.android.google.cn/studio/profile/cpu-profiler</p>
-<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/renderinganalysis/gpuprofile.jpg" alt=""></p>
-<h2 id="2原理分析">2、原理分析</h2>
-<h3 id="21-android刷新机制">2.1 Android刷新机制</h3>
-<p>参考资料：</p>
-<p><a href="http://hukai.me/android-performance-patterns/">http://hukai.me/android-performance-patterns/</a></p>
-<p><a href="http://hukai.me/android-performance-render/">http://hukai.me/android-performance-render/</a></p>
-<p><a href="https://www.cnblogs.com/dasusu/p/8311324.html">https://www.cnblogs.com/dasusu/p/8311324.html</a></p>
-<p><a href="http://gityuan.com/2017/02/25/choreographer/">http://gityuan.com/2017/02/25/choreographer/</a></p>
-<p>VSYN</p>
-<p>Refresh rate:一秒内刷新屏幕次数</p>
-<p>Frame rate:gpu一秒内操作的帧数</p>
-<p>卡顿原因：大部分屏幕刷新率时60Hz，如果1000/60=16.67ms内没办法处理一帧任务，那么就会发生丢帧，也就是卡顿。</p>
-<p>cpu负责Measure、Layout、Record、Excecute的计算操作，GPU负责rasterization（栅格化）</p>
-<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/renderinganalysis/vsync.jpg" alt=""></p>
-<h3 id="22-recyclerview源码分析">2.2 RecyclerView源码分析</h3>
-<p><a href="https://blog.csdn.net/weishenhong/article/details/81150172">https://blog.csdn.net/weishenhong/article/details/81150172</a></p>
-<p><a href="https://blog.csdn.net/crazy_everyday_xrp/article/details/70344638?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param">https://blog.csdn.net/crazy_everyday_xrp/article/details/70344638?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param</a></p>
-<p><a href="https://medium.com/google-developers/recyclerview-prefetch-c2f269075710">https://medium.com/google-developers/recyclerview-prefetch-c2f269075710</a>（需要科学上网）</p>
-<p>recyclerview测量时序图：</p>
-<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/renderinganalysis/recyclerviewmesure.jpg" alt=""></p>
+      <h2 id="activitymanagerservice流程总结">ActivityManagerService流程总结</h2>
+<p>ActivityManagerService是一个Binder服务，用来负责系统中四大组件的管理和调度。</p>
+<h3 id="1activitymanagerservice启动流程分析">1.ActivityManagerService启动流程分析</h3>
+<p>Android系统第一个启动的进程是Zygote进程，是通过脚本启动的，这个进程启动后马上会通过fork启动一个System Server进程，system server进程很重要，PackageManagerService和ActivityManagerService等一些重要服务都是运行在这个进程里。System Server进程启动后会开启一个ServerThread线程，这是一个开启了looper的线程，然后会在这个线程里调用ActivityManagerService的main函数进行启动。</p>
+<p>main函数执行的时序图如下：
+<img src="https://img-blog.csdnimg.cn/img_convert/d88c3b68bcb05192324ec63afcaeb194.png" alt=""></p>
+<p>1.创建一个AThread的线程</p>
+<p>2.启动Athread线程</p>
+<p>3.等待ActivityManagerService对象的创建</p>
+<p>4.Athread这时会去创建ActivityManagerService对象，即执行ActivityManagerService的构造方法</p>
+<p>5.ActivityManagerService对象创建完成唤醒ServerThread线程</p>
+<p>6.Athread等待</p>
+<p>7.执行ActivityThread.systemMain()函数，（我们知道ActivityThread是一个app进程的主线程，借用《深入理解Android卷2》中一句话，systemMain的目的是为system_server进程搭建一个和普通app进程一样的android运行环境）</p>
+<p>8.创建ActivityThread对象（在这里其实是system/framework/framework-res.apk的主线程）</p>
+<p>9.关联到系统进程</p>
+<p>10.取得系统ContextImpl对象（同样是system/framework/framework-res.apk的context）</p>
+<p>11.返回ContextImpl对象，然后创建一个ActivityStack对象。</p>
+<p>12.唤醒Athread线程，Athread线程进入looper循环</p>
+<p>13.继续执行startRunning函数（此处由于系统没准备好，直接返回）</p>
+<h2 id="2startactivity流程分析">2.startActivity流程分析</h2>
+<p>在控制台可以通过adb shell登录，并通过am命令打开一个activity
+比如</p>
+<p>am start -n demo.leakcanary.srain.in.leakcanarydemo/.MainActivity</p>
+<p>activity从桌面启动的时序图如下图所示：</p>
+<p>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-X8FsQtIO-1613019571484)(https://i.imgur.com/TUdt4OH.png)]</p>
+<h3 id="1-911步在amsactivitymanagerservice进程中执行">1-9、11步在AMS（ActivityManagerService）进程中执行；</h3>
+<p>1.使用am命令启动一个activity，实质是Am类通过ActivityManagerNative.getDefault()获得一个ActivityManagerProxy代理，ActivityManagerProxy代理会调用startActivityAndWait方法，而这其实又会调用AMS的startActivityAndWait方法。（因为AMS是ActivityManagerNative子类）</p>
+<p>2.调用ActivityStack的startActivityAndWait方法，ActivityStack是AMS的一个实例，是对activity进行调度的核心，比如管理activity的启动模式。</p>
+<p>3.这里会获取launchFlags来取出启动模式，检查权限等。</p>
+<p>4.创建activityRecod。</p>
+<p>5.这里也会对不同的启动模式进行处理，即为新建的activity_record找task。</p>
+<p>6.里面有一些动画相关的处理</p>
+<p>7.判断当前是否有resume的activity，有就进行pause操作（当前是home界面，所以先对launcher当前显示的activity进行pause操作）</p>
+<p>8.取出launcher进程的ApplicationThreadProxy代理。</p>
+<p>9.调用launcher进程代理的schedulePauseActivity方法进行pause activity的操作</p>
+<p>11、AMS执行完毕进入等待。</p>
+<h3 id="1012-14在launcher所在进程中执行">10、12-14在launcher所在进程中执行；</h3>
+<p>10.取出AMS发过来的参数。</p>
+<p>12.launcher通过H向自己的主线程发送pause activity的消息</p>
+<p>13.处理activity的pause操作。</p>
+<p>14.通过ActivityManagerProxy通知AMS当前activity已经完成暂停操作了。由此可见打开一个activity，首先得先把当前显示的activity先暂停。而不是先创建新的activity。</p>
+<h3 id="15-22在ams进程中执行">15-22在AMS进程中执行；</h3>
+<p>15.AMS调用ActivityStack的activityPaused方法。</p>
+<p>16.该过程会检查系统是否正在进入睡眠或关闭，否则再次调用resumeTopActivityLocked函数。</p>
+<p>17.resumeTopActivityLocked这个函数在第7步调用过，当时前面的activity没pause所以直接返回了，现在launcher显示的activity已经pause成功，则马上调用startSpecificActivityLocked方法、</p>
+<p>18.该函数首先会检查当前要启动的activity所在进程是否存在，如果不存在则新建进程，如果存在则直接执行realStartActivityLocked方法（这个方法后面32步也会调到）。</p>
+<p>19.取出ProcessRecord对象，如果进程不存在，则新建ProcessRecord对象，并加入到AMS的mProcessNames中。</p>
+<p>20.调用另一个startProcessLocked来创建新的进程对象</p>
+<p>21.调用Process.start方法开启一个新进程</p>
+<p>22.AMS执行完进入等待。</p>
+<h3 id="23-26在新开的应用进程中执行">23-26在新开的应用进程中执行；</h3>
+<p>23.Process.start开启进程后会进入新的app的主线程的main方法，也就是ActivityThread的main方法。ActivityThread类加载时会new一个ApplicationThread的binder对象，AMS便会和这个ApplicationThread进行进程间通信。</p>
+<p>24.创建一个ActivityThread对象。</p>
+<p>25.调用对象的attach方法</p>
+<p>26.通过AMS代理调用AMS的attachApplication方法</p>
+<h3 id="27-28在ams进程中执行">27-28在AMS进程中执行；</h3>
+<p>27.目的是将新的app的ApplicationThread和pid在AMS中注册。</p>
+<p>28.通过ApplicationThreadProxy将信息返回给新的app进程。</p>
+<h3 id="29-31在新开的应用进程中执行">29-31在新开的应用进程中执行；</h3>
+<p>29.新应用取出AMS发过来的数据向自己主线程的H发送消息。</p>
+<p>30.H处理消息。</p>
+<p>31.执行handleBindApplication进行相关信息的绑定。此处的操作包括创建上下文ContextImpl，创建应用的application，并调用application的oncreate方法。</p>
+<h3 id="32-33在ams进程中执行">32-33在AMS进程中执行；</h3>
+<p>32.AMS执行完bindApplication后便开始调用ActivityStack的realStartActivityLocked进行activity的显示，（该方法在之前18步的一个分支也可能会调用到）</p>
+<p>33.调用scheduleLaunchActivity方法，通过ApplicationThreadPoxy通知应用进行打开activity。</p>
+<h3 id="34-44在新开的应用进程中执行">34-44在新开的应用进程中执行；</h3>
+<p>34.像主线程的H发送打开activity的message。</p>
+<p>35.处理打开activity的操作。</p>
+<p>36.调用performLaunchActivity进行创建并打开activity的操作。</p>
+<p>37.该函数内会调用activity声明周期的oncreate和onstart方法。</p>
+<p>38.通过反射创建activity对象。</p>
+<p>39.newActivity创建完成返回activity变量。</p>
+<p>40.调用Instrumentation的callActivityOnCreate方法。</p>
+<p>41.调用activity的oncreate方法。</p>
+<p>42.执行完后会紧接着执行activity.performStart方法，即回调activity的onstart方法。</p>
+<p>43.执行handleResumeActivity方法，当44步调用完后，接着还会往主线程的MessageQueue发送一个Idler对象，会在这里面通知AMS对已经暂停的activity调用onStop和onDestroy的生命周期</p>
+<p>44.该过程会调用activity的onresume方法。</p>
+<h3 id="参考资料">参考资料</h3>
+<p>Android AOSP代码</p>
+<p>《深入理解Android 卷2 邓凡平》</p>
+<p>《Android系统源代码情景分析 罗升阳》</p>
 
     </div>
 
@@ -380,7 +438,7 @@
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-09-03
+      2018-02-08
       
     </span>
   </p>
@@ -401,7 +459,7 @@
       
       <nav class="post-nav">
         
-          <a class="prev" href="/post/miui%E6%A1%8C%E9%9D%A2%E7%BC%96%E8%BE%91%E6%A8%A1%E5%BC%8F%E7%84%A6%E7%82%B9%E9%A1%BA%E5%BA%8F%E9%94%99%E4%B9%B1%E5%88%86%E6%9E%90/">
+          <a class="prev" href="/post/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
             
             <i class="iconfont">
               <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -411,12 +469,12 @@
 </svg>
 
             </i>
-            <span class="prev-text nav-default">一次MIUI桌面编辑模式焦点浏览顺序错乱分析</span>
+            <span class="prev-text nav-default">从Android项目学习设计模式</span>
             <span class="prev-text nav-mobile">Prev</span>
           </a>
         
-          <a class="next" href="/post/fragment%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/">
-            <span class="next-text nav-default">Fragment机制原理溯源</span>
+          <a class="next" href="/post/android%E5%86%85%E5%AD%98%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/">
+            <span class="next-text nav-default">Android内存性能分析</span>
             <span class="prev-text nav-mobile">Next</span>
             
             <i class="iconfont">
