@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Android 内存分析（围绕Bitmap） - xuanliang</title>
+  
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta name="MobileOptimized" content="width"/>
+<meta name="HandheldFriendly" content="true"/>
+
+
+<meta name="applicable-device" content="pc,mobile">
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="author" content="xuanliang" />
+  <meta name="description" content="疑问： 1、图片在内存中的大小跟imageview设置的宽高有没影响？ 2、同一张图片放在drawable里面，跟放在drawable-xxhd" />
+
+  <meta name="keywords" content="Hugo, theme, jane" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.63.2" />
+
+
+<link rel="canonical" href="https://xuanliangdev.github.io/post/android%E5%86%85%E5%AD%98%E5%88%86%E6%9E%90%E5%9B%B4%E7%BB%95bitmap/" />
+
+
+
+
+
+<link rel="icon" href="/favicon.ico" />
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/sass/jane.min.0995afa14b62cd93e93cfc066b646c4c17a3eddca0e9d52a1d9dcf5d90aaacd3.css" integrity="sha256-CZWvoUtizZPpPPwGa2RsTBej7dyg6dUqHZ3PXZCqrNM=" media="screen" crossorigin="anonymous">
+
+
+
+
+
+<meta property="og:title" content="Android 内存分析（围绕Bitmap）" />
+<meta property="og:description" content="疑问： 1、图片在内存中的大小跟imageview设置的宽高有没影响？ 2、同一张图片放在drawable里面，跟放在drawable-xxhd" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://xuanliangdev.github.io/post/android%E5%86%85%E5%AD%98%E5%88%86%E6%9E%90%E5%9B%B4%E7%BB%95bitmap/" />
+<meta property="article:published_time" content="2021-02-15T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-02-15T00:00:00+00:00" />
+<meta itemprop="name" content="Android 内存分析（围绕Bitmap）">
+<meta itemprop="description" content="疑问： 1、图片在内存中的大小跟imageview设置的宽高有没影响？ 2、同一张图片放在drawable里面，跟放在drawable-xxhd">
+<meta itemprop="datePublished" content="2021-02-15T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2021-02-15T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2790">
+
+
+
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Android 内存分析（围绕Bitmap）"/>
+<meta name="twitter:description" content="疑问： 1、图片在内存中的大小跟imageview设置的宽高有没影响？ 2、同一张图片放在drawable里面，跟放在drawable-xxhd"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+
+
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">XuanLiang</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/">This is Home</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/post/">Archives</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/tags/">Tags</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/categories/">Categories</a>
+          
+        
+      </li><li class="mobile-menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+          
+        
+      </li>
+    
+
+    
+  </ul>
+</nav>
+
+
+  
+    
+
+
+
+
+
+
+  <link rel="stylesheet" href="/lib/photoswipe/photoswipe.min.css" />
+  <link rel="stylesheet" href="/lib/photoswipe/default-skin/default-skin.min.css" />
+
+
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+  
+
+  
+
+  
+
+  <header id="header" class="header container">
+    <div class="logo-wrapper">
+  <a href="/" class="logo">
+    
+      XuanLiang
+    
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/">This is Home</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/post/">Archives</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/tags/">Tags</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/categories/">Categories</a>
+          
+
+        
+
+      </li>
+    
+        <li class="menu-item">
+        
+          
+          
+            <a class="menu-item-link" href="https://xuanliangdev.github.io/about/">About</a>
+          
+
+        
+
+      </li>
+    
+
+    
+    
+
+    
+  </ul>
+</nav>
+
+  </header>
+
+  <div id="mobile-panel">
+    <main id="main" class="main bg-llight">
+      <div class="content-wrapper">
+        <div id="content" class="content container">
+          <article class="post bg-white">
+    
+    <header class="post-header">
+      <h1 class="post-title">Android 内存分析（围绕Bitmap）</h1>
+      
+      <div class="post-meta">
+        <time datetime="2021-02-15" class="post-time">
+          2021-02-15
+        </time>
+        
+        
+
+        
+        
+
+        
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Table of Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#疑问">疑问：</a></li>
+        <li><a href="#结论bitmap内存占用跟以下因素有关">结论：Bitmap内存占用跟以下因素有关</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      <h3 id="疑问">疑问：</h3>
+<h5 id="1图片在内存中的大小跟imageview设置的宽高有没影响">1、图片在内存中的大小跟imageview设置的宽高有没影响？</h5>
+<h5 id="2同一张图片放在drawable里面跟放在drawable-xxhdpi目录里面加载到内存中大小有什么区别">2、同一张图片放在drawable里面，跟放在drawable-xxhdpi目录里面，加载到内存中大小有什么区别？</h5>
+<h5 id="3如何减少bitmap的内存占用">3、如何减少Bitmap的内存占用？</h5>
+<h5 id="4加载svg图片的内存怎么计算">4、加载svg图片的内存怎么计算？</h5>
+<h3 id="结论bitmap内存占用跟以下因素有关">结论：Bitmap内存占用跟以下因素有关</h3>
+<h5 id="1手机屏幕密度">1、手机屏幕密度</h5>
+<h5 id="2图片资源存放的目录">2、图片资源存放的目录</h5>
+<h5 id="3bitmap宽高以及色彩格式">3、bitmap宽高以及色彩格式</h5>
+<h4 id="1加载相同图片只修改imageview宽高">1、加载相同图片，只修改ImageView宽高</h4>
+<p>测试imageview加载图片内存大小，改变imageview的大小</p>
+<pre><code>/***
+ * 计算ImageView中加载图片的具体尺寸和内存占用大小
+ * @param imageView
+ */
+private void calculateBitmapInfo(ImageView imageView) {
+    Drawable drawable = imageView.getDrawable();
+    if (drawable != null) {
+        final Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Log.d(TAG, &quot;imageView.getWidth() &quot; + imageView.getWidth() +
+                &quot; bitmap width = &quot; + bitmap.getWidth() +
+                &quot; bitmap height = &quot; + bitmap.getHeight() +
+                &quot; memory usage = &quot; + bitmap.getAllocationByteCount());
+    }
+}
+
+final ImageView img = findViewById(R.id.imag1000);
+   img.post(new Runnable() {
+       @Override
+        public void run() {
+           calculateBitmapInfo(img);
+       }
+});
+
+
+结果：改变imageview大小，内存占用不变
+
+2021-02-17 01:37:28.709 18883-18883/com.xuanliangdev.firstproject D/MainActivity: imageView.getWidth() 1000 bitmap width = 126 bitmap height = 126 memory usage = 63504
+
+2021-02-17 01:34:56.147 18752-18752/? D/MainActivity: imageView.getWidth() 500 bitmap width = 126 bitmap height = 126 memory usage = 63504
+</code></pre><h5 id="答案图片在内存中的大小跟imageview设置的宽高没影响">答案：图片在内存中的大小跟imageview设置的宽高没影响。</h5>
+<h4 id="21加载相同图片但是图片放在不同的drawable目录">2.1、加载相同图片，但是图片放在不同的drawable目录</h4>
+<p>通过如下的方式也可以直接算出一张图片的内存大小占用</p>
+<pre><code>Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launchern);
+Log.d(TAG, &quot; bitmap width = &quot; + bitmap.getWidth()
+        + &quot; bitmap height = &quot; + bitmap.getHeight()
+        + &quot; memory usage = &quot; + bitmap.getAllocationByteCount());
+</code></pre><p>针对一张192*192的png分别放在drawable、drawable-xhdpi、drawable-xxhdip、drawable-xxxhdpi在密度手机屏幕密度为480的模拟器上测试，结果分别为</p>
+<pre><code>drawable
+2021-02-17 00:07:12.461 16564-16564/com.xuanliangdev.firstproject D/MainActivity:  bitmap width = 576 bitmap height = 576 memory usage = 1327104
+
+drawable-xhdpi
+2021-02-17 00:08:33.710 16689-16689/? D/MainActivity:  bitmap width = 288 bitmap height = 288 memory usage = 331776
+
+drawable-xxhdip
+2021-02-17 00:09:05.434 16820-16820/com.xuanliangdev.firstproject D/MainActivity:  bitmap width = 192 bitmap height = 192 memory usage = 147456
+
+drawable-xxxhdpi
+2021-02-17 00:09:43.582 16936-16936/com.xuanliangdev.firstproject D/MainActivity:  bitmap width = 144 bitmap height = 144 memory usage = 82944
+</code></pre><h5 id="答案同一张图片放在不同的drawable文件夹加载到内存中的大小是不一样的">答案：同一张图片放在不同的drawable文件夹，加载到内存中的大小是不一样的。</h5>
+<p>宽为192的png图片放在drawable-xxhdpi目录，在屏幕密度为480的手机，加载到内存的宽为：width = 192 * （480）/(480) = 192</p>
+<p>放在drawable-xxxhdpi目录加载到内存的宽为：width = 192 * （480）/(640) = 144</p>
+<p>放在drawable-xhdpi目录加载到内存的宽为：width = 192 * （480）/(320) = 288</p>
+<p>放在drawable目录加载到内存的宽为：width = 192 * （480）/(160) = 578</p>
+<p>高度计算方法一样。</p>
+<h5 id="公式">公式：</h5>
+<p>1、scale = (float) targetDensity / density;（targetDensity为机型分辨率密度，density为资源所在目录密度，如默认drawable为160，drawable-xxhdpi为480）</p>
+<p>2、scaledWidth = width * scale + 0.5f;</p>
+<h4 id="22bitmap解码相关源码">2.2、bitmap解码相关源码：</h4>
+<h5 id="221bitmapfactorydecoderesource">2.2.1、BitmapFactory.decodeResource</h5>
+<pre><code>Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+</code></pre><pre><code>BitmapFactory.java
+
+/**
+ * Synonym for {@link #decodeResource(Resources, int, android.graphics.BitmapFactory.Options)}
+ * with null Options.
+ *
+ * @param res The resources object containing the image data
+ * @param id The resource id of the image data
+ * @return The decoded bitmap, or null if the image could not be decoded.
+ */
+public static Bitmap decodeResource(Resources res, int id) {
+    return decodeResource(res, id, null);
+}
+</code></pre><pre><code>public static Bitmap decodeResource(Resources res, int id, Options opts) {
+...
+     final TypedValue value = new TypedValue();
+     is = res.openRawResource(id, value);
+...
+     bm = decodeResourceStream(res, value, is, null, opts);
+...
+    return bm;
+}
+</code></pre><pre><code>public static Bitmap decodeResourceStream(@Nullable Resources res, @Nullable TypedValue value,
+        @Nullable InputStream is, @Nullable Rect pad, @Nullable Options opts) {
+    validate(opts);
+    if (opts == null) {
+        opts = new Options();
+    }
+
+    // TypedValue会取出res资源信息，比如从xxxhdp目录取出的图片资源，value.density为640.
+    if (opts.inDensity == 0 &amp;&amp; value != null) {
+        final int density = value.density;
+        if (density == TypedValue.DENSITY_DEFAULT) {
+            opts.inDensity = DisplayMetrics.DENSITY_DEFAULT;
+        } else if (density != TypedValue.DENSITY_NONE) {
+            opts.inDensity = density;
+        }
+    }
+    
+    if (opts.inTargetDensity == 0 &amp;&amp; res != null) {
+        // 手机屏幕密度
+        opts.inTargetDensity = res.getDisplayMetrics().densityDpi;
+    }
+    
+    return decodeStream(is, pad, opts);
+}
+</code></pre><pre><code>public static Bitmap decodeStream(@Nullable InputStream is, @Nullable Rect outPadding,
+        @Nullable Options opts) {
+    ..
+    Bitmap bm = null;
+..
+        final long asset = ((AssetManager.AssetInputStream) is).getNativeAsset();
+        bm = nativeDecodeAsset(asset, outPadding, opts, Options.nativeInBitmap(opts),
+..
+        // 重新设置java层bitmap的scale
+        setDensityFromOptions(bm, opts);
+..
+    return bm;
+}
+</code></pre><pre><code>static jobject nativeDecodeAsset(JNIEnv* env, jobject clazz, jlong native_asset,
+        jobject padding, jobject options, jlong inBitmapHandle, jlong colorSpaceHandle) {
+
+    Asset* asset = reinterpret_cast&lt;Asset*&gt;(native_asset);
+    // since we know we'll be done with the asset when we return, we can
+    // just use a simple wrapper
+    return doDecode(env, std::make_unique&lt;AssetStreamAdaptor&gt;(asset), padding, options,
+                    inBitmapHandle, colorSpaceHandle);
+}
+</code></pre><pre><code>static jobject doDecode(JNIEnv* env, std::unique_ptr&lt;SkStreamRewindable&gt; stream,
+                        jobject padding, jobject options, jlong inBitmapHandle,
+                        jlong colorSpaceHandle) {
+    ...
+    // Update with options supplied by the client.
+    if (options != NULL) {
+        ...
+        if (env-&gt;GetBooleanField(options, gOptions_scaledFieldID)) {
+            const int density = env-&gt;GetIntField(options, gOptions_densityFieldID);
+            const int targetDensity = env-&gt;GetIntField(options, gOptions_targetDensityFieldID);
+            const int screenDensity = env-&gt;GetIntField(options, gOptions_screenDensityFieldID);
+            if (density != 0 &amp;&amp; targetDensity != 0 &amp;&amp; density != screenDensity) {
+               // targetDensity为手机屏幕密度，density为当前资源目录的密度
+               scale = (float) targetDensity / density;
+            }
+        }
+    }
+
+    // Scale is necessary due to density differences.
+    if (scale != 1.0f) {
+        willScale = true;
+        // 此处对bitmap的宽高进行调整
+        scaledWidth = static_cast&lt;int&gt;(scaledWidth * scale + 0.5f);
+        scaledHeight = static_cast&lt;int&gt;(scaledHeight * scale + 0.5f);
+    }
+...
+    // 创建bitmap
+    // now create the java bitmap
+    return bitmap::createBitmap(env, defaultAllocator.getStorageObjAndReset(),
+            bitmapCreateFlags, ninePatchChunk, ninePatchInsets, -1);
+}
+</code></pre><pre><code>// native层回调创建Java的bitmap对象
+// called from JNI and Bitmap_Delegate.
+Bitmap(long nativeBitmap, int width, int height, int density,
+        boolean requestPremultiplied, byte[] ninePatchChunk,
+        NinePatch.InsetStruct ninePatchInsets, boolean fromMalloc) {
+    ...
+}
+</code></pre><pre><code>// 重新设置java层bitmap的scale
+/**
+ * Set the newly decoded bitmap's density based on the Options.
+ */
+private static void setDensityFromOptions(Bitmap outputBitmap, Options opts) {
+    if (outputBitmap == null || opts == null) return;
+
+    final int density = opts.inDensity;
+    if (density != 0) {
+        outputBitmap.setDensity(density);
+        final int targetDensity = opts.inTargetDensity;
+        if (targetDensity == 0 || density == targetDensity || density == opts.inScreenDensity) {
+            return;
+        }
+
+        byte[] np = outputBitmap.getNinePatchChunk();
+        final boolean isNinePatch = np != null &amp;&amp; NinePatch.isNinePatchChunk(np);
+        if (opts.inScaled || isNinePatch) {
+            outputBitmap.setDensity(targetDensity);
+        }
+    } else if (opts.inBitmap != null) {
+        // bitmap was reused, ensure density is reset
+        outputBitmap.setDensity(Bitmap.getDefaultDensity());
+    }
+}
+</code></pre><h5 id="222bitmapgetallocationbytecount">2.2.2、Bitmap#getAllocationByteCount</h5>
+<pre><code>/**
+ * Returns the size of the allocated memory used to store this bitmap's pixels.
+ *
+ * &lt;p&gt;This can be larger than the result of {@link #getByteCount()} if a bitmap is reused to
+ * decode other bitmaps of smaller size, or by manual reconfiguration. See {@link
+ * #reconfigure(int, int, Config)}, {@link #setWidth(int)}, {@link #setHeight(int)}, {@link
+ * #setConfig(Bitmap.Config)}, and {@link BitmapFactory.Options#inBitmap
+ * BitmapFactory.Options.inBitmap}. If a bitmap is not modified in this way, this value will be
+ * the same as that returned by {@link #getByteCount()}.&lt;/p&gt;
+ *
+ * &lt;p&gt;This value will not change over the lifetime of a Bitmap.&lt;/p&gt;
+ *
+ * @see #reconfigure(int, int, Config)
+ */
+public final int getAllocationByteCount() {
+    if (mRecycled) {
+        Log.w(TAG, &quot;Called getAllocationByteCount() on a recycle()'d bitmap! &quot;
+                + &quot;This is undefined behavior!&quot;);
+        return 0;
+    }
+    return nativeGetAllocationByteCount(mNativePtr);
+}
+</code></pre><pre><code>jni/Bitmap.cpp
+
+{   &quot;nativeGetAllocationByteCount&quot;, &quot;(J)I&quot;, (void*)Bitmap_getAllocationByteCount }
+
+static jint Bitmap_getAllocationByteCount(JNIEnv* env, jobject, jlong bitmapPtr) {
+    LocalScopedBitmap bitmapHandle(bitmapPtr);
+    return static_cast&lt;jint&gt;(bitmapHandle-&gt;getAllocationByteCount());
+}
+
+static jint Bitmap_rowBytes(JNIEnv* env, jobject, jlong bitmapHandle) {
+    LocalScopedBitmap bitmap(bitmapHandle);
+    return static_cast&lt;jint&gt;(bitmap-&gt;rowBytes());
+}
+
+size_t rowBytes() const {
+     if (mBitmap) {
+         return mBitmap-&gt;rowBytes();
+     }
+     return mRowBytes;
+}
+</code></pre><pre><code>hwui/Bitmap.cpp
+size_t Bitmap::getAllocationByteCount() const {
+    switch (mPixelStorageType) {
+        case PixelStorageType::Heap:
+            return mPixelStorage.heap.size;
+        case PixelStorageType::Ashmem:
+            return mPixelStorage.ashmem.size;
+        default:
+            return rowBytes() * height();
+    }
+}
+</code></pre><pre><code>readpixels.cpp
+
+size_t rowBytes = image-&gt;width() * SkColorTypeBytesPerPixel(dstColorType);
+</code></pre><h5 id="参考文档">参考文档：</h5>
+<p><a href="https://developer.android.com/training/multiscreen/screendensities?hl=zh-cn">https://developer.android.com/training/multiscreen/screendensities?hl=zh-cn</a></p>
+<p><a href="https://juejin.cn/post/6844903428729094157">https://juejin.cn/post/6844903428729094157</a></p>
+<h4 id="3如何正确的加载一张图片而不造成内存浪费">3.如何正确的加载一张图片而不造成内存浪费</h4>
+<p>通过前两节知道可以通过减少bitmap的宽高或者色彩格式来降低内存消耗。</p>
+<p>1、可以通过在不同的drawable目录内置不同分辨率的图片，注意图片不能只放在默认的drawable中，需要尽量往高分辨率的目录放，由上面的测试结果可以知道，同一张192*192的图片，仅仅放在默认drawable目录比放在drawable-xxhdi（针对匹配的屏幕密度为480的机型，目前市面绝大部分机型都是这个值，小米手机90%机型是440屏幕密度）内存消耗多9倍（（480/160)^2）（这里暂时不考虑图片宽高减小造成的图片分辨率变低的问题）。</p>
+<p>2、通过代码修改bitmap的inSampleSize值直接等比例缩小图片宽高，从而适应imageview大小，来减少内存消耗，官网文档https://developer.android.com/topic/performance/graphics/load-bitmap建议我们用一些优秀的三方图片加载库来加载图片，也提供了一个方法找出适当的inSampleSize值来适应bitmap的宽高和imageview的宽高。</p>
+<pre><code>// 计算出合适的inSampleSize值
+public static int calculateInSampleSize(
+                BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height &gt; reqHeight || width &gt; reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) &gt;= reqHeight
+                    &amp;&amp; (halfWidth / inSampleSize) &gt;= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+// 通过计算出的inSampleSize值来调整bitmap的宽高    
+     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+            int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(res, resId, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeResource(res, resId, options);
+    }
+// 加载图片    
+    imageView.setImageBitmap(
+        decodeSampledBitmapFromResource(getResources(), R.id.myimage, 100, 100));
+</code></pre>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">xuanliang</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+      2021-02-15
+      
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/android-architecture-blueprints/">
+            <span class="next-text nav-default">Android Architecture Blueprints学习</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+    
+
+  
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="icon-links">
+  
+  
+    <a href="https://github.com/xuanliangdev" rel="me noopener" class="iconfont"
+      title="github"  target="_blank"
+      >
+      <svg class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="36" height="36">
+  <path d="M512 12.672c-282.88 0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667 0-12.16-0.426667-44.373333-0.64-87.04-142.421333 30.890667-172.458667-68.693333-172.458667-68.693333C188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333 0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333 0 0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52 0.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667 0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72 0 68.522667-0.64 123.562667-0.64 140.202666 0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"></path>
+</svg>
+
+    </a>
+
+
+<a href="https://xuanliangdev.github.io/index.xml" rel="noopener alternate" type="application/rss&#43;xml"
+    class="iconfont" title="rss" target="_blank">
+    <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="30" height="30">
+  <path d="M819.157333 1024C819.157333 574.592 449.408 204.8 0 204.8V0c561.706667 0 1024 462.293333 1024 1024h-204.842667zM140.416 743.04a140.8 140.8 0 0 1 140.501333 140.586667A140.928 140.928 0 0 1 140.074667 1024C62.72 1024 0 961.109333 0 883.626667s62.933333-140.544 140.416-140.586667zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667V345.173333c372.352 0 678.784 306.517333 678.784 678.826667z"></path>
+</svg>
+
+  </a>
+   
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - <a class="theme-link" href="https://github.com/xianmin/hugo-theme-jane">Jane</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy;
+    
+      2017 -
+    2021
+    <span class="heart">
+      
+      <i class="iconfont">
+        <svg class="icon" viewBox="0 0 1025 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14" height="14">
+  <path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7 0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1 0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2 0.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2 0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3 0.1-42.5-8-83.6-24-122.2z"
+   fill="#8a8a8a"></path>
+</svg>
+
+      </i>
+    </span><span class="author">
+        xuanliang
+        
+      </span></span>
+
+  
+  
+
+  
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont">
+        
+        <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="35" height="35">
+  <path d="M510.866688 227.694839 95.449397 629.218702l235.761562 0-2.057869 328.796468 362.40389 0L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777l894.052392 0 0 131.813095L63.840492 195.775872 63.840492 63.962777 63.840492 63.962777zM63.840492 63.962777"></path>
+</svg>
+
+      </i>
+    </div>
+  </div>
+  
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+
+
+
+
+<script type="text/javascript" src="/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js" integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <script type="text/javascript" src="/js/load-photoswipe.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe.min.js"></script>
+    <script type="text/javascript" src="/lib/photoswipe/photoswipe-ui-default.min.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

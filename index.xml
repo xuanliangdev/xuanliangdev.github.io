@@ -6,7 +6,7 @@
     <description>Recent content on xuanliang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 03 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 15 Feb 2021 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://xuanliangdev.github.io/index.xml" rel="self" type="application/rss+xml" />
     
@@ -20,6 +20,757 @@
       
         <description>&lt;h3 id=&#34;小米android程序员&#34;&gt;小米android程序员&lt;/h3&gt;
 &lt;p&gt;搬砖工&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>Android 内存分析（围绕Bitmap）</title>
+      <link>https://xuanliangdev.github.io/post/android%E5%86%85%E5%AD%98%E5%88%86%E6%9E%90%E5%9B%B4%E7%BB%95bitmap/</link>
+      <pubDate>Mon, 15 Feb 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://xuanliangdev.github.io/post/android%E5%86%85%E5%AD%98%E5%88%86%E6%9E%90%E5%9B%B4%E7%BB%95bitmap/</guid>
+      
+        <description>&lt;h3 id=&#34;疑问&#34;&gt;疑问：&lt;/h3&gt;
+&lt;h5 id=&#34;1图片在内存中的大小跟imageview设置的宽高有没影响&#34;&gt;1、图片在内存中的大小跟imageview设置的宽高有没影响？&lt;/h5&gt;
+&lt;h5 id=&#34;2同一张图片放在drawable里面跟放在drawable-xxhdpi目录里面加载到内存中大小有什么区别&#34;&gt;2、同一张图片放在drawable里面，跟放在drawable-xxhdpi目录里面，加载到内存中大小有什么区别？&lt;/h5&gt;
+&lt;h5 id=&#34;3如何减少bitmap的内存占用&#34;&gt;3、如何减少Bitmap的内存占用？&lt;/h5&gt;
+&lt;h5 id=&#34;4加载svg图片的内存怎么计算&#34;&gt;4、加载svg图片的内存怎么计算？&lt;/h5&gt;
+&lt;h3 id=&#34;结论bitmap内存占用跟以下因素有关&#34;&gt;结论：Bitmap内存占用跟以下因素有关&lt;/h3&gt;
+&lt;h5 id=&#34;1手机屏幕密度&#34;&gt;1、手机屏幕密度&lt;/h5&gt;
+&lt;h5 id=&#34;2图片资源存放的目录&#34;&gt;2、图片资源存放的目录&lt;/h5&gt;
+&lt;h5 id=&#34;3bitmap宽高以及色彩格式&#34;&gt;3、bitmap宽高以及色彩格式&lt;/h5&gt;
+&lt;h4 id=&#34;1加载相同图片只修改imageview宽高&#34;&gt;1、加载相同图片，只修改ImageView宽高&lt;/h4&gt;
+&lt;p&gt;测试imageview加载图片内存大小，改变imageview的大小&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/***
+ * 计算ImageView中加载图片的具体尺寸和内存占用大小
+ * @param imageView
+ */
+private void calculateBitmapInfo(ImageView imageView) {
+    Drawable drawable = imageView.getDrawable();
+    if (drawable != null) {
+        final Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Log.d(TAG, &amp;quot;imageView.getWidth() &amp;quot; + imageView.getWidth() +
+                &amp;quot; bitmap width = &amp;quot; + bitmap.getWidth() +
+                &amp;quot; bitmap height = &amp;quot; + bitmap.getHeight() +
+                &amp;quot; memory usage = &amp;quot; + bitmap.getAllocationByteCount());
+    }
+}
+
+final ImageView img = findViewById(R.id.imag1000);
+   img.post(new Runnable() {
+       @Override
+        public void run() {
+           calculateBitmapInfo(img);
+       }
+});
+
+
+结果：改变imageview大小，内存占用不变
+
+2021-02-17 01:37:28.709 18883-18883/com.xuanliangdev.firstproject D/MainActivity: imageView.getWidth() 1000 bitmap width = 126 bitmap height = 126 memory usage = 63504
+
+2021-02-17 01:34:56.147 18752-18752/? D/MainActivity: imageView.getWidth() 500 bitmap width = 126 bitmap height = 126 memory usage = 63504
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;答案图片在内存中的大小跟imageview设置的宽高没影响&#34;&gt;答案：图片在内存中的大小跟imageview设置的宽高没影响。&lt;/h5&gt;
+&lt;h4 id=&#34;21加载相同图片但是图片放在不同的drawable目录&#34;&gt;2.1、加载相同图片，但是图片放在不同的drawable目录&lt;/h4&gt;
+&lt;p&gt;通过如下的方式也可以直接算出一张图片的内存大小占用&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launchern);
+Log.d(TAG, &amp;quot; bitmap width = &amp;quot; + bitmap.getWidth()
+        + &amp;quot; bitmap height = &amp;quot; + bitmap.getHeight()
+        + &amp;quot; memory usage = &amp;quot; + bitmap.getAllocationByteCount());
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;针对一张192*192的png分别放在drawable、drawable-xhdpi、drawable-xxhdip、drawable-xxxhdpi在密度手机屏幕密度为480的模拟器上测试，结果分别为&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;drawable
+2021-02-17 00:07:12.461 16564-16564/com.xuanliangdev.firstproject D/MainActivity:  bitmap width = 576 bitmap height = 576 memory usage = 1327104
+
+drawable-xhdpi
+2021-02-17 00:08:33.710 16689-16689/? D/MainActivity:  bitmap width = 288 bitmap height = 288 memory usage = 331776
+
+drawable-xxhdip
+2021-02-17 00:09:05.434 16820-16820/com.xuanliangdev.firstproject D/MainActivity:  bitmap width = 192 bitmap height = 192 memory usage = 147456
+
+drawable-xxxhdpi
+2021-02-17 00:09:43.582 16936-16936/com.xuanliangdev.firstproject D/MainActivity:  bitmap width = 144 bitmap height = 144 memory usage = 82944
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;答案同一张图片放在不同的drawable文件夹加载到内存中的大小是不一样的&#34;&gt;答案：同一张图片放在不同的drawable文件夹，加载到内存中的大小是不一样的。&lt;/h5&gt;
+&lt;p&gt;宽为192的png图片放在drawable-xxhdpi目录，在屏幕密度为480的手机，加载到内存的宽为：width = 192 * （480）/(480) = 192&lt;/p&gt;
+&lt;p&gt;放在drawable-xxxhdpi目录加载到内存的宽为：width = 192 * （480）/(640) = 144&lt;/p&gt;
+&lt;p&gt;放在drawable-xhdpi目录加载到内存的宽为：width = 192 * （480）/(320) = 288&lt;/p&gt;
+&lt;p&gt;放在drawable目录加载到内存的宽为：width = 192 * （480）/(160) = 578&lt;/p&gt;
+&lt;p&gt;高度计算方法一样。&lt;/p&gt;
+&lt;h5 id=&#34;公式&#34;&gt;公式：&lt;/h5&gt;
+&lt;p&gt;1、scale = (float) targetDensity / density;（targetDensity为机型分辨率密度，density为资源所在目录密度，如默认drawable为160，drawable-xxhdpi为480）&lt;/p&gt;
+&lt;p&gt;2、scaledWidth = width * scale + 0.5f;&lt;/p&gt;
+&lt;h4 id=&#34;22bitmap解码相关源码&#34;&gt;2.2、bitmap解码相关源码：&lt;/h4&gt;
+&lt;h5 id=&#34;221bitmapfactorydecoderesource&#34;&gt;2.2.1、BitmapFactory.decodeResource&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;BitmapFactory.java
+
+/**
+ * Synonym for {@link #decodeResource(Resources, int, android.graphics.BitmapFactory.Options)}
+ * with null Options.
+ *
+ * @param res The resources object containing the image data
+ * @param id The resource id of the image data
+ * @return The decoded bitmap, or null if the image could not be decoded.
+ */
+public static Bitmap decodeResource(Resources res, int id) {
+    return decodeResource(res, id, null);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;public static Bitmap decodeResource(Resources res, int id, Options opts) {
+...
+     final TypedValue value = new TypedValue();
+     is = res.openRawResource(id, value);
+...
+     bm = decodeResourceStream(res, value, is, null, opts);
+...
+    return bm;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;public static Bitmap decodeResourceStream(@Nullable Resources res, @Nullable TypedValue value,
+        @Nullable InputStream is, @Nullable Rect pad, @Nullable Options opts) {
+    validate(opts);
+    if (opts == null) {
+        opts = new Options();
+    }
+
+    // TypedValue会取出res资源信息，比如从xxxhdp目录取出的图片资源，value.density为640.
+    if (opts.inDensity == 0 &amp;amp;&amp;amp; value != null) {
+        final int density = value.density;
+        if (density == TypedValue.DENSITY_DEFAULT) {
+            opts.inDensity = DisplayMetrics.DENSITY_DEFAULT;
+        } else if (density != TypedValue.DENSITY_NONE) {
+            opts.inDensity = density;
+        }
+    }
+    
+    if (opts.inTargetDensity == 0 &amp;amp;&amp;amp; res != null) {
+        // 手机屏幕密度
+        opts.inTargetDensity = res.getDisplayMetrics().densityDpi;
+    }
+    
+    return decodeStream(is, pad, opts);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;public static Bitmap decodeStream(@Nullable InputStream is, @Nullable Rect outPadding,
+        @Nullable Options opts) {
+    ..
+    Bitmap bm = null;
+..
+        final long asset = ((AssetManager.AssetInputStream) is).getNativeAsset();
+        bm = nativeDecodeAsset(asset, outPadding, opts, Options.nativeInBitmap(opts),
+..
+        // 重新设置java层bitmap的scale
+        setDensityFromOptions(bm, opts);
+..
+    return bm;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;static jobject nativeDecodeAsset(JNIEnv* env, jobject clazz, jlong native_asset,
+        jobject padding, jobject options, jlong inBitmapHandle, jlong colorSpaceHandle) {
+
+    Asset* asset = reinterpret_cast&amp;lt;Asset*&amp;gt;(native_asset);
+    // since we know we&#39;ll be done with the asset when we return, we can
+    // just use a simple wrapper
+    return doDecode(env, std::make_unique&amp;lt;AssetStreamAdaptor&amp;gt;(asset), padding, options,
+                    inBitmapHandle, colorSpaceHandle);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;static jobject doDecode(JNIEnv* env, std::unique_ptr&amp;lt;SkStreamRewindable&amp;gt; stream,
+                        jobject padding, jobject options, jlong inBitmapHandle,
+                        jlong colorSpaceHandle) {
+    ...
+    // Update with options supplied by the client.
+    if (options != NULL) {
+        ...
+        if (env-&amp;gt;GetBooleanField(options, gOptions_scaledFieldID)) {
+            const int density = env-&amp;gt;GetIntField(options, gOptions_densityFieldID);
+            const int targetDensity = env-&amp;gt;GetIntField(options, gOptions_targetDensityFieldID);
+            const int screenDensity = env-&amp;gt;GetIntField(options, gOptions_screenDensityFieldID);
+            if (density != 0 &amp;amp;&amp;amp; targetDensity != 0 &amp;amp;&amp;amp; density != screenDensity) {
+               // targetDensity为手机屏幕密度，density为当前资源目录的密度
+               scale = (float) targetDensity / density;
+            }
+        }
+    }
+
+    // Scale is necessary due to density differences.
+    if (scale != 1.0f) {
+        willScale = true;
+        // 此处对bitmap的宽高进行调整
+        scaledWidth = static_cast&amp;lt;int&amp;gt;(scaledWidth * scale + 0.5f);
+        scaledHeight = static_cast&amp;lt;int&amp;gt;(scaledHeight * scale + 0.5f);
+    }
+...
+    // 创建bitmap
+    // now create the java bitmap
+    return bitmap::createBitmap(env, defaultAllocator.getStorageObjAndReset(),
+            bitmapCreateFlags, ninePatchChunk, ninePatchInsets, -1);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;// native层回调创建Java的bitmap对象
+// called from JNI and Bitmap_Delegate.
+Bitmap(long nativeBitmap, int width, int height, int density,
+        boolean requestPremultiplied, byte[] ninePatchChunk,
+        NinePatch.InsetStruct ninePatchInsets, boolean fromMalloc) {
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;// 重新设置java层bitmap的scale
+/**
+ * Set the newly decoded bitmap&#39;s density based on the Options.
+ */
+private static void setDensityFromOptions(Bitmap outputBitmap, Options opts) {
+    if (outputBitmap == null || opts == null) return;
+
+    final int density = opts.inDensity;
+    if (density != 0) {
+        outputBitmap.setDensity(density);
+        final int targetDensity = opts.inTargetDensity;
+        if (targetDensity == 0 || density == targetDensity || density == opts.inScreenDensity) {
+            return;
+        }
+
+        byte[] np = outputBitmap.getNinePatchChunk();
+        final boolean isNinePatch = np != null &amp;amp;&amp;amp; NinePatch.isNinePatchChunk(np);
+        if (opts.inScaled || isNinePatch) {
+            outputBitmap.setDensity(targetDensity);
+        }
+    } else if (opts.inBitmap != null) {
+        // bitmap was reused, ensure density is reset
+        outputBitmap.setDensity(Bitmap.getDefaultDensity());
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;222bitmapgetallocationbytecount&#34;&gt;2.2.2、Bitmap#getAllocationByteCount&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;/**
+ * Returns the size of the allocated memory used to store this bitmap&#39;s pixels.
+ *
+ * &amp;lt;p&amp;gt;This can be larger than the result of {@link #getByteCount()} if a bitmap is reused to
+ * decode other bitmaps of smaller size, or by manual reconfiguration. See {@link
+ * #reconfigure(int, int, Config)}, {@link #setWidth(int)}, {@link #setHeight(int)}, {@link
+ * #setConfig(Bitmap.Config)}, and {@link BitmapFactory.Options#inBitmap
+ * BitmapFactory.Options.inBitmap}. If a bitmap is not modified in this way, this value will be
+ * the same as that returned by {@link #getByteCount()}.&amp;lt;/p&amp;gt;
+ *
+ * &amp;lt;p&amp;gt;This value will not change over the lifetime of a Bitmap.&amp;lt;/p&amp;gt;
+ *
+ * @see #reconfigure(int, int, Config)
+ */
+public final int getAllocationByteCount() {
+    if (mRecycled) {
+        Log.w(TAG, &amp;quot;Called getAllocationByteCount() on a recycle()&#39;d bitmap! &amp;quot;
+                + &amp;quot;This is undefined behavior!&amp;quot;);
+        return 0;
+    }
+    return nativeGetAllocationByteCount(mNativePtr);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;jni/Bitmap.cpp
+
+{   &amp;quot;nativeGetAllocationByteCount&amp;quot;, &amp;quot;(J)I&amp;quot;, (void*)Bitmap_getAllocationByteCount }
+
+static jint Bitmap_getAllocationByteCount(JNIEnv* env, jobject, jlong bitmapPtr) {
+    LocalScopedBitmap bitmapHandle(bitmapPtr);
+    return static_cast&amp;lt;jint&amp;gt;(bitmapHandle-&amp;gt;getAllocationByteCount());
+}
+
+static jint Bitmap_rowBytes(JNIEnv* env, jobject, jlong bitmapHandle) {
+    LocalScopedBitmap bitmap(bitmapHandle);
+    return static_cast&amp;lt;jint&amp;gt;(bitmap-&amp;gt;rowBytes());
+}
+
+size_t rowBytes() const {
+     if (mBitmap) {
+         return mBitmap-&amp;gt;rowBytes();
+     }
+     return mRowBytes;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;hwui/Bitmap.cpp
+size_t Bitmap::getAllocationByteCount() const {
+    switch (mPixelStorageType) {
+        case PixelStorageType::Heap:
+            return mPixelStorage.heap.size;
+        case PixelStorageType::Ashmem:
+            return mPixelStorage.ashmem.size;
+        default:
+            return rowBytes() * height();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;readpixels.cpp
+
+size_t rowBytes = image-&amp;gt;width() * SkColorTypeBytesPerPixel(dstColorType);
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;参考文档&#34;&gt;参考文档：&lt;/h5&gt;
+&lt;p&gt;&lt;a href=&#34;https://developer.android.com/training/multiscreen/screendensities?hl=zh-cn&#34;&gt;https://developer.android.com/training/multiscreen/screendensities?hl=zh-cn&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://juejin.cn/post/6844903428729094157&#34;&gt;https://juejin.cn/post/6844903428729094157&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;3如何正确的加载一张图片而不造成内存浪费&#34;&gt;3.如何正确的加载一张图片而不造成内存浪费&lt;/h4&gt;
+&lt;p&gt;通过前两节知道可以通过减少bitmap的宽高或者色彩格式来降低内存消耗。&lt;/p&gt;
+&lt;p&gt;1、可以通过在不同的drawable目录内置不同分辨率的图片，注意图片不能只放在默认的drawable中，需要尽量往高分辨率的目录放，由上面的测试结果可以知道，同一张192*192的图片，仅仅放在默认drawable目录比放在drawable-xxhdi（针对匹配的屏幕密度为480的机型，目前市面绝大部分机型都是这个值，小米手机90%机型是440屏幕密度）内存消耗多9倍（（480/160)^2）（这里暂时不考虑图片宽高减小造成的图片分辨率变低的问题）。&lt;/p&gt;
+&lt;p&gt;2、通过代码修改bitmap的inSampleSize值直接等比例缩小图片宽高，从而适应imageview大小，来减少内存消耗，官网文档https://developer.android.com/topic/performance/graphics/load-bitmap建议我们用一些优秀的三方图片加载库来加载图片，也提供了一个方法找出适当的inSampleSize值来适应bitmap的宽高和imageview的宽高。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;// 计算出合适的inSampleSize值
+public static int calculateInSampleSize(
+                BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height &amp;gt; reqHeight || width &amp;gt; reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) &amp;gt;= reqHeight
+                    &amp;amp;&amp;amp; (halfWidth / inSampleSize) &amp;gt;= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+// 通过计算出的inSampleSize值来调整bitmap的宽高    
+     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+            int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(res, resId, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeResource(res, resId, options);
+    }
+// 加载图片    
+    imageView.setImageBitmap(
+        decodeSampledBitmapFromResource(getResources(), R.id.myimage, 100, 100));
+&lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Android Architecture Blueprints学习</title>
+      <link>https://xuanliangdev.github.io/post/android-architecture-blueprints/</link>
+      <pubDate>Fri, 12 Feb 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://xuanliangdev.github.io/post/android-architecture-blueprints/</guid>
+      
+        <description>&lt;h3 id=&#34;google-android-architecture-blueprints学习&#34;&gt;google Android Architecture Blueprints学习&lt;/h3&gt;
+&lt;p&gt;参考资料：&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://developer.android.google.cn/topic/libraries/architecture&#34;&gt;https://developer.android.google.cn/topic/libraries/architecture&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;1todo-mvp&#34;&gt;1、todo-mvp&lt;/h3&gt;
+&lt;p&gt;一个便签的demo，&lt;/p&gt;
+&lt;p&gt;类图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/architecture/mvpclass.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;核心：&lt;/p&gt;
+&lt;p&gt;1、View：&lt;/p&gt;
+&lt;p&gt;将对于view的操作封装成具体的接口，Activity或者Fragment来实现这些接口&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public interface AddEditTaskContract {
+
+    interface View extends BaseView&amp;lt;Presenter&amp;gt; {
+
+        void showEmptyTaskError();
+
+        void showTasksList();
+
+        void setTitle(String title);
+
+        void setDescription(String description);
+
+        boolean isActive();
+    }
+...
+}
+
+public class AddEditTaskFragment extends Fragment implements AddEditTaskContract.View {
+...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;持有Present接口（具体各个业务的Present对象），将界面对于数据的操作转接给Present层（比如保存编辑的数据），可以将原本Fragment繁重的数据操作逻辑转交给Present层实现&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fab.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        mPresenter.saveTask(mTitle.getText().toString(), mDescription.getText().toString());
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;2、Model：&lt;/p&gt;
+&lt;p&gt;本地数据库采用了Room库，&lt;/p&gt;
+&lt;p&gt;参考资料：https://developer.android.com/training/data-storage/room&lt;/p&gt;
+&lt;p&gt;TasksRepository：管理数据的读取或者是保存，给present层提供Task控制接口&lt;/p&gt;
+&lt;p&gt;3、Present：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public interface AddEditTaskContract {
+...
+
+    interface Presenter extends BasePresenter {
+
+        void saveTask(String title, String description);
+
+        void populateTask();
+
+        boolean isDataMissing();
+    }
+}
+
+public class AddEditTaskPresenter implements AddEditTaskContract.Presenter,
+        TasksDataSource.GetTaskCallback {
+...
+        }
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;持有View相关接口（Fragment对象），通过View接口更新界面元素&lt;/p&gt;
+&lt;h3 id=&#34;2todo-mvvm-databinding&#34;&gt;2、todo-mvvm-databinding&lt;/h3&gt;
+&lt;p&gt;待续。。。&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>RecyclerView学习整理</title>
+      <link>https://xuanliangdev.github.io/post/recyclerview/</link>
+      <pubDate>Fri, 12 Feb 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://xuanliangdev.github.io/post/recyclerview/</guid>
+      
+        <description>&lt;h4 id=&#34;疑问&#34;&gt;疑问&lt;/h4&gt;
+&lt;h5 id=&#34;1recyclerview缓存复用机制原理&#34;&gt;1、RecyclerView缓存复用机制原理？&lt;/h5&gt;
+&lt;h5 id=&#34;2pre-layout和prefetch原理&#34;&gt;2、pre-layout和prefetch原理？&lt;/h5&gt;
+&lt;h2 id=&#34;recyclerview-核心类图&#34;&gt;RecyclerView 核心类图&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/recyclerview/recyclerviewclass.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;1核心流程&#34;&gt;1、核心流程&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/recyclerview/recyclerview.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h5 id=&#34;核心流程源码&#34;&gt;核心流程源码：&lt;/h5&gt;
+&lt;p&gt;1、三个layout流程&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/**
+ * The first step of a layout where we;
+ * - process adapter updates
+ * - decide which animation should run
+ * - save information about current views
+ * - If necessary, run predictive layout and save its information
+ */
+private void dispatchLayoutStep1() {
+...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;/**
+ * The second layout step where we do the actual layout of the views for the final state.
+ * This step might be run multiple times if necessary (e.g. measure).
+ */
+private void dispatchLayoutStep2() {
+...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;/**
+ * The final step of the layout where we save the information about views for animations,
+ * trigger animations and do any necessary cleanup.
+ */
+private void dispatchLayoutStep3() {
+...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;ViewHolder tryGetViewHolderForPositionByDeadline(int position,
+        boolean dryRun, long deadlineNs) {
+    ...
+    ViewHolder holder = null;
+    // 0) If there is a changed scrap, try to find from there
+    if (mState.isPreLayout()) {
+        holder = getChangedScrapViewForPosition(position);
+        fromScrapOrHiddenOrCache = holder != null;
+    }
+    // 1) Find by position from scrap/hidden list/cache
+    if (holder == null) {
+        holder = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);
+        ...
+    }
+    if (holder == null) {
+        ...
+
+        final int type = mAdapter.getItemViewType(offsetPosition);
+        // 2) Find from scrap/cache via stable ids, if exists
+        if (mAdapter.hasStableIds()) {
+            holder = getScrapOrCachedViewForId(mAdapter.getItemId(offsetPosition),
+                    type, dryRun);
+            ...
+        }
+        if (holder == null &amp;amp;&amp;amp; mViewCacheExtension != null) {
+            // We are NOT sending the offsetPosition because LayoutManager does not
+            // know it.
+            final View view = mViewCacheExtension
+                    .getViewForPositionAndType(this, position, type);
+            if (view != null) {
+                holder = getChildViewHolder(view);
+                ...
+            }
+        }
+        if (holder == null) { // fallback to pool
+            ...
+            holder = getRecycledViewPool().getRecycledView(type);
+            if (holder != null) {
+                holder.resetInternal();
+                ...
+            }
+        }
+        if (holder == null) {
+            ...
+            holder = mAdapter.createViewHolder(RecyclerView.this, type);
+            ...
+        }
+    }
+    ...
+    boolean bound = false;
+    if (mState.isPreLayout() &amp;amp;&amp;amp; holder.isBound()) {
+        // do not update unless we absolutely have to.
+        holder.mPreLayoutPosition = position;
+    } else if (!holder.isBound() || holder.needsUpdate() || holder.isInvalid()) {
+        ...
+        bound = tryBindViewHolderByDeadline(holder, offsetPosition, position, deadlineNs);
+    }
+...
+    return holder;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;11屏幕内复用&#34;&gt;1.1、屏幕内复用&lt;/h4&gt;
+&lt;p&gt;当屏幕内的内容进行更新时的缓存&lt;/p&gt;
+&lt;h5 id=&#34;111-arraylistviewholder-mchangedscrap&#34;&gt;1.1.1 ArrayList&lt;!-- raw HTML omitted --&gt; mChangedScrap&lt;/h5&gt;
+&lt;p&gt;1.1.1.1 缓存存入时机&lt;/p&gt;
+&lt;p&gt;当执行notifyItemChanged方法（比如动画刷新某个列表项）时，会使holder.needsUpdate()为true，把除了做动画的item放进mChangedScrap，其余的item则放进mAttachedScrap。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+void scrapView(View view) {
+    final ViewHolder holder = getChildViewHolderInt(view);
+    if (holder.hasAnyOfTheFlags(ViewHolder.FLAG_REMOVED | ViewHolder.FLAG_INVALID)
+            || !holder.isUpdated() || canReuseUpdatedViewHolder(holder)) {
+        ...
+        mAttachedScrap.add(holder);
+    } else {
+        ...
+        mChangedScrap.add(holder);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;1.1.1.2 缓存取出时机，只有在mState.isPreLayout()状态下会从ChangedScrap中取缓存，dispatchLayoutStep1的时候会执行&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ViewHolder tryGetViewHolderForPositionByDeadline(int position,
+                boolean dryRun, long deadlineNs) {
+                ...
+		// 0) If there is a changed scrap, try to find from there
+		if (mState.isPreLayout()) {
+   		 holder = getChangedScrapViewForPosition(position);
+   		 fromScrapOrHiddenOrCache = holder != null;
+		}
+		...
+}
+
+public boolean isPreLayout() {
+     return mInPreLayout;
+}
+        
+private void dispatchLayoutStep1() {
+..
+   mState.mInPreLayout = mState.mRunPredictiveAnimations;
+...
+}
+
+private void processAdapterUpdatesAndSetAnimationFlags() {
+...
+    mState.mRunPredictiveAnimations = mState.mRunSimpleAnimations
+        &amp;amp;&amp;amp; animationTypeSupported
+        &amp;amp;&amp;amp; !mDataSetHasChangedAfterLayout
+        &amp;amp;&amp;amp; predictiveItemAnimationsEnabled();
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;由上代码调用知道preLayout的状态受到predictiveItemAnimationsEnabled方法影响，因此如果需要预布局，我们需要重写LinearLayoutManager的supportsPredictiveItemAnimations方法返回true（默认为false），才会从mChangedScrap取缓存。&lt;/p&gt;
+&lt;p&gt;参考文档&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://frogermcs.github.io/recyclerview-animations-androiddevsummit-write-up/&#34;&gt;http://frogermcs.github.io/recyclerview-animations-androiddevsummit-write-up/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://juejin.cn/post/6844904146684870669&#34;&gt;https://juejin.cn/post/6844904146684870669&lt;/a&gt;&lt;/p&gt;
+&lt;h5 id=&#34;预布局核心原理&#34;&gt;预布局核心原理：&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;LinearLayoutManager.java
+
+private void dispatchLayoutStep1() {
+        ...
+        if (mState.mRunPredictiveAnimations) {
+            // Step 1: run prelayout: This will use the old positions of items. The layout manager
+            // is expected to layout everything, even removed items (though not to add removed
+            // items back to the container). This gives the pre-layout position of APPEARING views
+            // which come into existence as part of the real layout.
+
+            // Save old positions so that LayoutManager can run its mapping logic.
+            saveOldPositions();
+            final boolean didStructureChange = mState.mStructureChanged;
+            mState.mStructureChanged = false;
+            // temporarily disable flag because we are asking for previous layout
+            mLayout.onLayoutChildren(mRecycler, mState);
+            mState.mStructureChanged = didStructureChange;
+
+            ...
+            // we don&#39;t process disappearing list because they may re-appear in post layout pass.
+            clearOldPositions();
+        } else {
+            clearOldPositions();
+        }
+        onExitLayoutOrScroll();
+        stopInterceptRequestLayout(false);
+        mState.mLayoutStep = State.STEP_LAYOUT;
+    }
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;当删除一个可见的item时，额外增加一个将要显示的item，这样item进入的时候就可以滑入而不是渐变的方式展现&lt;/p&gt;
+&lt;h5 id=&#34;112-arraylistviewholder-mattachedscrap&#34;&gt;1.1.2 ArrayList&lt;!-- raw HTML omitted --&gt; mAttachedScrap&lt;/h5&gt;
+&lt;p&gt;1.1.2.1 缓存存入时机&lt;/p&gt;
+&lt;p&gt;见1.1.1.1节&lt;/p&gt;
+&lt;p&gt;1.1.2.2缓存取出时机&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ViewHolder tryGetViewHolderForPositionByDeadline(int position,
+                boolean dryRun, long deadlineNs) {
+   ...             
+		// 1) Find by position from scrap/hidden list/cache
+		if (holder == null) {
+  		  holder = getScrapOrHiddenOrCachedHolderForPosition(position, dryRun);
+		}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;113-getscraporcachedviewforid&#34;&gt;1.1.3 getScrapOrCachedViewForId&lt;/h5&gt;
+&lt;p&gt;通过id取缓存，该机制只对设置了Adapter.hasStableIds()为true，并且配合重写getItemId(int position) 方法才会生效，可以解决一些数据刷新图片闪烁的问题（网上的说法，暂时还没验证）&lt;/p&gt;
+&lt;h4 id=&#34;12滚动复用&#34;&gt;1.2、滚动复用&lt;/h4&gt;
+&lt;h5 id=&#34;121-arraylistviewholder-mcachedviews&#34;&gt;1.2.1 ArrayList&lt;!-- raw HTML omitted --&gt; mCachedViews&lt;/h5&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/recyclerview/cachedviews.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;1.2.1.1&lt;/p&gt;
+&lt;p&gt;屏幕外的第一级缓存，&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;int mViewCacheMax = DEFAULT_CACHE_SIZE;
+...
+static final int DEFAULT_CACHE_SIZE = 2;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果支持预取操作（最新版默认开启，开发者可以自行选择关闭）&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;GapWorker.java
+void collectPrefetchPositionsFromView(RecyclerView view, boolean nested) {
+...
+        if (nested) {
+         ..
+                layout.collectInitialPrefetchPositions(view.mAdapter.getItemCount(), this);
+        } else {
+        ..
+                layout.collectAdjacentPrefetchPositions(mPrefetchDx, mPrefetchDy,
+                        view.mState, this);
+        }
+
+        if (mCount &amp;gt; layout.mPrefetchMaxCountObserved) {
+            layout.mPrefetchMaxCountObserved = mCount;
+            layout.mPrefetchMaxObservedInInitialPrefetch = nested;
+            view.mRecycler.updateViewCacheSize();
+        }
+}
+
+Recycler.java
+void updateViewCacheSize() {
+    int extraCache = mLayout != null ? mLayout.mPrefetchMaxCountObserved : 0;
+    mViewCacheMax = mRequestedCacheMax + extraCache;
+...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果recyclerview支持嵌套，用户可以设置预取的个数，走collectInitialPrefetchPositions逻辑，默认情况下走collectAdjacentPrefetchPositions逻辑，mCount++设置为1，从而赋值给mPrefetchMaxCountObserved，所以一级缓存默认情况下最大值是3&lt;/p&gt;
+&lt;p&gt;1.2.1.2 预取机制&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/recyclerview/prefeching.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;参考文档&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://blog.csdn.net/weishenhong/article/details/81150172&#34;&gt;https://blog.csdn.net/weishenhong/article/details/81150172&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://blog.csdn.net/crazy_everyday_xrp/article/details/70344638?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&#34;&gt;https://blog.csdn.net/crazy_everyday_xrp/article/details/70344638?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://medium.com/google-developers/recyclerview-prefetch-c2f269075710&#34;&gt;https://medium.com/google-developers/recyclerview-prefetch-c2f269075710&lt;/a&gt;（需要科学上网）&lt;/p&gt;
+&lt;h5 id=&#34;gapworker预取加载原理将闲置的ui线程利用起来在ui线程将页面数据交由render线程渲染以后提前处理下一个显示的item的数据创建和绑定&#34;&gt;GapWorker预取加载原理：将闲置的UI线程利用起来，在UI线程将页面数据交由Render线程渲染以后提前处理下一个显示的item的数据创建和绑定。&lt;/h5&gt;
+&lt;h5 id=&#34;122-viewcacheextension&#34;&gt;1.2.2 ViewCacheExtension&lt;/h5&gt;
+&lt;p&gt;屏幕外的第二级缓存，开发者可以自定义的缓存，在RecycledViewPool前，CachedViews之后。&lt;/p&gt;
+&lt;h5 id=&#34;123-recycledviewpool&#34;&gt;1.2.3 RecycledViewPool&lt;/h5&gt;
+&lt;p&gt;屏幕外的第三级缓存&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;private static final int DEFAULT_MAX_SCRAP = 5;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;RecycledViewPool默认最大缓存为5个&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;if (holder == null) { // fallback to pool
+...
+    holder = getRecycledViewPool().getRecycledView(type);
+    if (holder != null) {
+        holder.resetInternal();
+        if (FORCE_INVALIDATE_DISPLAY_LIST) {
+            invalidateDisplayListInt(holder);
+        }
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;void resetInternal() {
+    mFlags = 0;
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;boolean bound = false;
+if (mState.isPreLayout() &amp;amp;&amp;amp; holder.isBound()) {
+    // do not update unless we absolutely have to.
+    holder.mPreLayoutPosition = position;
+} else if (!holder.isBound() || holder.needsUpdate() || holder.isInvalid()) {
+    if (DEBUG &amp;amp;&amp;amp; holder.isRemoved()) {
+        throw new IllegalStateException(&amp;quot;Removed holder should be bound and it should&amp;quot;
+                + &amp;quot; come here only in pre-layout. Holder: &amp;quot; + holder
+                + exceptionLabel());
+    }
+    final int offsetPosition = mAdapterHelper.findPositionOffset(position);
+    bound = tryBindViewHolderByDeadline(holder, offsetPosition, position, deadlineNs);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;tryBindViewHolderByDeadline会回调onBindViewHolder逻辑，由判断条件知道，从RecycledViewPool取出的holder会清理标志位，!holder.isBound()为true，所以从RecycledViewPool取出的holder会重新走onBindViewHolder逻辑，&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;状态&lt;/th&gt;
+&lt;th&gt;场景&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;holder.isBound()&lt;/td&gt;
+&lt;td&gt;回调onBindViewHolder前会设置isBound为true&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;holder.needsUpdate()&lt;/td&gt;
+&lt;td&gt;onItemRangeChanged进行更新时会触发，对应某个item更新&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;holder.isInvalid()&lt;/td&gt;
+&lt;td&gt;notifyDataSetChanged被调用，对应整个数据集刷新&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;pre&gt;&lt;code&gt;/**
+ * This ViewHolder has been bound to a position; mPosition, mItemId and mItemViewType
+ * are all valid.
+ */
+static final int FLAG_BOUND = 1 &amp;lt;&amp;lt; 0;
+
+/**
+ * The data this ViewHolder&#39;s view reflects is stale and needs to be rebound
+ * by the adapter. mPosition and mItemId are consistent.
+ */
+static final int FLAG_UPDATE = 1 &amp;lt;&amp;lt; 1;
+
+/**
+ * This ViewHolder&#39;s data is invalid. The identity implied by mPosition and mItemId
+ * are not to be trusted and may no longer match the item view type.
+ * This ViewHolder must be fully rebound to different data.
+ */
+static final int FLAG_INVALID = 1 &amp;lt;&amp;lt; 2;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;一些api分析&#34;&gt;一些api分析：&lt;/h4&gt;
+&lt;h5 id=&#34;1sethasfixedsize&#34;&gt;1、setHasFixedSize：&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;        @Override
+        public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
+            assertNotInLayoutOrScroll(null);
+            if (mAdapterHelper.onItemRangeChanged(positionStart, itemCount, payload)) {
+                triggerUpdateProcessor();
+            }
+        }
+
+        @Override
+        public void onItemRangeInserted(int positionStart, int itemCount) {
+            assertNotInLayoutOrScroll(null);
+            if (mAdapterHelper.onItemRangeInserted(positionStart, itemCount)) {
+                triggerUpdateProcessor();
+            }
+        }
+
+        @Override
+        public void onItemRangeRemoved(int positionStart, int itemCount) {
+            assertNotInLayoutOrScroll(null);
+            if (mAdapterHelper.onItemRangeRemoved(positionStart, itemCount)) {
+                triggerUpdateProcessor();
+            }
+        }
+
+        @Override
+        public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+            assertNotInLayoutOrScroll(null);
+            if (mAdapterHelper.onItemRangeMoved(fromPosition, toPosition, itemCount)) {
+                triggerUpdateProcessor();
+            }
+        }
+
+        void triggerUpdateProcessor() {
+            if (POST_UPDATES_ON_ANIMATION &amp;amp;&amp;amp; mHasFixedSize &amp;amp;&amp;amp; mIsAttached) {
+                ViewCompat.postOnAnimation(RecyclerView.this, mUpdateChildViewsRunnable);
+            } else {
+                mAdapterUpdateDuringMeasure = true;
+                requestLayout();
+            }
+        }
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果设置setHasFixedSize为true，通过onItemRangeInserted、onItemRangeRemoved等方法更新列表时不会重新requestLayout，提升性能&lt;/p&gt;
 </description>
       
     </item>
@@ -59,12 +810,6 @@
 &lt;p&gt;卡顿原因：大部分屏幕刷新率时60Hz，如果1000/60=16.67ms内没办法处理一帧任务，那么就会发生丢帧，也就是卡顿。&lt;/p&gt;
 &lt;p&gt;cpu负责Measure、Layout、Record、Excecute的计算操作，GPU负责rasterization（栅格化）&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/renderinganalysis/vsync.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;h3 id=&#34;22-recyclerview源码分析&#34;&gt;2.2 RecyclerView源码分析&lt;/h3&gt;
-&lt;p&gt;&lt;a href=&#34;https://blog.csdn.net/weishenhong/article/details/81150172&#34;&gt;https://blog.csdn.net/weishenhong/article/details/81150172&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://blog.csdn.net/crazy_everyday_xrp/article/details/70344638?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&#34;&gt;https://blog.csdn.net/crazy_everyday_xrp/article/details/70344638?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://medium.com/google-developers/recyclerview-prefetch-c2f269075710&#34;&gt;https://medium.com/google-developers/recyclerview-prefetch-c2f269075710&lt;/a&gt;（需要科学上网）&lt;/p&gt;
-&lt;p&gt;recyclerview测量时序图：&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/renderinganalysis/recyclerviewmesure.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 </description>
       
     </item>
@@ -310,6 +1055,717 @@ final void performDestroy() {
 }
 
 &lt;/code&gt;&lt;/pre&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>无障碍学习整理（基于talkback）</title>
+      <link>https://xuanliangdev.github.io/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/</link>
+      <pubDate>Wed, 05 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://xuanliangdev.github.io/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/</guid>
+      
+        <description>&lt;h2 id=&#34;一整理原因&#34;&gt;一、整理原因：&lt;/h2&gt;
+&lt;p&gt;为了辅助理解无障碍google官方开发文档api的原理。&lt;/p&gt;
+&lt;h2 id=&#34;二参考文档&#34;&gt;二、参考文档&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://developer.android.google.cn/guide/topics/ui/accessibility&#34;&gt;无障碍开发google官方文档&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;三无障碍服务框架结构分析&#34;&gt;三、无障碍服务框架结构分析&lt;/h2&gt;
+&lt;h3 id=&#34;31结构&#34;&gt;3.1.结构&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/accessibility/%E6%97%A0%E9%9A%9C%E7%A2%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;32相关类图&#34;&gt;3.2、相关类图&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/accessibilityclass.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;整个talkback机制涉及了4个进程，SystemServer（蓝色部分）、Talkback（黄色部分）、被辅助app进程（绿色部分），TTS引擎进程（暂不分析）&lt;/p&gt;
+&lt;p&gt;四个AIDL接口，图上红色部分&lt;/p&gt;
+&lt;h4 id=&#34;321talkback辅助app实现了accessibilityservice的app&#34;&gt;3.2.1、talkback（辅助app，实现了AccessibilityService的app）&lt;/h4&gt;
+&lt;p&gt;辅助app需要用到的在framewors目录中相关的类，主要是继承AccessibilityService从而接收SystemServer进程发送过来的无障碍事件并进行相关处理&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/a11yservice.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;322被辅助app进程被辅助app&#34;&gt;3.2.2、被辅助app进程（被辅助app）&lt;/h4&gt;
+&lt;p&gt;被辅助的app的无障碍特性主要是通过扩展Android的View框架的功能对外提供，因此无障碍相关的类主要放在view包中，如下。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/viewaccessibility.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;323system_process&#34;&gt;3.2.3、system_process&lt;/h4&gt;
+&lt;p&gt;SystemServer进程中的无障碍服务管理类如下所示，比如核心的AccessibilityManagerService，用于协调辅助app进程和被辅助app进程的交互；TouchExpolorer用于实现“触摸浏览”手势功能等。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/a11yms.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;系统进程SystemServer中的AccessibilityManagerService，用来管理所有的无障碍服务，类似AMS，SystemServer启动时会在startOtherServices方法中启动AccessibilityManagerService，startOtherServices方法在ActivityManagerService、PackageManagerService等一些核心服务的后面启动。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;com.android.server.SystemServer.java
+
+/**
+ * Starts a miscellaneous grab bag of stuff that has yet to be refactored
+ * and organized.
+ */
+private void startOtherServices() {
+...
+            traceBeginAndSlog(&amp;quot;StartAccessibilityManagerService&amp;quot;);
+            try {
+                ServiceManager.addService(Context.ACCESSIBILITY_SERVICE,
+                        new AccessibilityManagerService(context));
+            } catch (Throwable e) {
+                reportWtf(&amp;quot;starting Accessibility Manager&amp;quot;, e);
+            }
+            traceEnd();
+...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;334tts&#34;&gt;3.3.4、TTS&lt;/h5&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/tts.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;暂不分析&lt;/p&gt;
+&lt;h3 id=&#34;33-无障碍框架aidl接口&#34;&gt;3.3 无障碍框架AIDL接口&lt;/h3&gt;
+&lt;p&gt;理解无障碍框架的aidl的设计是理解无障碍框架的关键。&lt;/p&gt;
+&lt;p&gt;我们进行无障碍的开发通常会涉及到三个进程：&lt;/p&gt;
+&lt;p&gt;辅助app（talkback、或者我们自己开发的无障碍应用（比如红包助手））&lt;/p&gt;
+&lt;p&gt;SystemServer（系统服务进程，管理所有的无障碍服务，并且起到中转的作用，类似AMS的设计）&lt;/p&gt;
+&lt;p&gt;被辅助的app（）&lt;/p&gt;
+&lt;p&gt;跨进程通信需要用到aidl接口，无障碍服务框架也不例外，由于涉及到三个进程的通信，并且辅助app通常不需要直接跟被辅助的app通信，大部分通过SystemServer进行中转通信，因此主要涉及到了四个aidl接口：&lt;/p&gt;
+&lt;p&gt;被辅助app-&amp;gt;SystemServer（IAccessibilityManager.aidl）&lt;/p&gt;
+&lt;p&gt;SystemServer-&amp;gt;辅助app（IAccessibilityServiceClient.aidl）&lt;/p&gt;
+&lt;p&gt;辅助app-&amp;gt;SystemServer（IAccessibilityServiceConnection.aidl）&lt;/p&gt;
+&lt;p&gt;SystemServer-&amp;gt;被辅助app（IAccessibilityInteractionConnection.aidl）&lt;/p&gt;
+&lt;h4 id=&#34;331iaccessibilitymanageraidl客户端被辅助app服务端systemserver&#34;&gt;3.3.1、IAccessibilityManager.aidl（客户端：被辅助app、服务端：SystemServer）&lt;/h4&gt;
+&lt;p&gt;比如当被辅助app产生触摸事件后，会通过这个接口发送无障碍事件给SystemServer进程的AccessibilityManagerService&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.view.accessibility.IAccessibilityManager.aidl
+
+/**
+ * Interface implemented by the AccessibilityManagerService called by
+ * the AccessibilityManagers.
+ *
+ * @hide
+ */
+interface IAccessibilityManager {
+
+    oneway void sendAccessibilityEvent(in AccessibilityEvent uiEvent, int userId);
+
+    long addClient(IAccessibilityManagerClient client, int userId);
+
+    List&amp;lt;AccessibilityServiceInfo&amp;gt; getInstalledAccessibilityServiceList(int userId);
+
+    List&amp;lt;AccessibilityServiceInfo&amp;gt; getEnabledAccessibilityServiceList(int feedbackType, int userId);
+
+    int addAccessibilityInteractionConnection(IWindow windowToken,
+            in IAccessibilityInteractionConnection connection,
+            String packageName, int userId);
+
+    void removeAccessibilityInteractionConnection(IWindow windowToken);
+
+    void notifyAccessibilityButtonClicked();
+
+    // Requires WRITE_SECURE_SETTINGS
+    void performAccessibilityShortcut();
+
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;332-iaccessibilityserviceclientaidl客户端systemserver服务端辅助app&#34;&gt;3.3.2 、IAccessibilityServiceClient.aidl（客户端：SystemServer、服务端：辅助app）&lt;/h4&gt;
+&lt;p&gt;当SystemServer接收到被辅助的app发送的无障碍事件时，会将事件通过该接口传递给辅助app进程进行处理。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.accessibilityservice.IAccessibilityServiceClient.aidl
+
+/**
+ * Top-level interface to an accessibility service component.
+ */
+oneway interface IAccessibilityServiceClient {
+
+    void onAccessibilityEvent(in AccessibilityEvent event, in boolean serviceWantsEvent);
+
+    void onSoftKeyboardShowModeChanged(int showMode);
+
+    void onPerformGestureResult(int sequence, boolean completedSuccessfully);
+
+    void onAccessibilityButtonClicked();
+
+    void onAccessibilityButtonAvailabilityChanged(boolean available);
+    
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;333iaccessibilityserviceconnectionaidl客户端辅助app服务端systemserver&#34;&gt;3.3.3、IAccessibilityServiceConnection.aidl（客户端：辅助app、服务端：SystemServer）&lt;/h4&gt;
+&lt;p&gt;当我们需要找到被辅助的app的某个view的信息时，可以通过该接口的findAccessibilityNodeInfosByViewId方法实现。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.accessibilityservice.IAccessibilityServiceConnection.aidl
+
+/**
+ * Interface given to an AccessibilitySerivce to talk to the AccessibilityManagerService.
+ */
+interface IAccessibilityServiceConnection {
+
+    String[] findAccessibilityNodeInfoByAccessibilityId(int accessibilityWindowId,
+        long accessibilityNodeId, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, int flags, long threadId,
+        in Bundle arguments);
+
+    String[] findAccessibilityNodeInfosByViewId(int accessibilityWindowId,
+        long accessibilityNodeId, String viewId, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, long threadId);
+
+    String[] findFocus(int accessibilityWindowId, long accessibilityNodeId, int focusType,
+        int interactionId, IAccessibilityInteractionConnectionCallback callback, long threadId);
+
+    boolean performAccessibilityAction(int accessibilityWindowId, long accessibilityNodeId,
+        int action, in Bundle arguments, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, long threadId);
+
+    AccessibilityServiceInfo getServiceInfo();
+
+    boolean performGlobalAction(int action);
+
+    boolean isAccessibilityButtonAvailable();
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;heading&#34;&gt;&lt;/h4&gt;
+&lt;h4 id=&#34;334iaccessibilityinteractionconnectionaidl客户端systemserver服务端被辅助app&#34;&gt;3.3.4、IAccessibilityInteractionConnection.aidl（客户端：SystemServer、服务端：被辅助app）&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;android.view.accessibility.IAccessibilityInteractionConnection.aidl
+
+/**
+ * Interface for interaction between the AccessibilityManagerService
+ * and the ViewRoot in a given window.
+ *
+ * @hide
+ */
+oneway interface IAccessibilityInteractionConnection {
+
+    void findAccessibilityNodeInfoByAccessibilityId(long accessibilityNodeId, in Region bounds,
+        int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
+        int interrogatingPid, long interrogatingTid, in MagnificationSpec spec,
+        in Bundle arguments);
+
+    ...
+
+    void findFocus(long accessibilityNodeId, int focusType, in Region bounds, int interactionId,
+        IAccessibilityInteractionConnectionCallback callback, int flags, int interrogatingPid,
+        long interrogatingTid, in MagnificationSpec spec);
+
+  ...
+
+    void performAccessibilityAction(long accessibilityNodeId, int action, in Bundle arguments,
+        int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
+        int interrogatingPid, long interrogatingTid);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;四流程分析&#34;&gt;四、流程分析&lt;/h2&gt;
+&lt;h3 id=&#34;41accessibilityservice启动流程以talkback开关打开后到talkbackservice启动进行分析&#34;&gt;4.1、AccessibilityService启动流程（以talkback开关打开后到TalkbackService启动进行分析）。&lt;/h3&gt;
+&lt;p&gt;在设置中打开talback开关后，会调用到如下方法，最终会往Settings provider中key为Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES的字段写入Talkback注册的AccessibilityService值（TalkbackService），这个值保存在&lt;/p&gt;
+&lt;p&gt;/data/system/users/0/settings_secure.xml文件中。（其他app的AccessibilityService也保存在同一个key中）&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;com.android.settingslib.accessibility.AccessibilityUtils.java
+
+/**
+ * Changes an accessibility component&#39;s state for {@param userId}.
+ */
+public static void setAccessibilityServiceState(Context context, ComponentName toggledService,
+        boolean enabled, int userId) {
+    ...
+    Settings.Secure.putStringForUser(context.getContentResolver(),
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+            enabledServicesBuilder.toString(), userId);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;由于AccessibilityManagerService创建时注册了AccessibilityContentObserver，因此马上会收到Settings provider数据变化的监听。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityServiceConnection.java
+
+private void updateServicesLocked(UserState userState) {
+    ...
+        if (userState.mEnabledServices.contains(componentName)
+                &amp;amp;&amp;amp; !mUiAutomationManager.suppressingAccessibilityServicesLocked()) {
+            if (service == null) {
+                service = new AccessibilityServiceConnection(userState, mContext, componentName,
+                        installedService, sIdCounter++, mMainHandler, mLock, mSecurityPolicy,
+                        this, mWindowManagerService, mGlobalActionPerformer);
+            } 
+            ...
+            service.bindLocked();
+        } ...
+    }
+    ...
+    updateAccessibilityEnabledSetting(userState);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;根据获取到的AccessibilityService信息（com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService）创建出AccessibilityServiceConnection。AccessibilityServiceConnection代表了一个无障碍服务，存储用于管理这个服务需要的所有数据，提供了开始/停止服务和在服务管理的数据结构中添加或者移除这个服务的api。&lt;/p&gt;
+&lt;p&gt;接着调用bindServiceAsUser方法来绑定服务。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityServiceConnection.java
+
+public void bindLocked() {
+    ...
+    try {
+        ...
+        if (mService == null &amp;amp;&amp;amp; mContext.bindServiceAsUser(
+                mIntent, this, flags, new UserHandle(userState.mUserId))) {
+            userState.getBindingServicesLocked().add(mComponentName);
+        }
+    } ...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;服务启动后会跨进程调用到TalkbackService(AccessibilityService)的onBind方法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.accessibilityservice.AccessibilityService
+
+/**
+ * Implement to return the implementation of the internal accessibility
+ * service interface.
+ */
+@Override
+public final IBinder onBind(Intent intent) {
+    return new IAccessibilityServiceClientWrapper(this, getMainLooper(), new Callbacks() {
+        @Override
+        public void onServiceConnected() {
+            AccessibilityService.this.dispatchServiceConnected();
+        }
+
+        ...
+        @Override
+        public void onAccessibilityEvent(AccessibilityEvent event) {
+            AccessibilityService.this.onAccessibilityEvent(event);
+        }
+...
+    });
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;onBind方法返回的是一个IAccessibilityServiceClientWrapper的binder对象&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/**
+ * Implements the internal {@link IAccessibilityServiceClient} interface to convert
+ * incoming calls to it back to calls on an {@link AccessibilityService}.
+ *
+ * @hide
+ */
+public static class IAccessibilityServiceClientWrapper extends IAccessibilityServiceClient.Stub
+        implements HandlerCaller.Callback {
+    ...
+
+    private final HandlerCaller mCaller;
+
+    private final Callbacks mCallback;
+
+    private int mConnectionId = AccessibilityInteractionClient.NO_ID;
+
+    public IAccessibilityServiceClientWrapper(Context context, Looper looper,
+            Callbacks callback) {
+        mCallback = callback;
+        mCaller = new HandlerCaller(context, looper, this, true /*asyncHandler*/);
+    }
+
+    public void init(IAccessibilityServiceConnection connection, int connectionId,
+            IBinder windowToken) {
+        Message message = mCaller.obtainMessageIOO(DO_INIT, connectionId,
+                connection, windowToken);
+        mCaller.sendMessage(message);
+    }
+
+    ...
+
+    public void onAccessibilityEvent(AccessibilityEvent event, boolean serviceWantsEvent) {
+        Message message = mCaller.obtainMessageBO(
+                DO_ON_ACCESSIBILITY_EVENT, serviceWantsEvent, event);
+        mCaller.sendMessage(message);
+    }
+...
+
+    @Override
+    public void executeMessage(Message message) {
+        switch (message.what) {
+            case DO_ON_ACCESSIBILITY_EVENT: {
+                AccessibilityEvent event = (AccessibilityEvent) message.obj;
+                boolean serviceWantsEvent = message.arg1 != 0;
+                if (event != null) {
+                    // Send the event to AccessibilityCache via AccessibilityInteractionClient
+                    AccessibilityInteractionClient.getInstance().onAccessibilityEvent(event);
+                    if (serviceWantsEvent
+                            &amp;amp;&amp;amp; (mConnectionId != AccessibilityInteractionClient.NO_ID)) {
+                        // Send the event to AccessibilityService
+                        mCallback.onAccessibilityEvent(event);
+                    }
+                    ...
+                }
+            } return;
+
+            ...
+            case DO_INIT: {
+                mConnectionId = message.arg1;
+                SomeArgs args = (SomeArgs) message.obj;
+                IAccessibilityServiceConnection connection =
+                        (IAccessibilityServiceConnection) args.arg1;
+                IBinder windowToken = (IBinder) args.arg2;
+                args.recycle();
+                if (connection != null) {
+                    AccessibilityInteractionClient.getInstance().addConnection(mConnectionId,
+                            connection);
+                    mCallback.init(mConnectionId, windowToken);
+                    mCallback.onServiceConnected();
+                }...
+            } return;
+...
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;IAccessibilityServiceClientWrapper中保存了一个HandlerCaller和Callbacks对象，其中HandlerCaller主要是将SystemServer进程中AccessibilityServiceConnection的binder call的binder线程调研切换到AccessibilityService的主线程调用。Callbacks对象则将IAccessibilityServiceClientWrapper中的调用回调到AccessibilityService中。&lt;/p&gt;
+&lt;p&gt;AccessibilityService返回binder后会走到AccessibilityServiceConnection的onServiceConnected调用中:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityServiceConnection.java
+
+@Override
+public void onServiceConnected(ComponentName componentName, IBinder service) {
+    synchronized (mLock) {
+        ...
+        mServiceInterface = IAccessibilityServiceClient.Stub.asInterface(service);
+        ...
+        userState.addServiceLocked(this);
+        mSystemSupport.onClientChange(false);
+        // Initialize the service on the main handler after we&#39;re done setting up for
+        // the new configuration (for example, initializing the input filter).
+        mMainHandler.sendMessage(obtainMessage(
+                AccessibilityServiceConnection::initializeService, this));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;private void initializeService() {
+    IAccessibilityServiceClient serviceInterface = null;
+    ...
+    try {
+        serviceInterface.init(this, mId, mOverlayWindowToken);
+    } catch (RemoteException re) {
+        ...
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在serviceInterface.init方法中（binder调用）将这个AccessibilityServiceConnection、mId和mOverlayWindowToken传给AccessibilityService完成初始化工作。&lt;/p&gt;
+&lt;p&gt;初始化时会调用&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;AccessibilityInteractionClient.getInstance().addConnection(mConnectionId,
+        connection);
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;将AccessibilityServiceConnection保存到AccessibilityInteractionClient中。&lt;/p&gt;
+&lt;h3 id=&#34;42无障碍模式下视图状态初始化流程&#34;&gt;4.2、无障碍模式下视图状态初始化流程。&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/findAccessibilityNodeInfoByAccessibilityId.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h5 id=&#34;分析该流程原因&#34;&gt;分析该流程原因：&lt;/h5&gt;
+&lt;h5 id=&#34;为了辅助理解如下方法&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
+&lt;h5 id=&#34;getaccessibilitynodeprovider&#34;&gt;getAccessibilityNodeProvider&lt;/h5&gt;
+&lt;h5 id=&#34;oninitializeaccessibilitynodeinfo&#34;&gt;onInitializeAccessibilityNodeInfo&lt;/h5&gt;
+&lt;p&gt;主要流程分析：&lt;/p&gt;
+&lt;p&gt;1、talkback打开状态下，新的应用打开时，TalkbackService会接收到类型为TYPE_WINDOWS_CHANGED的无障碍事件，这个事件是SystemServer进程接收到其他进程发出的TYPE_VIEW_ACCESSIBILITY_FOCUSED事件时附带发出的，应用发出TYPE_VIEW_ACCESSIBILITY_FOCUSED事件的流程在下一节分析，暂时跳过。&lt;/p&gt;
+&lt;p&gt;2、当tailback收到TYPE_WINDOWS_CHANGED事件时，会间接调用调用父类AccessibilityService的getRootInActiveWindow方法，如上图，经过SystemServer进程中转后会调用到DecorView的getAccessibilityNodeProvider，由于DecorView没有重写getAccessibilityNodeProvider方法，因此会调用到View的createAccessibilityNodeInfo方法，进一步会调用到&lt;strong&gt;onInitializeAccessibilityNodeInfo&lt;/strong&gt;方法，如果没有重写该方法，则默认实现在onInitializeAccessibilityNodeInfoInternal中。&lt;/p&gt;
+&lt;p&gt;3、AccessibilityNodePrefetcher在取出DecorView的无障碍节点后，会进一步通过prefetchDescendantsOfRealNode方法取子view的无障碍节点。同理，如果我们重写了&lt;strong&gt;getAccessibilityNodeProvider&lt;/strong&gt;方法（一些特殊的自定义view需要自己重写该方法，比如webview，android.widget.NumberPicker等），重写getAccessibilityNodeProvider，需要我们实现一个AccessibilityNodeProvider的子类，来实现虚拟的view来支持无障碍模式。通常实现比较复杂的view时会重写这两个方法&lt;/p&gt;
+&lt;h3 id=&#34;43无障碍事件分发流程重要app适配无障碍以及处理无障碍相关问题主要通过该流程入手&#34;&gt;4.3、无障碍事件分发流程（重要，app适配无障碍以及处理无障碍相关问题主要通过该流程入手）。&lt;/h3&gt;
+&lt;p&gt;流程：被辅助app将无障碍事件发送给辅助app，systemserver进程作为中转，接口为IAccessibilityManager.aidl和IAccessibilityServiceClient.aidl&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/sendaccessibilityevent.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h5 id=&#34;分析该流程原因-1&#34;&gt;分析该流程原因：&lt;/h5&gt;
+&lt;h5 id=&#34;为了辅助理解如下方法-1&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
+&lt;h5 id=&#34;sendaccessibilityevent&#34;&gt;&lt;strong&gt;sendAccessibilityEvent&lt;/strong&gt;&lt;/h5&gt;
+&lt;p&gt;&lt;strong&gt;sendAccessibilityEventUnchecked&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;onInitializeAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;dispatchPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;onPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;onRequestSendAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;由于talkback的无障碍服务中声明了android:canRequestTouchExplorationMode=&amp;quot;true&amp;rdquo;，因此开启talkback后AccessibilityManagerService会更新AccessibilityInputFilter成员变量的触摸浏览（FLAG_FEATURE_TOUCH_EXPLORATION）的特性为true。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityInputFilter
+
+private void enableFeatures() {
+    ...
+    if ((mEnabledFeatures &amp;amp; FLAG_FEATURE_TOUCH_EXPLORATION) != 0) {
+        mTouchExplorer = new TouchExplorer(mContext, mAms);
+        addFirstEventHandler(mTouchExplorer);
+    }
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;触摸浏览特性开启后会创建一个TouchExplorer对象。AccessibilityInputFilter继承自InputFilter，对输入事件进行过滤，通过和TouchExplorer配合从而实现talkback模式下的触摸浏览手势。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/**
+ * This class is a strategy for performing touch exploration. It
+ * transforms the motion event stream by modifying, adding, replacing,
+ * and consuming certain events. The interaction model is:
+ *
+ * &amp;lt;ol&amp;gt;
+ *   &amp;lt;li&amp;gt;1. One finger moving slow around performs touch exploration.&amp;lt;/li&amp;gt;
+ *   &amp;lt;li&amp;gt;2. One finger moving fast around performs gestures.&amp;lt;/li&amp;gt;
+ *   &amp;lt;li&amp;gt;3. Two close fingers moving in the same direction perform a drag.&amp;lt;/li&amp;gt;
+ *   &amp;lt;li&amp;gt;4. Multi-finger gestures are delivered to view hierarchy.&amp;lt;/li&amp;gt;
+ *   &amp;lt;li&amp;gt;5. Two fingers moving in different directions are considered a multi-finger gesture.&amp;lt;/li&amp;gt;
+ *   &amp;lt;li&amp;gt;7. Double tapping clicks on the on the last touch explored location if it was in
+ *          a window that does not take focus, otherwise the click is within the accessibility
+ *          focused rectangle.&amp;lt;/li&amp;gt;
+ *   &amp;lt;li&amp;gt;7. Tapping and holding for a while performs a long press in a similar fashion
+ *          as the click above.&amp;lt;/li&amp;gt;
+ * &amp;lt;ol&amp;gt;
+ *
+ * @hide
+ */
+class TouchExplorer extends BaseEventStreamTransformation
+        implements AccessibilityGestureDetector.Listener {
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;该类负责将普通的触摸事件转换为触摸浏览手势，比如将MotionEvent.ACTION_DOWN事件转换为悬停事件）（MotionEvent.ACTION_HOVER_ENTER）。因此在talkback模式下，当我们点击一次view上的控件时，应用收到的是（ACTION_HOVER_ENTER）事件，而只有双击才会传递我们熟悉的ACTION_DOWN事件&lt;/p&gt;
+&lt;p&gt;*ViewRootImpl:View层次结构的根。View的&lt;strong&gt;绘制流程&lt;/strong&gt;（测量measure、布局layout、绘制draw）和输入&lt;strong&gt;事件的分发流程&lt;/strong&gt;都是从ViewRootImp开始。&lt;/p&gt;
+&lt;p&gt;主要流程分析：&lt;/p&gt;
+&lt;p&gt;1、ViewRootImpl的内部类WindowInputEventReceiver从native方法调起dispatchInputEvent方法。&lt;/p&gt;
+&lt;p&gt;2、ViewRootImpl调用deliverInputEvent传递事件输入事件。&lt;/p&gt;
+&lt;p&gt;3、从顶层的DecorView的dispatchPointerEvent开始分发输入事件。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.view.View.java
+
+/**
+ * Dispatch a pointer event.
+ * &amp;lt;p&amp;gt;
+ * Dispatches touch related pointer events to {@link #onTouchEvent(MotionEvent)} and all
+ * other events to {@link #onGenericMotionEvent(MotionEvent)}.  This separation of concerns
+ * reinforces the invariant that {@link #onTouchEvent(MotionEvent)} is really about touches
+ * and should not be expected to handle other pointing device features.
+ * &amp;lt;/p&amp;gt;
+ *
+ * @param event The motion event to be dispatched.
+ * @return True if the event was handled by the view, false otherwise.
+ * @hide
+ */
+public final boolean dispatchPointerEvent(MotionEvent event) {
+    if (event.isTouchEvent()) {
+        return dispatchTouchEvent(event);
+    } else {
+        return dispatchGenericMotionEvent(event);
+    }
+}
+
+...
+
+/**
+ * Returns true if this motion event is a touch event.
+ * &amp;lt;p&amp;gt;
+ * Specifically excludes pointer events with action {@link #ACTION_HOVER_MOVE},
+ * {@link #ACTION_HOVER_ENTER}, {@link #ACTION_HOVER_EXIT}, or {@link #ACTION_SCROLL}
+ * because they are not actually touch events (the pointer is not down).
+ * &amp;lt;/p&amp;gt;
+ * @return True if this motion event is a touch event.
+ * @hide
+ */
+public final boolean isTouchEvent() {
+    return nativeIsTouchEvent(mNativePtr);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在dispatchPointerEvent方法中会有event.isTouchEvent()的判断，如果talkback模式下，由于收到的是ACTION_HOVER_ENTER事件，因此不会走dispatchTouchEvent方法而是dispatchGenericMotionEvent方法。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.view.View.java
+/**
+ * Dispatch a generic motion event.
+ * &amp;lt;p&amp;gt;
+ * Generic motion events with source class {@link InputDevice#SOURCE_CLASS_POINTER}
+ * are delivered to the view under the pointer.  All other generic motion events are
+ * delivered to the focused view.  Hover events are handled specially and are delivered
+ * to {@link #onHoverEvent(MotionEvent)}.
+ * &amp;lt;/p&amp;gt;
+ *
+ * @param event The motion event to be dispatched.
+ * @return True if the event was handled by the view, false otherwise.
+ */
+public boolean dispatchGenericMotionEvent(MotionEvent event) {
+...
+    final int source = event.getSource();
+    if ((source &amp;amp; InputDevice.SOURCE_CLASS_POINTER) != 0) {
+        final int action = event.getAction();
+        if (action == MotionEvent.ACTION_HOVER_ENTER
+                || action == MotionEvent.ACTION_HOVER_MOVE
+                || action == MotionEvent.ACTION_HOVER_EXIT) {
+            if (dispatchHoverEvent(event)) {
+                return true;
+            }
+        } else if (dispatchGenericPointerEvent(event)) {
+            return true;
+        }
+    } else if (dispatchGenericFocusedEvent(event)) {
+        return true;
+    }
+	...
+    return false;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在dispatchGenericMotionEvent中，如果是Hover events，则会走到dispatchHoverEvent方法中。这个方法的机制类似dispatchTouchEvent的流程，是一个责任链模式的实现，不详细展开，默认会传到最后一个子节点的onHoverEvent方法。接着该方法会调用到sendAccessibilityHoverEvent里。&lt;/p&gt;
+&lt;p&gt;3、sendAccessibilityHoverEvent方法接着会调用以下方法。&lt;/p&gt;
+&lt;p&gt;​     &lt;strong&gt;sendAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;​       &lt;strong&gt;-&amp;gt;sendAccessibilityEventUnchecked&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;​           &lt;strong&gt;-&amp;gt;onInitializeAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;​           &lt;strong&gt;-&amp;gt;dispatchPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;​                &lt;strong&gt;-&amp;gt;onPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;​           &lt;strong&gt;-&amp;gt;onRequestSendAccessibilityEvent&lt;/strong&gt;（只在ViewGroup中有默认实现）&lt;/p&gt;
+&lt;p&gt;*&lt;strong&gt;重要：以上六个方法为当我们自定义view时适配无障碍模式可以覆盖实现的方法，可以重写view的这些方法或者实现View.AccessibilityDelegate来解决一些特殊场景下talkback播报的问题。更详细的用法可以参考官方文档。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;以talkback模式下朗读一个textview上的文字为例，textview重写了view中的onPopulateAccessibilityEventInternal方法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.widget.TextView.java
+
+/** @hide */
+@Override
+public void onPopulateAccessibilityEventInternal(AccessibilityEvent event) {
+    super.onPopulateAccessibilityEventInternal(event);
+
+    final CharSequence text = getTextForAccessibility();
+    if (!TextUtils.isEmpty(text)) {
+        event.getText().add(text);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;getTextForAccessibility方法会取到当前textview中显示的text，然后将该text的内容填充到AccessibilityEvent中发送出去。后面talkback会取出这个text并朗读出来。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.view.View
+
+public void onPopulateAccessibilityEvent(AccessibilityEvent event) {
+    if (mAccessibilityDelegate != null) {
+        mAccessibilityDelegate.onPopulateAccessibilityEvent(this, event);
+    } else {
+        onPopulateAccessibilityEventInternal(event);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;因此如果我们需要自定义textview在talkback模式下朗读的内容，或者不让某个view的内容在talkback模式下被朗读出来，可以考虑重写onPopulateAccessibilityEvent方法。&lt;/p&gt;
+&lt;p&gt;4、当我们通过第3步修改view中无障碍节点的信息后，被点击的View的sendAccessibilityEventUnchecked方法会向上通过DecorView传递到ViewRootImpl的requestSendAccessibilityEvent方法中，&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.view.ViewRootImpl
+
+public boolean requestSendAccessibilityEvent(View child, AccessibilityEvent event) {
+    ...
+    final int eventType = event.getEventType();
+    switch (eventType) {
+        case AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED: {
+            final long sourceNodeId = event.getSourceNodeId();
+            final int accessibilityViewId = AccessibilityNodeInfo.getAccessibilityViewId(
+                    sourceNodeId);
+            View source = mView.findViewByAccessibilityId(accessibilityViewId);
+            if (source != null) {
+                AccessibilityNodeProvider provider = source.getAccessibilityNodeProvider();
+                if (provider != null) {
+                    final int virtualNodeId = AccessibilityNodeInfo.getVirtualDescendantId(
+                            sourceNodeId);
+                    final AccessibilityNodeInfo node;
+                    node = provider.createAccessibilityNodeInfo(virtualNodeId);
+                    setAccessibilityFocus(source, node);
+                }
+            }
+        } break;
+        ...
+    }
+    mAccessibilityManager.sendAccessibilityEvent(event);
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;接着无障碍事件会通过AccessibilityManager的sendAccessibilityEvent方法跨进程调用systemserver进程的AccessibilityManagerService，将类型为TYPE_VIEW_HOVER_ENTER的AccessibilityEvent事件传递到talkback的的TalkBackService（继承自AccessibilityService）的onAccessibilityEvent方法中（或者其他实现了AccessibilityService的应用）。&lt;/p&gt;
+&lt;h3 id=&#34;44执行无障碍事件流程以talkback发出focus无障碍事件到被辅助的app端通过viewrootimpl绘制绿框焦点过程进行分析&#34;&gt;4.4、执行无障碍事件流程（以talkback发出focus无障碍事件，到被辅助的app端通过ViewRootImpl绘制绿框焦点过程进行分析）。&lt;/h3&gt;
+&lt;p&gt;流程：辅助app（talkback）将无障碍事件发送给被辅助app，systemserver进程作为中转，接口为IAccessibilityServiceConnection.aidl和IAccessibilityInteractionConnection.aidl&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/requesfocus.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h5 id=&#34;分析该流程原因-2&#34;&gt;分析该流程原因：&lt;/h5&gt;
+&lt;h5 id=&#34;为了辅助理解如下方法-2&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
+&lt;h5 id=&#34;accessibilitynodeinfoperformaction&#34;&gt;AccessibilityNodeInfo.performAction&lt;/h5&gt;
+&lt;p&gt;主要流程分析：&lt;/p&gt;
+&lt;p&gt;1、在talkback中有个AccessibilityEventProcessor类对无障碍事件进行集中处理，根据无障碍事件的不同类型分发到不同的处理器进行处理，比如ProcessorFocusAndSingleTap这个处理器会对类型为TYPE_VIEW_HOVER_ENTER的无障碍事件进行处理，ProcessorEventQueue（主要用于tts朗读，后面分析）这个处理器会处理所有的无障碍事件。&lt;/p&gt;
+&lt;p&gt;2、在前面一节4.2中，触摸事件TYPE_VIEW_HOVER_ENTER传递到了TalkBackService，而ProcessorFocusAndSingleTap这个类会对TYPE_VIEW_HOVER_ENTER这个事件进行处理，tryFocusing函数中会调用AccessibilityNodeInfo的performAction方法，AccessibilityNodeInfo的节点信息就是4.2节中触摸到的view的信息，因此通过AccessibilityManagerService进程中转后，会最终调用到我们触摸到的view的&lt;strong&gt;performAccessibilityAction&lt;/strong&gt;方法中去（我们也可以通过调用这个方法处理一些无障碍焦点的问题）。&lt;/p&gt;
+&lt;p&gt;3、在performAccessibilityAction会调用到performAccessibilityActionInternal，接着如果判断到是ACTION_ACCESSIBILITY_FOCUS事件，则会调用requestAccessibilityFocus函数&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.view.View
+
+public boolean requestAccessibilityFocus() {
+    ...
+    if ((mPrivateFlags2 &amp;amp; PFLAG2_ACCESSIBILITY_FOCUSED) == 0) {
+        mPrivateFlags2 |= PFLAG2_ACCESSIBILITY_FOCUSED;
+        ViewRootImpl viewRootImpl = getViewRootImpl();
+        if (viewRootImpl != null) {
+            viewRootImpl.setAccessibilityFocus(this, null);
+        }
+        invalidate();
+        sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
+        return true;
+    }
+    return false;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个函数里有两个重要的操作，一是调用ViewRootImpl的setAccessibilityFocus将自身设置为focus的view，然后调用invalidate触发重绘操作，ViewRootImpl会在onPostDraw中执行drawAccessibilityFocusedDrawableIfNeeded来绘制出绿框。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;android.view.ViewRootImpl.java
+
+/**
+ * We want to draw a highlight around the current accessibility focused.
+ * Since adding a style for all possible view is not a viable option we
+ * have this specialized drawing method.
+ *
+ * Note: We are doing this here to be able to draw the highlight for
+ *       virtual views in addition to real ones.
+ *
+ * @param canvas The canvas on which to draw.
+ */
+private void drawAccessibilityFocusedDrawableIfNeeded(Canvas canvas) {
+    final Rect bounds = mAttachInfo.mTmpInvalRect;
+    if (getAccessibilityFocusedRect(bounds)) {
+        final Drawable drawable = getAccessibilityFocusedDrawable();
+        if (drawable != null) {
+            drawable.setBounds(bounds);
+            drawable.draw(canvas);
+        }
+    } else if (mAttachInfo.mAccessibilityFocusDrawable != null) {
+        mAttachInfo.mAccessibilityFocusDrawable.setBounds(0, 0, 0, 0);
+    }
+}
+
+private boolean getAccessibilityFocusedRect(Rect bounds) {
+    final AccessibilityManager manager = AccessibilityManager.getInstance(mView.mContext);
+    if (!manager.isEnabled() || !manager.isTouchExplorationEnabled()) {
+        return false;
+    }
+
+    final View host = mAccessibilityFocusedHost;
+    if (host == null || host.mAttachInfo == null) {
+        return false;
+    }
+
+    final AccessibilityNodeProvider provider = host.getAccessibilityNodeProvider();
+    if (provider == null) {
+        host.getBoundsOnScreen(bounds, true);
+    } else if (mAccessibilityFocusedVirtualView != null) {
+        mAccessibilityFocusedVirtualView.getBoundsInScreen(bounds);
+    } else {
+        return false;
+    }
+
+    // Transform the rect into window-relative coordinates.
+    final AttachInfo attachInfo = mAttachInfo;
+    bounds.offset(0, attachInfo.mViewRootImpl.mScrollY);
+    bounds.offset(-attachInfo.mWindowLeft, -attachInfo.mWindowTop);
+    if (!bounds.intersect(0, 0, attachInfo.mViewRootImpl.mWidth,
+            attachInfo.mViewRootImpl.mHeight)) {
+        // If no intersection, set bounds to empty.
+        bounds.setEmpty();
+    }
+    return !bounds.isEmpty();
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;第二个操作是调用sendAccessibilityEvent方法，将TYPE_VIEW_ACCESSIBILITY_FOCUSED事件发送出去，这个事件会被talkback处理，从而调用tts引擎读出view的内容，这个流程分析如下。&lt;/p&gt;
+&lt;h3 id=&#34;45talkback调用tts读出view中的text的过程&#34;&gt;4.5、talkback调用TTS读出view中的text的过程。&lt;/h3&gt;
+&lt;p&gt;由于talkback最新版本属于google维护，没有开源代码，网上公开的只有talkback6.0版本的代码，因此基于6.0版本的概要分析如下&lt;/p&gt;
+&lt;p&gt;无障碍事件的分发跟4.2节流程一样，talkback处理TYPE_VIEW_ACCESSIBILITY_FOCUSED事件大致流程如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/talkbacktts.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;talkback调用tts进行朗读主要通过com.google.android.accessibility.compositor.Compositor这个类来控制，这个类中又有一个ParseTree的类来管理朗读的内容，ParseTree通过一个compositor.json的文件来定义朗读的内容的规则，比如一个简单的按钮，在talkback模式下不仅需要读出按钮的内容，还需要读出按钮的状态（比如disabled），因此朗读的内容是一个拼接起来的结果，比如下面就是通过解析compositor.json来读出一个按钮内容的大概流程。&lt;/p&gt;
+&lt;p&gt;以下在compositor.json中某几个节点类型的定义，&lt;/p&gt;
+&lt;p&gt;$开头会被解析成ParseTreeVariableNode，比如 &amp;ldquo;node.text&amp;quot;经过ParseTreeVariableNode的处理会取出Button中text（也就是AccessibilityEvent中AccessibilityNodeInfo中的mText）&lt;/p&gt;
+&lt;p&gt;@开头会被解析成ParseTreeResourceNode，最后会通过Resource取出字段的内容，比如&amp;rdquo;@string/value_button&amp;quot;中文下会被解析为“按钮”，&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;@string/value_disabled&amp;quot;中文下会被解析为“已停用”。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;     &amp;quot;notify_disabled&amp;quot;: {
+      &amp;quot;if&amp;quot;: &amp;quot;$node.isActionable &amp;amp;&amp;amp; !$node.isEnabled&amp;quot;,
+      &amp;quot;then&amp;quot;: &amp;quot;@string/value_disabled&amp;quot;
+     },
+
+....
+
+     &amp;quot;get_node_text&amp;quot;: {  // AccessibilityNodeInfoUtils.getNodeText()
+      &amp;quot;fallback&amp;quot;: [
+        {
+          // If focusing on-screen keyboard key... apply speak-passwords policy to hide key name.
+          &amp;quot;if&amp;quot;: &amp;quot;$event.sourceIsKeyboard &amp;amp;&amp;amp; $global.lastTextEditIsPassword &amp;amp;&amp;amp; !$global.speakPasswordOnAndroidShowingPasswords&amp;quot;,
+          &amp;quot;then&amp;quot;: &amp;quot;@string/symbol_bullet&amp;quot;,
+          &amp;quot;else&amp;quot;: &amp;quot;$node.contentDescription&amp;quot;
+        },
+        &amp;quot;$node.text&amp;quot;
+      ]
+    },
+    &amp;quot;get_role_description_or_default&amp;quot;: {
+      &amp;quot;fallback&amp;quot;: [
+        &amp;quot;$node.roleDescription&amp;quot;,
+        &amp;quot;%node_role&amp;quot;
+      ]
+    },
+    &amp;quot;node_role&amp;quot;: {
+      &amp;quot;switch&amp;quot;: &amp;quot;$node.role&amp;quot;,
+      &amp;quot;cases&amp;quot;: {
+        &amp;quot;button&amp;quot;: &amp;quot;@string/value_button&amp;quot;,
+        &amp;quot;check_box&amp;quot;: &amp;quot;@string/value_checkbox&amp;quot;,
+        &amp;quot;drop_down_list&amp;quot;: &amp;quot;@string/value_spinner&amp;quot;,
+        &amp;quot;edit_text&amp;quot;: &amp;quot;@string/value_edit_box&amp;quot;,
+        &amp;quot;grid&amp;quot;: &amp;quot;@string/value_gridview&amp;quot;,
+        &amp;quot;image&amp;quot;: &amp;quot;@string/value_image&amp;quot;,
+        &amp;quot;image_button&amp;quot;: &amp;quot;@string/value_button&amp;quot;, // Same as |button|
+        &amp;quot;list&amp;quot;: &amp;quot;@string/value_listview&amp;quot;,
+        &amp;quot;pager&amp;quot;: &amp;quot;@string/value_pager&amp;quot;,
+        &amp;quot;progress_bar&amp;quot;: &amp;quot;@string/value_progress_bar&amp;quot;,
+        &amp;quot;radio_button&amp;quot;: &amp;quot;@string/value_radio_button&amp;quot;,
+        &amp;quot;seek_control&amp;quot;: &amp;quot;@string/value_seek_bar&amp;quot;,
+        &amp;quot;switch&amp;quot;: &amp;quot;@string/value_switch&amp;quot;,
+        &amp;quot;tab_bar&amp;quot;: &amp;quot;@string/value_tabwidget&amp;quot;,
+        &amp;quot;toggle_button&amp;quot;: &amp;quot;@string/value_switch&amp;quot;, // Same as |switch|
+        &amp;quot;view_group&amp;quot;: &amp;quot;&amp;quot;, // None
+        &amp;quot;web_view&amp;quot;: &amp;quot;@string/value_webview&amp;quot;,
+        &amp;quot;checked_text_view&amp;quot;: &amp;quot;&amp;quot; // None
+      }
+    },
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ttsOutput&lt;/p&gt;
+&lt;p&gt;TYPE_VIEW_ACCESSIBILITY_FOCUSED&lt;/p&gt;
+&lt;p&gt;get_description_for_tree&lt;/p&gt;
+&lt;p&gt;​        StateNameRolePosition&lt;/p&gt;
+&lt;p&gt;​              tree_description_with_label&lt;/p&gt;
+&lt;p&gt;​                 append_description_for_tree&lt;/p&gt;
+&lt;p&gt;​                 |  &amp;ldquo;conditionalPrepend(%description_for_tree_status, %description_for_tree_nodes)&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;​                 |      description_for_tree_nodes&lt;/p&gt;
+&lt;p&gt;​                 |           get_description_for_node&lt;/p&gt;
+&lt;p&gt;​                 |             rule_default&lt;/p&gt;
+&lt;p&gt;​                 |                node_text_and_role&lt;/p&gt;
+&lt;p&gt;​                 |                    rule_view_group（%get_node_text）&lt;/p&gt;
+&lt;p&gt;​                 |                    |    &amp;ldquo;$node.text&amp;rdquo;&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;取出“Button的text”&lt;/p&gt;
+&lt;p&gt;​                 |                    get_role_description_or_default&lt;/p&gt;
+&lt;p&gt;​                 |                    |     %node_role&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;-取出“按钮的String资源”&lt;/p&gt;
+&lt;p&gt;​                  notify_disabled&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;-取出“已停用的String资源”&lt;/p&gt;
+&lt;p&gt;最后talkback朗读“xxx，按钮，已停用”&lt;/p&gt;
+&lt;p&gt;​&lt;/p&gt;
+</description>
       
     </item>
     
@@ -1038,717 +2494,6 @@ public int displaySearchResults() {
     });
 }
 &lt;/code&gt;&lt;/pre&gt;</description>
-      
-    </item>
-    
-    <item>
-      <title>无障碍学习整理（基于talkback）</title>
-      <link>https://xuanliangdev.github.io/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/</link>
-      <pubDate>Sat, 03 Aug 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://xuanliangdev.github.io/post/%E6%97%A0%E9%9A%9C%E7%A2%8D%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86%E4%B8%BB%E8%A6%81%E7%A0%94%E7%A9%B6talkback%E7%9A%84%E6%97%A0%E9%9A%9C%E7%A2%8D%E6%9C%8D%E5%8A%A1/</guid>
-      
-        <description>&lt;h2 id=&#34;一整理原因&#34;&gt;一、整理原因：&lt;/h2&gt;
-&lt;p&gt;为了辅助理解无障碍google官方开发文档api的原理。&lt;/p&gt;
-&lt;h2 id=&#34;二参考文档&#34;&gt;二、参考文档&lt;/h2&gt;
-&lt;p&gt;&lt;a href=&#34;https://developer.android.google.cn/guide/topics/ui/accessibility&#34;&gt;无障碍开发google官方文档&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&#34;三无障碍服务框架结构分析&#34;&gt;三、无障碍服务框架结构分析&lt;/h2&gt;
-&lt;h3 id=&#34;31结构&#34;&gt;3.1.结构&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/accessibility/%E6%97%A0%E9%9A%9C%E7%A2%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;h3 id=&#34;32相关类图&#34;&gt;3.2、相关类图&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/accessibilityclass.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;p&gt;整个talkback机制涉及了4个进程，SystemServer（蓝色部分）、Talkback（黄色部分）、被辅助app进程（绿色部分），TTS引擎进程（暂不分析）&lt;/p&gt;
-&lt;p&gt;四个AIDL接口，图上红色部分&lt;/p&gt;
-&lt;h4 id=&#34;321talkback辅助app实现了accessibilityservice的app&#34;&gt;3.2.1、talkback（辅助app，实现了AccessibilityService的app）&lt;/h4&gt;
-&lt;p&gt;辅助app需要用到的在framewors目录中相关的类，主要是继承AccessibilityService从而接收SystemServer进程发送过来的无障碍事件并进行相关处理&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/a11yservice.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;h4 id=&#34;322被辅助app进程被辅助app&#34;&gt;3.2.2、被辅助app进程（被辅助app）&lt;/h4&gt;
-&lt;p&gt;被辅助的app的无障碍特性主要是通过扩展Android的View框架的功能对外提供，因此无障碍相关的类主要放在view包中，如下。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/viewaccessibility.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;h4 id=&#34;323system_process&#34;&gt;3.2.3、system_process&lt;/h4&gt;
-&lt;p&gt;SystemServer进程中的无障碍服务管理类如下所示，比如核心的AccessibilityManagerService，用于协调辅助app进程和被辅助app进程的交互；TouchExpolorer用于实现“触摸浏览”手势功能等。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/a11yms.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;p&gt;系统进程SystemServer中的AccessibilityManagerService，用来管理所有的无障碍服务，类似AMS，SystemServer启动时会在startOtherServices方法中启动AccessibilityManagerService，startOtherServices方法在ActivityManagerService、PackageManagerService等一些核心服务的后面启动。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;com.android.server.SystemServer.java
-
-/**
- * Starts a miscellaneous grab bag of stuff that has yet to be refactored
- * and organized.
- */
-private void startOtherServices() {
-...
-            traceBeginAndSlog(&amp;quot;StartAccessibilityManagerService&amp;quot;);
-            try {
-                ServiceManager.addService(Context.ACCESSIBILITY_SERVICE,
-                        new AccessibilityManagerService(context));
-            } catch (Throwable e) {
-                reportWtf(&amp;quot;starting Accessibility Manager&amp;quot;, e);
-            }
-            traceEnd();
-...
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;334tts&#34;&gt;3.3.4、TTS&lt;/h5&gt;
-&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/tts.png?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;p&gt;暂不分析&lt;/p&gt;
-&lt;h3 id=&#34;33-无障碍框架aidl接口&#34;&gt;3.3 无障碍框架AIDL接口&lt;/h3&gt;
-&lt;p&gt;理解无障碍框架的aidl的设计是理解无障碍框架的关键。&lt;/p&gt;
-&lt;p&gt;我们进行无障碍的开发通常会涉及到三个进程：&lt;/p&gt;
-&lt;p&gt;辅助app（talkback、或者我们自己开发的无障碍应用（比如红包助手））&lt;/p&gt;
-&lt;p&gt;SystemServer（系统服务进程，管理所有的无障碍服务，并且起到中转的作用，类似AMS的设计）&lt;/p&gt;
-&lt;p&gt;被辅助的app（）&lt;/p&gt;
-&lt;p&gt;跨进程通信需要用到aidl接口，无障碍服务框架也不例外，由于涉及到三个进程的通信，并且辅助app通常不需要直接跟被辅助的app通信，大部分通过SystemServer进行中转通信，因此主要涉及到了四个aidl接口：&lt;/p&gt;
-&lt;p&gt;被辅助app-&amp;gt;SystemServer（IAccessibilityManager.aidl）&lt;/p&gt;
-&lt;p&gt;SystemServer-&amp;gt;辅助app（IAccessibilityServiceClient.aidl）&lt;/p&gt;
-&lt;p&gt;辅助app-&amp;gt;SystemServer（IAccessibilityServiceConnection.aidl）&lt;/p&gt;
-&lt;p&gt;SystemServer-&amp;gt;被辅助app（IAccessibilityInteractionConnection.aidl）&lt;/p&gt;
-&lt;h4 id=&#34;331iaccessibilitymanageraidl客户端被辅助app服务端systemserver&#34;&gt;3.3.1、IAccessibilityManager.aidl（客户端：被辅助app、服务端：SystemServer）&lt;/h4&gt;
-&lt;p&gt;比如当被辅助app产生触摸事件后，会通过这个接口发送无障碍事件给SystemServer进程的AccessibilityManagerService&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.view.accessibility.IAccessibilityManager.aidl
-
-/**
- * Interface implemented by the AccessibilityManagerService called by
- * the AccessibilityManagers.
- *
- * @hide
- */
-interface IAccessibilityManager {
-
-    oneway void sendAccessibilityEvent(in AccessibilityEvent uiEvent, int userId);
-
-    long addClient(IAccessibilityManagerClient client, int userId);
-
-    List&amp;lt;AccessibilityServiceInfo&amp;gt; getInstalledAccessibilityServiceList(int userId);
-
-    List&amp;lt;AccessibilityServiceInfo&amp;gt; getEnabledAccessibilityServiceList(int feedbackType, int userId);
-
-    int addAccessibilityInteractionConnection(IWindow windowToken,
-            in IAccessibilityInteractionConnection connection,
-            String packageName, int userId);
-
-    void removeAccessibilityInteractionConnection(IWindow windowToken);
-
-    void notifyAccessibilityButtonClicked();
-
-    // Requires WRITE_SECURE_SETTINGS
-    void performAccessibilityShortcut();
-
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;332-iaccessibilityserviceclientaidl客户端systemserver服务端辅助app&#34;&gt;3.3.2 、IAccessibilityServiceClient.aidl（客户端：SystemServer、服务端：辅助app）&lt;/h4&gt;
-&lt;p&gt;当SystemServer接收到被辅助的app发送的无障碍事件时，会将事件通过该接口传递给辅助app进程进行处理。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.accessibilityservice.IAccessibilityServiceClient.aidl
-
-/**
- * Top-level interface to an accessibility service component.
- */
-oneway interface IAccessibilityServiceClient {
-
-    void onAccessibilityEvent(in AccessibilityEvent event, in boolean serviceWantsEvent);
-
-    void onSoftKeyboardShowModeChanged(int showMode);
-
-    void onPerformGestureResult(int sequence, boolean completedSuccessfully);
-
-    void onAccessibilityButtonClicked();
-
-    void onAccessibilityButtonAvailabilityChanged(boolean available);
-    
-    ...
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;333iaccessibilityserviceconnectionaidl客户端辅助app服务端systemserver&#34;&gt;3.3.3、IAccessibilityServiceConnection.aidl（客户端：辅助app、服务端：SystemServer）&lt;/h4&gt;
-&lt;p&gt;当我们需要找到被辅助的app的某个view的信息时，可以通过该接口的findAccessibilityNodeInfosByViewId方法实现。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.accessibilityservice.IAccessibilityServiceConnection.aidl
-
-/**
- * Interface given to an AccessibilitySerivce to talk to the AccessibilityManagerService.
- */
-interface IAccessibilityServiceConnection {
-
-    String[] findAccessibilityNodeInfoByAccessibilityId(int accessibilityWindowId,
-        long accessibilityNodeId, int interactionId,
-        IAccessibilityInteractionConnectionCallback callback, int flags, long threadId,
-        in Bundle arguments);
-
-    String[] findAccessibilityNodeInfosByViewId(int accessibilityWindowId,
-        long accessibilityNodeId, String viewId, int interactionId,
-        IAccessibilityInteractionConnectionCallback callback, long threadId);
-
-    String[] findFocus(int accessibilityWindowId, long accessibilityNodeId, int focusType,
-        int interactionId, IAccessibilityInteractionConnectionCallback callback, long threadId);
-
-    boolean performAccessibilityAction(int accessibilityWindowId, long accessibilityNodeId,
-        int action, in Bundle arguments, int interactionId,
-        IAccessibilityInteractionConnectionCallback callback, long threadId);
-
-    AccessibilityServiceInfo getServiceInfo();
-
-    boolean performGlobalAction(int action);
-
-    boolean isAccessibilityButtonAvailable();
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;heading&#34;&gt;&lt;/h4&gt;
-&lt;h4 id=&#34;334iaccessibilityinteractionconnectionaidl客户端systemserver服务端被辅助app&#34;&gt;3.3.4、IAccessibilityInteractionConnection.aidl（客户端：SystemServer、服务端：被辅助app）&lt;/h4&gt;
-&lt;pre&gt;&lt;code&gt;android.view.accessibility.IAccessibilityInteractionConnection.aidl
-
-/**
- * Interface for interaction between the AccessibilityManagerService
- * and the ViewRoot in a given window.
- *
- * @hide
- */
-oneway interface IAccessibilityInteractionConnection {
-
-    void findAccessibilityNodeInfoByAccessibilityId(long accessibilityNodeId, in Region bounds,
-        int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
-        int interrogatingPid, long interrogatingTid, in MagnificationSpec spec,
-        in Bundle arguments);
-
-    ...
-
-    void findFocus(long accessibilityNodeId, int focusType, in Region bounds, int interactionId,
-        IAccessibilityInteractionConnectionCallback callback, int flags, int interrogatingPid,
-        long interrogatingTid, in MagnificationSpec spec);
-
-  ...
-
-    void performAccessibilityAction(long accessibilityNodeId, int action, in Bundle arguments,
-        int interactionId, IAccessibilityInteractionConnectionCallback callback, int flags,
-        int interrogatingPid, long interrogatingTid);
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;四流程分析&#34;&gt;四、流程分析&lt;/h2&gt;
-&lt;h3 id=&#34;41accessibilityservice启动流程以talkback开关打开后到talkbackservice启动进行分析&#34;&gt;4.1、AccessibilityService启动流程（以talkback开关打开后到TalkbackService启动进行分析）。&lt;/h3&gt;
-&lt;p&gt;在设置中打开talback开关后，会调用到如下方法，最终会往Settings provider中key为Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES的字段写入Talkback注册的AccessibilityService值（TalkbackService），这个值保存在&lt;/p&gt;
-&lt;p&gt;/data/system/users/0/settings_secure.xml文件中。（其他app的AccessibilityService也保存在同一个key中）&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;com.android.settingslib.accessibility.AccessibilityUtils.java
-
-/**
- * Changes an accessibility component&#39;s state for {@param userId}.
- */
-public static void setAccessibilityServiceState(Context context, ComponentName toggledService,
-        boolean enabled, int userId) {
-    ...
-    Settings.Secure.putStringForUser(context.getContentResolver(),
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
-            enabledServicesBuilder.toString(), userId);
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;由于AccessibilityManagerService创建时注册了AccessibilityContentObserver，因此马上会收到Settings provider数据变化的监听。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityServiceConnection.java
-
-private void updateServicesLocked(UserState userState) {
-    ...
-        if (userState.mEnabledServices.contains(componentName)
-                &amp;amp;&amp;amp; !mUiAutomationManager.suppressingAccessibilityServicesLocked()) {
-            if (service == null) {
-                service = new AccessibilityServiceConnection(userState, mContext, componentName,
-                        installedService, sIdCounter++, mMainHandler, mLock, mSecurityPolicy,
-                        this, mWindowManagerService, mGlobalActionPerformer);
-            } 
-            ...
-            service.bindLocked();
-        } ...
-    }
-    ...
-    updateAccessibilityEnabledSetting(userState);
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;根据获取到的AccessibilityService信息（com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService）创建出AccessibilityServiceConnection。AccessibilityServiceConnection代表了一个无障碍服务，存储用于管理这个服务需要的所有数据，提供了开始/停止服务和在服务管理的数据结构中添加或者移除这个服务的api。&lt;/p&gt;
-&lt;p&gt;接着调用bindServiceAsUser方法来绑定服务。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityServiceConnection.java
-
-public void bindLocked() {
-    ...
-    try {
-        ...
-        if (mService == null &amp;amp;&amp;amp; mContext.bindServiceAsUser(
-                mIntent, this, flags, new UserHandle(userState.mUserId))) {
-            userState.getBindingServicesLocked().add(mComponentName);
-        }
-    } ...
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;服务启动后会跨进程调用到TalkbackService(AccessibilityService)的onBind方法&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.accessibilityservice.AccessibilityService
-
-/**
- * Implement to return the implementation of the internal accessibility
- * service interface.
- */
-@Override
-public final IBinder onBind(Intent intent) {
-    return new IAccessibilityServiceClientWrapper(this, getMainLooper(), new Callbacks() {
-        @Override
-        public void onServiceConnected() {
-            AccessibilityService.this.dispatchServiceConnected();
-        }
-
-        ...
-        @Override
-        public void onAccessibilityEvent(AccessibilityEvent event) {
-            AccessibilityService.this.onAccessibilityEvent(event);
-        }
-...
-    });
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;onBind方法返回的是一个IAccessibilityServiceClientWrapper的binder对象&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;/**
- * Implements the internal {@link IAccessibilityServiceClient} interface to convert
- * incoming calls to it back to calls on an {@link AccessibilityService}.
- *
- * @hide
- */
-public static class IAccessibilityServiceClientWrapper extends IAccessibilityServiceClient.Stub
-        implements HandlerCaller.Callback {
-    ...
-
-    private final HandlerCaller mCaller;
-
-    private final Callbacks mCallback;
-
-    private int mConnectionId = AccessibilityInteractionClient.NO_ID;
-
-    public IAccessibilityServiceClientWrapper(Context context, Looper looper,
-            Callbacks callback) {
-        mCallback = callback;
-        mCaller = new HandlerCaller(context, looper, this, true /*asyncHandler*/);
-    }
-
-    public void init(IAccessibilityServiceConnection connection, int connectionId,
-            IBinder windowToken) {
-        Message message = mCaller.obtainMessageIOO(DO_INIT, connectionId,
-                connection, windowToken);
-        mCaller.sendMessage(message);
-    }
-
-    ...
-
-    public void onAccessibilityEvent(AccessibilityEvent event, boolean serviceWantsEvent) {
-        Message message = mCaller.obtainMessageBO(
-                DO_ON_ACCESSIBILITY_EVENT, serviceWantsEvent, event);
-        mCaller.sendMessage(message);
-    }
-...
-
-    @Override
-    public void executeMessage(Message message) {
-        switch (message.what) {
-            case DO_ON_ACCESSIBILITY_EVENT: {
-                AccessibilityEvent event = (AccessibilityEvent) message.obj;
-                boolean serviceWantsEvent = message.arg1 != 0;
-                if (event != null) {
-                    // Send the event to AccessibilityCache via AccessibilityInteractionClient
-                    AccessibilityInteractionClient.getInstance().onAccessibilityEvent(event);
-                    if (serviceWantsEvent
-                            &amp;amp;&amp;amp; (mConnectionId != AccessibilityInteractionClient.NO_ID)) {
-                        // Send the event to AccessibilityService
-                        mCallback.onAccessibilityEvent(event);
-                    }
-                    ...
-                }
-            } return;
-
-            ...
-            case DO_INIT: {
-                mConnectionId = message.arg1;
-                SomeArgs args = (SomeArgs) message.obj;
-                IAccessibilityServiceConnection connection =
-                        (IAccessibilityServiceConnection) args.arg1;
-                IBinder windowToken = (IBinder) args.arg2;
-                args.recycle();
-                if (connection != null) {
-                    AccessibilityInteractionClient.getInstance().addConnection(mConnectionId,
-                            connection);
-                    mCallback.init(mConnectionId, windowToken);
-                    mCallback.onServiceConnected();
-                }...
-            } return;
-...
-        }
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;IAccessibilityServiceClientWrapper中保存了一个HandlerCaller和Callbacks对象，其中HandlerCaller主要是将SystemServer进程中AccessibilityServiceConnection的binder call的binder线程调研切换到AccessibilityService的主线程调用。Callbacks对象则将IAccessibilityServiceClientWrapper中的调用回调到AccessibilityService中。&lt;/p&gt;
-&lt;p&gt;AccessibilityService返回binder后会走到AccessibilityServiceConnection的onServiceConnected调用中:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityServiceConnection.java
-
-@Override
-public void onServiceConnected(ComponentName componentName, IBinder service) {
-    synchronized (mLock) {
-        ...
-        mServiceInterface = IAccessibilityServiceClient.Stub.asInterface(service);
-        ...
-        userState.addServiceLocked(this);
-        mSystemSupport.onClientChange(false);
-        // Initialize the service on the main handler after we&#39;re done setting up for
-        // the new configuration (for example, initializing the input filter).
-        mMainHandler.sendMessage(obtainMessage(
-                AccessibilityServiceConnection::initializeService, this));
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;private void initializeService() {
-    IAccessibilityServiceClient serviceInterface = null;
-    ...
-    try {
-        serviceInterface.init(this, mId, mOverlayWindowToken);
-    } catch (RemoteException re) {
-        ...
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在serviceInterface.init方法中（binder调用）将这个AccessibilityServiceConnection、mId和mOverlayWindowToken传给AccessibilityService完成初始化工作。&lt;/p&gt;
-&lt;p&gt;初始化时会调用&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;AccessibilityInteractionClient.getInstance().addConnection(mConnectionId,
-        connection);
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;将AccessibilityServiceConnection保存到AccessibilityInteractionClient中。&lt;/p&gt;
-&lt;h3 id=&#34;42无障碍模式下视图状态初始化流程&#34;&gt;4.2、无障碍模式下视图状态初始化流程。&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/findAccessibilityNodeInfoByAccessibilityId.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;h5 id=&#34;分析该流程原因&#34;&gt;分析该流程原因：&lt;/h5&gt;
-&lt;h5 id=&#34;为了辅助理解如下方法&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
-&lt;h5 id=&#34;getaccessibilitynodeprovider&#34;&gt;getAccessibilityNodeProvider&lt;/h5&gt;
-&lt;h5 id=&#34;oninitializeaccessibilitynodeinfo&#34;&gt;onInitializeAccessibilityNodeInfo&lt;/h5&gt;
-&lt;p&gt;主要流程分析：&lt;/p&gt;
-&lt;p&gt;1、talkback打开状态下，新的应用打开时，TalkbackService会接收到类型为TYPE_WINDOWS_CHANGED的无障碍事件，这个事件是SystemServer进程接收到其他进程发出的TYPE_VIEW_ACCESSIBILITY_FOCUSED事件时附带发出的，应用发出TYPE_VIEW_ACCESSIBILITY_FOCUSED事件的流程在下一节分析，暂时跳过。&lt;/p&gt;
-&lt;p&gt;2、当tailback收到TYPE_WINDOWS_CHANGED事件时，会间接调用调用父类AccessibilityService的getRootInActiveWindow方法，如上图，经过SystemServer进程中转后会调用到DecorView的getAccessibilityNodeProvider，由于DecorView没有重写getAccessibilityNodeProvider方法，因此会调用到View的createAccessibilityNodeInfo方法，进一步会调用到&lt;strong&gt;onInitializeAccessibilityNodeInfo&lt;/strong&gt;方法，如果没有重写该方法，则默认实现在onInitializeAccessibilityNodeInfoInternal中。&lt;/p&gt;
-&lt;p&gt;3、AccessibilityNodePrefetcher在取出DecorView的无障碍节点后，会进一步通过prefetchDescendantsOfRealNode方法取子view的无障碍节点。同理，如果我们重写了&lt;strong&gt;getAccessibilityNodeProvider&lt;/strong&gt;方法（一些特殊的自定义view需要自己重写该方法，比如webview，android.widget.NumberPicker等），重写getAccessibilityNodeProvider，需要我们实现一个AccessibilityNodeProvider的子类，来实现虚拟的view来支持无障碍模式。通常实现比较复杂的view时会重写这两个方法&lt;/p&gt;
-&lt;h3 id=&#34;43无障碍事件分发流程重要app适配无障碍以及处理无障碍相关问题主要通过该流程入手&#34;&gt;4.3、无障碍事件分发流程（重要，app适配无障碍以及处理无障碍相关问题主要通过该流程入手）。&lt;/h3&gt;
-&lt;p&gt;流程：被辅助app将无障碍事件发送给辅助app，systemserver进程作为中转，接口为IAccessibilityManager.aidl和IAccessibilityServiceClient.aidl&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/sendaccessibilityevent.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;h5 id=&#34;分析该流程原因-1&#34;&gt;分析该流程原因：&lt;/h5&gt;
-&lt;h5 id=&#34;为了辅助理解如下方法-1&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
-&lt;h5 id=&#34;sendaccessibilityevent&#34;&gt;&lt;strong&gt;sendAccessibilityEvent&lt;/strong&gt;&lt;/h5&gt;
-&lt;p&gt;&lt;strong&gt;sendAccessibilityEventUnchecked&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;onInitializeAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;dispatchPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;onPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;onRequestSendAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;由于talkback的无障碍服务中声明了android:canRequestTouchExplorationMode=&amp;quot;true&amp;rdquo;，因此开启talkback后AccessibilityManagerService会更新AccessibilityInputFilter成员变量的触摸浏览（FLAG_FEATURE_TOUCH_EXPLORATION）的特性为true。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;com.android.server.accessibility.AccessibilityInputFilter
-
-private void enableFeatures() {
-    ...
-    if ((mEnabledFeatures &amp;amp; FLAG_FEATURE_TOUCH_EXPLORATION) != 0) {
-        mTouchExplorer = new TouchExplorer(mContext, mAms);
-        addFirstEventHandler(mTouchExplorer);
-    }
-    ...
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;触摸浏览特性开启后会创建一个TouchExplorer对象。AccessibilityInputFilter继承自InputFilter，对输入事件进行过滤，通过和TouchExplorer配合从而实现talkback模式下的触摸浏览手势。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;/**
- * This class is a strategy for performing touch exploration. It
- * transforms the motion event stream by modifying, adding, replacing,
- * and consuming certain events. The interaction model is:
- *
- * &amp;lt;ol&amp;gt;
- *   &amp;lt;li&amp;gt;1. One finger moving slow around performs touch exploration.&amp;lt;/li&amp;gt;
- *   &amp;lt;li&amp;gt;2. One finger moving fast around performs gestures.&amp;lt;/li&amp;gt;
- *   &amp;lt;li&amp;gt;3. Two close fingers moving in the same direction perform a drag.&amp;lt;/li&amp;gt;
- *   &amp;lt;li&amp;gt;4. Multi-finger gestures are delivered to view hierarchy.&amp;lt;/li&amp;gt;
- *   &amp;lt;li&amp;gt;5. Two fingers moving in different directions are considered a multi-finger gesture.&amp;lt;/li&amp;gt;
- *   &amp;lt;li&amp;gt;7. Double tapping clicks on the on the last touch explored location if it was in
- *          a window that does not take focus, otherwise the click is within the accessibility
- *          focused rectangle.&amp;lt;/li&amp;gt;
- *   &amp;lt;li&amp;gt;7. Tapping and holding for a while performs a long press in a similar fashion
- *          as the click above.&amp;lt;/li&amp;gt;
- * &amp;lt;ol&amp;gt;
- *
- * @hide
- */
-class TouchExplorer extends BaseEventStreamTransformation
-        implements AccessibilityGestureDetector.Listener {
-...
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;该类负责将普通的触摸事件转换为触摸浏览手势，比如将MotionEvent.ACTION_DOWN事件转换为悬停事件）（MotionEvent.ACTION_HOVER_ENTER）。因此在talkback模式下，当我们点击一次view上的控件时，应用收到的是（ACTION_HOVER_ENTER）事件，而只有双击才会传递我们熟悉的ACTION_DOWN事件&lt;/p&gt;
-&lt;p&gt;*ViewRootImpl:View层次结构的根。View的&lt;strong&gt;绘制流程&lt;/strong&gt;（测量measure、布局layout、绘制draw）和输入&lt;strong&gt;事件的分发流程&lt;/strong&gt;都是从ViewRootImp开始。&lt;/p&gt;
-&lt;p&gt;主要流程分析：&lt;/p&gt;
-&lt;p&gt;1、ViewRootImpl的内部类WindowInputEventReceiver从native方法调起dispatchInputEvent方法。&lt;/p&gt;
-&lt;p&gt;2、ViewRootImpl调用deliverInputEvent传递事件输入事件。&lt;/p&gt;
-&lt;p&gt;3、从顶层的DecorView的dispatchPointerEvent开始分发输入事件。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.view.View.java
-
-/**
- * Dispatch a pointer event.
- * &amp;lt;p&amp;gt;
- * Dispatches touch related pointer events to {@link #onTouchEvent(MotionEvent)} and all
- * other events to {@link #onGenericMotionEvent(MotionEvent)}.  This separation of concerns
- * reinforces the invariant that {@link #onTouchEvent(MotionEvent)} is really about touches
- * and should not be expected to handle other pointing device features.
- * &amp;lt;/p&amp;gt;
- *
- * @param event The motion event to be dispatched.
- * @return True if the event was handled by the view, false otherwise.
- * @hide
- */
-public final boolean dispatchPointerEvent(MotionEvent event) {
-    if (event.isTouchEvent()) {
-        return dispatchTouchEvent(event);
-    } else {
-        return dispatchGenericMotionEvent(event);
-    }
-}
-
-...
-
-/**
- * Returns true if this motion event is a touch event.
- * &amp;lt;p&amp;gt;
- * Specifically excludes pointer events with action {@link #ACTION_HOVER_MOVE},
- * {@link #ACTION_HOVER_ENTER}, {@link #ACTION_HOVER_EXIT}, or {@link #ACTION_SCROLL}
- * because they are not actually touch events (the pointer is not down).
- * &amp;lt;/p&amp;gt;
- * @return True if this motion event is a touch event.
- * @hide
- */
-public final boolean isTouchEvent() {
-    return nativeIsTouchEvent(mNativePtr);
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在dispatchPointerEvent方法中会有event.isTouchEvent()的判断，如果talkback模式下，由于收到的是ACTION_HOVER_ENTER事件，因此不会走dispatchTouchEvent方法而是dispatchGenericMotionEvent方法。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.view.View.java
-/**
- * Dispatch a generic motion event.
- * &amp;lt;p&amp;gt;
- * Generic motion events with source class {@link InputDevice#SOURCE_CLASS_POINTER}
- * are delivered to the view under the pointer.  All other generic motion events are
- * delivered to the focused view.  Hover events are handled specially and are delivered
- * to {@link #onHoverEvent(MotionEvent)}.
- * &amp;lt;/p&amp;gt;
- *
- * @param event The motion event to be dispatched.
- * @return True if the event was handled by the view, false otherwise.
- */
-public boolean dispatchGenericMotionEvent(MotionEvent event) {
-...
-    final int source = event.getSource();
-    if ((source &amp;amp; InputDevice.SOURCE_CLASS_POINTER) != 0) {
-        final int action = event.getAction();
-        if (action == MotionEvent.ACTION_HOVER_ENTER
-                || action == MotionEvent.ACTION_HOVER_MOVE
-                || action == MotionEvent.ACTION_HOVER_EXIT) {
-            if (dispatchHoverEvent(event)) {
-                return true;
-            }
-        } else if (dispatchGenericPointerEvent(event)) {
-            return true;
-        }
-    } else if (dispatchGenericFocusedEvent(event)) {
-        return true;
-    }
-	...
-    return false;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;在dispatchGenericMotionEvent中，如果是Hover events，则会走到dispatchHoverEvent方法中。这个方法的机制类似dispatchTouchEvent的流程，是一个责任链模式的实现，不详细展开，默认会传到最后一个子节点的onHoverEvent方法。接着该方法会调用到sendAccessibilityHoverEvent里。&lt;/p&gt;
-&lt;p&gt;3、sendAccessibilityHoverEvent方法接着会调用以下方法。&lt;/p&gt;
-&lt;p&gt;​     &lt;strong&gt;sendAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;​       &lt;strong&gt;-&amp;gt;sendAccessibilityEventUnchecked&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;​           &lt;strong&gt;-&amp;gt;onInitializeAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;​           &lt;strong&gt;-&amp;gt;dispatchPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;​                &lt;strong&gt;-&amp;gt;onPopulateAccessibilityEvent&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;​           &lt;strong&gt;-&amp;gt;onRequestSendAccessibilityEvent&lt;/strong&gt;（只在ViewGroup中有默认实现）&lt;/p&gt;
-&lt;p&gt;*&lt;strong&gt;重要：以上六个方法为当我们自定义view时适配无障碍模式可以覆盖实现的方法，可以重写view的这些方法或者实现View.AccessibilityDelegate来解决一些特殊场景下talkback播报的问题。更详细的用法可以参考官方文档。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;以talkback模式下朗读一个textview上的文字为例，textview重写了view中的onPopulateAccessibilityEventInternal方法&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.widget.TextView.java
-
-/** @hide */
-@Override
-public void onPopulateAccessibilityEventInternal(AccessibilityEvent event) {
-    super.onPopulateAccessibilityEventInternal(event);
-
-    final CharSequence text = getTextForAccessibility();
-    if (!TextUtils.isEmpty(text)) {
-        event.getText().add(text);
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;getTextForAccessibility方法会取到当前textview中显示的text，然后将该text的内容填充到AccessibilityEvent中发送出去。后面talkback会取出这个text并朗读出来。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.view.View
-
-public void onPopulateAccessibilityEvent(AccessibilityEvent event) {
-    if (mAccessibilityDelegate != null) {
-        mAccessibilityDelegate.onPopulateAccessibilityEvent(this, event);
-    } else {
-        onPopulateAccessibilityEventInternal(event);
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;因此如果我们需要自定义textview在talkback模式下朗读的内容，或者不让某个view的内容在talkback模式下被朗读出来，可以考虑重写onPopulateAccessibilityEvent方法。&lt;/p&gt;
-&lt;p&gt;4、当我们通过第3步修改view中无障碍节点的信息后，被点击的View的sendAccessibilityEventUnchecked方法会向上通过DecorView传递到ViewRootImpl的requestSendAccessibilityEvent方法中，&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.view.ViewRootImpl
-
-public boolean requestSendAccessibilityEvent(View child, AccessibilityEvent event) {
-    ...
-    final int eventType = event.getEventType();
-    switch (eventType) {
-        case AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED: {
-            final long sourceNodeId = event.getSourceNodeId();
-            final int accessibilityViewId = AccessibilityNodeInfo.getAccessibilityViewId(
-                    sourceNodeId);
-            View source = mView.findViewByAccessibilityId(accessibilityViewId);
-            if (source != null) {
-                AccessibilityNodeProvider provider = source.getAccessibilityNodeProvider();
-                if (provider != null) {
-                    final int virtualNodeId = AccessibilityNodeInfo.getVirtualDescendantId(
-                            sourceNodeId);
-                    final AccessibilityNodeInfo node;
-                    node = provider.createAccessibilityNodeInfo(virtualNodeId);
-                    setAccessibilityFocus(source, node);
-                }
-            }
-        } break;
-        ...
-    }
-    mAccessibilityManager.sendAccessibilityEvent(event);
-    return true;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;接着无障碍事件会通过AccessibilityManager的sendAccessibilityEvent方法跨进程调用systemserver进程的AccessibilityManagerService，将类型为TYPE_VIEW_HOVER_ENTER的AccessibilityEvent事件传递到talkback的的TalkBackService（继承自AccessibilityService）的onAccessibilityEvent方法中（或者其他实现了AccessibilityService的应用）。&lt;/p&gt;
-&lt;h3 id=&#34;44执行无障碍事件流程以talkback发出focus无障碍事件到被辅助的app端通过viewrootimpl绘制绿框焦点过程进行分析&#34;&gt;4.4、执行无障碍事件流程（以talkback发出focus无障碍事件，到被辅助的app端通过ViewRootImpl绘制绿框焦点过程进行分析）。&lt;/h3&gt;
-&lt;p&gt;流程：辅助app（talkback）将无障碍事件发送给被辅助app，systemserver进程作为中转，接口为IAccessibilityServiceConnection.aidl和IAccessibilityInteractionConnection.aidl&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/requesfocus.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;h5 id=&#34;分析该流程原因-2&#34;&gt;分析该流程原因：&lt;/h5&gt;
-&lt;h5 id=&#34;为了辅助理解如下方法-2&#34;&gt;为了辅助理解如下方法：&lt;/h5&gt;
-&lt;h5 id=&#34;accessibilitynodeinfoperformaction&#34;&gt;AccessibilityNodeInfo.performAction&lt;/h5&gt;
-&lt;p&gt;主要流程分析：&lt;/p&gt;
-&lt;p&gt;1、在talkback中有个AccessibilityEventProcessor类对无障碍事件进行集中处理，根据无障碍事件的不同类型分发到不同的处理器进行处理，比如ProcessorFocusAndSingleTap这个处理器会对类型为TYPE_VIEW_HOVER_ENTER的无障碍事件进行处理，ProcessorEventQueue（主要用于tts朗读，后面分析）这个处理器会处理所有的无障碍事件。&lt;/p&gt;
-&lt;p&gt;2、在前面一节4.2中，触摸事件TYPE_VIEW_HOVER_ENTER传递到了TalkBackService，而ProcessorFocusAndSingleTap这个类会对TYPE_VIEW_HOVER_ENTER这个事件进行处理，tryFocusing函数中会调用AccessibilityNodeInfo的performAction方法，AccessibilityNodeInfo的节点信息就是4.2节中触摸到的view的信息，因此通过AccessibilityManagerService进程中转后，会最终调用到我们触摸到的view的&lt;strong&gt;performAccessibilityAction&lt;/strong&gt;方法中去（我们也可以通过调用这个方法处理一些无障碍焦点的问题）。&lt;/p&gt;
-&lt;p&gt;3、在performAccessibilityAction会调用到performAccessibilityActionInternal，接着如果判断到是ACTION_ACCESSIBILITY_FOCUS事件，则会调用requestAccessibilityFocus函数&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.view.View
-
-public boolean requestAccessibilityFocus() {
-    ...
-    if ((mPrivateFlags2 &amp;amp; PFLAG2_ACCESSIBILITY_FOCUSED) == 0) {
-        mPrivateFlags2 |= PFLAG2_ACCESSIBILITY_FOCUSED;
-        ViewRootImpl viewRootImpl = getViewRootImpl();
-        if (viewRootImpl != null) {
-            viewRootImpl.setAccessibilityFocus(this, null);
-        }
-        invalidate();
-        sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
-        return true;
-    }
-    return false;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这个函数里有两个重要的操作，一是调用ViewRootImpl的setAccessibilityFocus将自身设置为focus的view，然后调用invalidate触发重绘操作，ViewRootImpl会在onPostDraw中执行drawAccessibilityFocusedDrawableIfNeeded来绘制出绿框。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;android.view.ViewRootImpl.java
-
-/**
- * We want to draw a highlight around the current accessibility focused.
- * Since adding a style for all possible view is not a viable option we
- * have this specialized drawing method.
- *
- * Note: We are doing this here to be able to draw the highlight for
- *       virtual views in addition to real ones.
- *
- * @param canvas The canvas on which to draw.
- */
-private void drawAccessibilityFocusedDrawableIfNeeded(Canvas canvas) {
-    final Rect bounds = mAttachInfo.mTmpInvalRect;
-    if (getAccessibilityFocusedRect(bounds)) {
-        final Drawable drawable = getAccessibilityFocusedDrawable();
-        if (drawable != null) {
-            drawable.setBounds(bounds);
-            drawable.draw(canvas);
-        }
-    } else if (mAttachInfo.mAccessibilityFocusDrawable != null) {
-        mAttachInfo.mAccessibilityFocusDrawable.setBounds(0, 0, 0, 0);
-    }
-}
-
-private boolean getAccessibilityFocusedRect(Rect bounds) {
-    final AccessibilityManager manager = AccessibilityManager.getInstance(mView.mContext);
-    if (!manager.isEnabled() || !manager.isTouchExplorationEnabled()) {
-        return false;
-    }
-
-    final View host = mAccessibilityFocusedHost;
-    if (host == null || host.mAttachInfo == null) {
-        return false;
-    }
-
-    final AccessibilityNodeProvider provider = host.getAccessibilityNodeProvider();
-    if (provider == null) {
-        host.getBoundsOnScreen(bounds, true);
-    } else if (mAccessibilityFocusedVirtualView != null) {
-        mAccessibilityFocusedVirtualView.getBoundsInScreen(bounds);
-    } else {
-        return false;
-    }
-
-    // Transform the rect into window-relative coordinates.
-    final AttachInfo attachInfo = mAttachInfo;
-    bounds.offset(0, attachInfo.mViewRootImpl.mScrollY);
-    bounds.offset(-attachInfo.mWindowLeft, -attachInfo.mWindowTop);
-    if (!bounds.intersect(0, 0, attachInfo.mViewRootImpl.mWidth,
-            attachInfo.mViewRootImpl.mHeight)) {
-        // If no intersection, set bounds to empty.
-        bounds.setEmpty();
-    }
-    return !bounds.isEmpty();
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;第二个操作是调用sendAccessibilityEvent方法，将TYPE_VIEW_ACCESSIBILITY_FOCUSED事件发送出去，这个事件会被talkback处理，从而调用tts引擎读出view的内容，这个流程分析如下。&lt;/p&gt;
-&lt;h3 id=&#34;45talkback调用tts读出view中的text的过程&#34;&gt;4.5、talkback调用TTS读出view中的text的过程。&lt;/h3&gt;
-&lt;p&gt;由于talkback最新版本属于google维护，没有开源代码，网上公开的只有talkback6.0版本的代码，因此基于6.0版本的概要分析如下&lt;/p&gt;
-&lt;p&gt;无障碍事件的分发跟4.2节流程一样，talkback处理TYPE_VIEW_ACCESSIBILITY_FOCUSED事件大致流程如下：&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://github.com/xuanliangdev/blogpic/blob/master/accessibility/talkbacktts.jpg?raw=true&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
-&lt;p&gt;talkback调用tts进行朗读主要通过com.google.android.accessibility.compositor.Compositor这个类来控制，这个类中又有一个ParseTree的类来管理朗读的内容，ParseTree通过一个compositor.json的文件来定义朗读的内容的规则，比如一个简单的按钮，在talkback模式下不仅需要读出按钮的内容，还需要读出按钮的状态（比如disabled），因此朗读的内容是一个拼接起来的结果，比如下面就是通过解析compositor.json来读出一个按钮内容的大概流程。&lt;/p&gt;
-&lt;p&gt;以下在compositor.json中某几个节点类型的定义，&lt;/p&gt;
-&lt;p&gt;$开头会被解析成ParseTreeVariableNode，比如 &amp;ldquo;node.text&amp;quot;经过ParseTreeVariableNode的处理会取出Button中text（也就是AccessibilityEvent中AccessibilityNodeInfo中的mText）&lt;/p&gt;
-&lt;p&gt;@开头会被解析成ParseTreeResourceNode，最后会通过Resource取出字段的内容，比如&amp;rdquo;@string/value_button&amp;quot;中文下会被解析为“按钮”，&lt;/p&gt;
-&lt;p&gt;&amp;ldquo;@string/value_disabled&amp;quot;中文下会被解析为“已停用”。&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;     &amp;quot;notify_disabled&amp;quot;: {
-      &amp;quot;if&amp;quot;: &amp;quot;$node.isActionable &amp;amp;&amp;amp; !$node.isEnabled&amp;quot;,
-      &amp;quot;then&amp;quot;: &amp;quot;@string/value_disabled&amp;quot;
-     },
-
-....
-
-     &amp;quot;get_node_text&amp;quot;: {  // AccessibilityNodeInfoUtils.getNodeText()
-      &amp;quot;fallback&amp;quot;: [
-        {
-          // If focusing on-screen keyboard key... apply speak-passwords policy to hide key name.
-          &amp;quot;if&amp;quot;: &amp;quot;$event.sourceIsKeyboard &amp;amp;&amp;amp; $global.lastTextEditIsPassword &amp;amp;&amp;amp; !$global.speakPasswordOnAndroidShowingPasswords&amp;quot;,
-          &amp;quot;then&amp;quot;: &amp;quot;@string/symbol_bullet&amp;quot;,
-          &amp;quot;else&amp;quot;: &amp;quot;$node.contentDescription&amp;quot;
-        },
-        &amp;quot;$node.text&amp;quot;
-      ]
-    },
-    &amp;quot;get_role_description_or_default&amp;quot;: {
-      &amp;quot;fallback&amp;quot;: [
-        &amp;quot;$node.roleDescription&amp;quot;,
-        &amp;quot;%node_role&amp;quot;
-      ]
-    },
-    &amp;quot;node_role&amp;quot;: {
-      &amp;quot;switch&amp;quot;: &amp;quot;$node.role&amp;quot;,
-      &amp;quot;cases&amp;quot;: {
-        &amp;quot;button&amp;quot;: &amp;quot;@string/value_button&amp;quot;,
-        &amp;quot;check_box&amp;quot;: &amp;quot;@string/value_checkbox&amp;quot;,
-        &amp;quot;drop_down_list&amp;quot;: &amp;quot;@string/value_spinner&amp;quot;,
-        &amp;quot;edit_text&amp;quot;: &amp;quot;@string/value_edit_box&amp;quot;,
-        &amp;quot;grid&amp;quot;: &amp;quot;@string/value_gridview&amp;quot;,
-        &amp;quot;image&amp;quot;: &amp;quot;@string/value_image&amp;quot;,
-        &amp;quot;image_button&amp;quot;: &amp;quot;@string/value_button&amp;quot;, // Same as |button|
-        &amp;quot;list&amp;quot;: &amp;quot;@string/value_listview&amp;quot;,
-        &amp;quot;pager&amp;quot;: &amp;quot;@string/value_pager&amp;quot;,
-        &amp;quot;progress_bar&amp;quot;: &amp;quot;@string/value_progress_bar&amp;quot;,
-        &amp;quot;radio_button&amp;quot;: &amp;quot;@string/value_radio_button&amp;quot;,
-        &amp;quot;seek_control&amp;quot;: &amp;quot;@string/value_seek_bar&amp;quot;,
-        &amp;quot;switch&amp;quot;: &amp;quot;@string/value_switch&amp;quot;,
-        &amp;quot;tab_bar&amp;quot;: &amp;quot;@string/value_tabwidget&amp;quot;,
-        &amp;quot;toggle_button&amp;quot;: &amp;quot;@string/value_switch&amp;quot;, // Same as |switch|
-        &amp;quot;view_group&amp;quot;: &amp;quot;&amp;quot;, // None
-        &amp;quot;web_view&amp;quot;: &amp;quot;@string/value_webview&amp;quot;,
-        &amp;quot;checked_text_view&amp;quot;: &amp;quot;&amp;quot; // None
-      }
-    },
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ttsOutput&lt;/p&gt;
-&lt;p&gt;TYPE_VIEW_ACCESSIBILITY_FOCUSED&lt;/p&gt;
-&lt;p&gt;get_description_for_tree&lt;/p&gt;
-&lt;p&gt;​        StateNameRolePosition&lt;/p&gt;
-&lt;p&gt;​              tree_description_with_label&lt;/p&gt;
-&lt;p&gt;​                 append_description_for_tree&lt;/p&gt;
-&lt;p&gt;​                 |  &amp;ldquo;conditionalPrepend(%description_for_tree_status, %description_for_tree_nodes)&amp;rdquo;&lt;/p&gt;
-&lt;p&gt;​                 |      description_for_tree_nodes&lt;/p&gt;
-&lt;p&gt;​                 |           get_description_for_node&lt;/p&gt;
-&lt;p&gt;​                 |             rule_default&lt;/p&gt;
-&lt;p&gt;​                 |                node_text_and_role&lt;/p&gt;
-&lt;p&gt;​                 |                    rule_view_group（%get_node_text）&lt;/p&gt;
-&lt;p&gt;​                 |                    |    &amp;ldquo;$node.text&amp;rdquo;&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;取出“Button的text”&lt;/p&gt;
-&lt;p&gt;​                 |                    get_role_description_or_default&lt;/p&gt;
-&lt;p&gt;​                 |                    |     %node_role&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;-取出“按钮的String资源”&lt;/p&gt;
-&lt;p&gt;​                  notify_disabled&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;-取出“已停用的String资源”&lt;/p&gt;
-&lt;p&gt;最后talkback朗读“xxx，按钮，已停用”&lt;/p&gt;
-&lt;p&gt;​&lt;/p&gt;
-</description>
       
     </item>
     

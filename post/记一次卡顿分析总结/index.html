@@ -69,7 +69,7 @@
 <meta itemprop="description" content="内存专项测试问题发现：小米闻声第一版时自测发现，当连续识别时间过长超过半小时，界面列表滑动出现明显卡顿，重启应用后卡顿不复现。 1、问题定位 卡">
 <meta itemprop="datePublished" content="2020-09-03T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-09-03T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="680">
+<meta itemprop="wordCount" content="564">
 
 
 
@@ -323,7 +323,6 @@
     <li><a href="#2原理分析">2、原理分析</a>
       <ul>
         <li><a href="#21-android刷新机制">2.1 Android刷新机制</a></li>
-        <li><a href="#22-recyclerview源码分析">2.2 RecyclerView源码分析</a></li>
       </ul>
     </li>
   </ul>
@@ -361,12 +360,6 @@
 <p>卡顿原因：大部分屏幕刷新率时60Hz，如果1000/60=16.67ms内没办法处理一帧任务，那么就会发生丢帧，也就是卡顿。</p>
 <p>cpu负责Measure、Layout、Record、Excecute的计算操作，GPU负责rasterization（栅格化）</p>
 <p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/renderinganalysis/vsync.jpg" alt=""></p>
-<h3 id="22-recyclerview源码分析">2.2 RecyclerView源码分析</h3>
-<p><a href="https://blog.csdn.net/weishenhong/article/details/81150172">https://blog.csdn.net/weishenhong/article/details/81150172</a></p>
-<p><a href="https://blog.csdn.net/crazy_everyday_xrp/article/details/70344638?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param">https://blog.csdn.net/crazy_everyday_xrp/article/details/70344638?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param</a></p>
-<p><a href="https://medium.com/google-developers/recyclerview-prefetch-c2f269075710">https://medium.com/google-developers/recyclerview-prefetch-c2f269075710</a>（需要科学上网）</p>
-<p>recyclerview测量时序图：</p>
-<p><img src="https://raw.githubusercontent.com/xuanliangdev/blogpic/master/renderinganalysis/recyclerviewmesure.jpg" alt=""></p>
 
     </div>
 
@@ -401,6 +394,19 @@
       
       <nav class="post-nav">
         
+          <a class="prev" href="/post/recyclerview/">
+            
+            <i class="iconfont">
+              <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M691.908486 949.511495l75.369571-89.491197c10.963703-12.998035 10.285251-32.864502-1.499144-44.378743L479.499795 515.267417 757.434875 204.940602c11.338233-12.190647 11.035334-32.285311-0.638543-44.850487l-80.46666-86.564541c-11.680017-12.583596-30.356378-12.893658-41.662889-0.716314L257.233596 494.235404c-11.332093 12.183484-11.041474 32.266891 0.657986 44.844348l80.46666 86.564541c1.772366 1.910513 3.706415 3.533476 5.750981 4.877077l306.620399 321.703933C662.505829 963.726242 680.945807 962.528973 691.908486 949.511495z"></path>
+</svg>
+
+            </i>
+            <span class="prev-text nav-default">RecyclerView学习整理</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
         
           <a class="next" href="/post/fragment%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/">
             <span class="next-text nav-default">Fragment机制原理溯源</span>
