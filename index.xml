@@ -6,7 +6,7 @@
     <description>Recent content on xuanliang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 15 Feb 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 25 Feb 2021 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://xuanliangdev.github.io/index.xml" rel="self" type="application/rss+xml" />
     
@@ -20,6 +20,336 @@
       
         <description>&lt;h3 id=&#34;小米android程序员&#34;&gt;小米android程序员&lt;/h3&gt;
 &lt;p&gt;搬砖工&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>InputManagerService和ANR原理学习（待完善）</title>
+      <link>https://xuanliangdev.github.io/post/inputmanagerservice%E5%92%8Canr%E5%8E%9F%E7%90%86/</link>
+      <pubDate>Thu, 25 Feb 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://xuanliangdev.github.io/post/inputmanagerservice%E5%92%8Canr%E5%8E%9F%E7%90%86/</guid>
+      
+        <description>&lt;p&gt;参考资料：&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.cnblogs.com/samchen2009/p/3368158.html&#34;&gt;https://www.cnblogs.com/samchen2009/p/3368158.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;《深入理解Android 卷三》邓凡平&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://gityuan.com/2017/01/01/input-anr/&#34;&gt;http://gityuan.com/2017/01/01/input-anr/&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;输入系统主要作用&#34;&gt;输入系统主要作用：&lt;/h2&gt;
+&lt;p&gt;读取设备节点原始的事件，然后派发给一个特定的窗口以及窗口中的控件。&lt;/p&gt;
+&lt;h4 id=&#34;核心类&#34;&gt;核心类&lt;/h4&gt;
+&lt;h3 id=&#34;1inputmanagerservice&#34;&gt;1、InputManagerService：&lt;/h3&gt;
+&lt;p&gt;是系统进程的一个服务，分为java层和native层，java层负责与WMS通信。Native层是InputReader和InputDispatcher的运行容器。&lt;/p&gt;
+&lt;h3 id=&#34;2eventhub-&#34;&gt;2、EventHub :&lt;/h3&gt;
+&lt;p&gt;作为直接操作设备节点的输入系统组件，隐藏了INotify与Epoll以及设备节点读取等底层操作。通过一个简单的接口getEvents向使用者提供抽取设备事件与原始输入事件的功能。&lt;/p&gt;
+&lt;h5 id=&#34;inotify与epoll&#34;&gt;INotify与Epoll:&lt;/h5&gt;
+&lt;p&gt;&lt;strong&gt;INotify&lt;/strong&gt;:Linux内核提供的一种文件系统变化通知机制。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Epoll&lt;/strong&gt;：可扩展I/O事件通知机制，&lt;/p&gt;
+&lt;p&gt;这两套机制提供的事件监听机制以最小的开销解决了&lt;strong&gt;文件系统变化通知&lt;/strong&gt;以及&lt;strong&gt;文件描述符可读可写状态变化&lt;/strong&gt;的&lt;strong&gt;监听&lt;/strong&gt;问题。&lt;/p&gt;
+&lt;h3 id=&#34;3windowmanagerservice&#34;&gt;3、WindowManagerService:&lt;/h3&gt;
+&lt;p&gt;创建新窗口时，将窗口信息，包括点击区域、焦点窗口等信息实时更新到IMS的InputDispatcher中。&lt;/p&gt;
+&lt;h3 id=&#34;4inputreader&#34;&gt;4、InputReader&lt;/h3&gt;
+&lt;h5 id=&#34;native层inputreader&#34;&gt;（native层）InputReader：&lt;/h5&gt;
+&lt;p&gt;作用1：运行在独立线程，循环从EventHub中取事件。&lt;/p&gt;
+&lt;p&gt;作用2：由于原始输入事件结构简单，信息量少，可用性不好，而且所携带的事件信息往往与硬件实现有关，因此InputReader会对原始输入事件进行整合变换，比如对Keyboard类型或Touch类型分别加工。&lt;/p&gt;
+&lt;h3 id=&#34;5inputdispatcher&#34;&gt;5、InputDispatcher&lt;/h3&gt;
+&lt;h5 id=&#34;native层inputdispatcher也运行在独立线程保管wms的所有窗口信息当收到inputreader输入事件后会从中寻找合适的窗口进行分发&#34;&gt;（native层）InputDispatcher：也运行在独立线程，保管WMS的所有窗口信息，当收到InputReader输入事件后，会从中寻找合适的窗口进行分发。&lt;/h5&gt;
+&lt;p&gt;mInboundQueue:会区分Key或者Motion等类型事件分别派发，或者是废弃&lt;/p&gt;
+&lt;p&gt;mOutboundQueue:&lt;strong&gt;Connection&lt;/strong&gt;中的成员，&lt;strong&gt;Connection&lt;/strong&gt;描述了从InputDispatcher到目标窗口的一个连接&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;// Queue of events that need to be published to the connection.
+std::deque&amp;lt;DispatchEntry*&amp;gt; outboundQueue;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;WaitQueue:Connection中的成员&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;// Queue of events that have been published to the connection but that have not
+// yet received a &amp;quot;finished&amp;quot; response from the application.
+std::deque&amp;lt;DispatchEntry*&amp;gt; waitQueue;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;流程&#34;&gt;流程：&lt;/h5&gt;
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/xuanliangdev/blogpic/master/anr/InputDispatcher.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;1、inputReader取出的事件加入派发队列mInboundQueue，有需要的话唤醒派发线程，过程发生在InputReader线程中。&lt;/p&gt;
+&lt;p&gt;2、派发线程的循环：&lt;/p&gt;
+&lt;p&gt;1）从mInboundQueue取事件；&lt;/p&gt;
+&lt;p&gt;2）寻找目标窗口，过程中会判断是否需要出发ANR&lt;/p&gt;
+&lt;p&gt;3）找到窗口则进行事件的分发，将事件加入mOutboundQueue队列，通过InputChannel向上层分发事件，然后将mOutboundQueue队列的事件转移到WaitQueue队列等待上层处理结果。&lt;/p&gt;
+&lt;p&gt;4）上层事件处理完成后通知底层从WaitQueue移除事件。&lt;/p&gt;
+&lt;h5 id=&#34;源码分析&#34;&gt;源码分析：&lt;/h5&gt;
+&lt;p&gt;InputDispatcher.cpp&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool InputDispatcherThread::threadLoop() {
+    mDispatcher-&amp;gt;dispatchOnce();
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;真正的一次事件分发流程&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void InputDispatcher::dispatchOnce() {
+    nsecs_t nextWakeupTime = LONG_LONG_MAX;
+    { // acquire lock
+        AutoMutex _l(mLock);
+        mDispatcherIsAliveCondition.broadcast();
+
+        // Run a dispatch loop if there are no pending commands.
+        // The dispatch loop might enqueue commands to run afterwards.
+        if (!haveCommandsLocked()) {
+            dispatchOnceInnerLocked(&amp;amp;nextWakeupTime);
+        }
+
+        // Run all pending commands if there are any.
+        // If any commands were run then force the next poll to wake up immediately.
+        if (runCommandsLockedInterruptible()) {
+            nextWakeupTime = LONG_LONG_MIN;
+        }
+    } // release lock
+
+    // Wait for callback or timeout or wake.  (make sure we round up, not down)
+    nsecs_t currentTime = now();
+    int timeoutMillis = toMillisecondTimeoutDelay(currentTime, nextWakeupTime);
+    mLooper-&amp;gt;pollOnce(timeoutMillis);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;void InputDispatcher::dispatchOnceInnerLocked(nsecs_t* nextWakeupTime) {
+    nsecs_t currentTime = now();
+...
+    // Optimize latency of app switches.
+    // Essentially we start a short timeout when an app switch key (HOME / ENDCALL) has
+    // been pressed.  When it expires, we preempt dispatch and drop all other pending events.
+    bool isAppSwitchDue = mAppSwitchDueTime &amp;lt;= currentTime;
+    if (mAppSwitchDueTime &amp;lt; *nextWakeupTime) {
+        *nextWakeupTime = mAppSwitchDueTime;
+    }
+
+    // Ready to start a new event.
+    // If we don&#39;t already have a pending event, go grab one.
+    if (! mPendingEvent) {
+        if (mInboundQueue.isEmpty()) {
+...
+            // Nothing to do if there is no pending event.
+            if (!mPendingEvent) {
+                return;
+            }
+        } else {
+            // Inbound queue has at least one entry.
+            mPendingEvent = mInboundQueue.dequeueAtHead();
+            traceInboundQueueLengthLocked();
+        }
+
+        // Poke user activity for this event.
+        if (mPendingEvent-&amp;gt;policyFlags &amp;amp; POLICY_FLAG_PASS_TO_USER) {
+            pokeUserActivityLocked(mPendingEvent);
+        }
+
+        // Get ready to dispatch the event.
+        resetANRTimeoutsLocked();
+    }
+
+    // Now we have an event to dispatch.
+    // All events are eventually dequeued and processed this way, even if we intend to drop them.
+    ALOG_ASSERT(mPendingEvent != NULL);
+    bool done = false;
+    DropReason dropReason = DROP_REASON_NOT_DROPPED;
+    if (!(mPendingEvent-&amp;gt;policyFlags &amp;amp; POLICY_FLAG_PASS_TO_USER)) {
+        dropReason = DROP_REASON_POLICY;
+    } else if (!mDispatchEnabled) {
+        dropReason = DROP_REASON_DISABLED;
+    }
+
+    if (mNextUnblockedEvent == mPendingEvent) {
+        mNextUnblockedEvent = NULL;
+    }
+
+    switch (mPendingEvent-&amp;gt;type) {
+...
+
+    case EventEntry::TYPE_KEY: {
+        KeyEntry* typedEntry = static_cast&amp;lt;KeyEntry*&amp;gt;(mPendingEvent);
+        if (isAppSwitchDue) {
+            if (isAppSwitchKeyEventLocked(typedEntry)) {
+                resetPendingAppSwitchLocked(true);
+                isAppSwitchDue = false;
+            } else if (dropReason == DROP_REASON_NOT_DROPPED) {
+                dropReason = DROP_REASON_APP_SWITCH;
+            }
+        }
+        if (dropReason == DROP_REASON_NOT_DROPPED
+                &amp;amp;&amp;amp; isStaleEventLocked(currentTime, typedEntry)) {
+            dropReason = DROP_REASON_STALE;
+        }
+        if (dropReason == DROP_REASON_NOT_DROPPED &amp;amp;&amp;amp; mNextUnblockedEvent) {
+            dropReason = DROP_REASON_BLOCKED;
+        }
+        done = dispatchKeyLocked(currentTime, typedEntry, &amp;amp;dropReason, nextWakeupTime);
+        break;
+    }
+
+    case EventEntry::TYPE_MOTION: {
+        MotionEntry* typedEntry = static_cast&amp;lt;MotionEntry*&amp;gt;(mPendingEvent);
+        if (dropReason == DROP_REASON_NOT_DROPPED &amp;amp;&amp;amp; isAppSwitchDue) {
+            dropReason = DROP_REASON_APP_SWITCH;
+        }
+        if (dropReason == DROP_REASON_NOT_DROPPED
+                &amp;amp;&amp;amp; isStaleEventLocked(currentTime, typedEntry)) {
+            dropReason = DROP_REASON_STALE;
+        }
+        if (dropReason == DROP_REASON_NOT_DROPPED &amp;amp;&amp;amp; mNextUnblockedEvent) {
+            dropReason = DROP_REASON_BLOCKED;
+        }
+        done = dispatchMotionLocked(currentTime, typedEntry,
+                &amp;amp;dropReason, nextWakeupTime);
+        break;
+    }
+..
+    }
+
+    if (done) {
+        if (dropReason != DROP_REASON_NOT_DROPPED) {
+            dropInboundEventLocked(mPendingEvent, dropReason);
+        }
+
+        releasePendingEventLocked();
+        *nextWakeupTime = LONG_LONG_MIN;  // force next poll to wake up immediately
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;bool InputDispatcher::dispatchMotionLocked(
+        nsecs_t currentTime, MotionEntry* entry, DropReason* dropReason, nsecs_t* nextWakeupTime) {
+    // Preprocessing.
+...
+
+    // Clean up if dropping the event.
+    if (*dropReason != DROP_REASON_NOT_DROPPED) {
+        setInjectionResultLocked(entry, *dropReason == DROP_REASON_POLICY
+                ? INPUT_EVENT_INJECTION_SUCCEEDED : INPUT_EVENT_INJECTION_FAILED);
+        return true;
+    }
+
+    bool isPointerEvent = entry-&amp;gt;source &amp;amp; AINPUT_SOURCE_CLASS_POINTER;
+
+    // Identify targets.
+    Vector&amp;lt;InputTarget&amp;gt; inputTargets;
+
+    bool conflictingPointerActions = false;
+    int32_t injectionResult;
+    if (isPointerEvent) {
+        // Pointer event.  (eg. touchscreen)
+        injectionResult = findTouchedWindowTargetsLocked(currentTime,
+                entry, inputTargets, nextWakeupTime, &amp;amp;conflictingPointerActions);
+    } else {
+        // Non touch event.  (eg. trackball)
+        injectionResult = findFocusedWindowTargetsLocked(currentTime,
+                entry, inputTargets, nextWakeupTime);
+    }
+  ...
+    dispatchEventLocked(currentTime, entry, inputTargets);
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code&gt;int32_t InputDispatcher::findTouchedWindowTargetsLocked(nsecs_t currentTime,
+        const MotionEntry* entry, Vector&amp;lt;InputTarget&amp;gt;&amp;amp; inputTargets, nsecs_t* nextWakeupTime,
+        bool* outConflictingPointerActions) {
+...
+
+    // Ensure all touched foreground windows are ready for new input.
+    for (size_t i = 0; i &amp;lt; mTempTouchState.windows.size(); i++) {
+        const TouchedWindow&amp;amp; touchedWindow = mTempTouchState.windows[i];
+        if (touchedWindow.targetFlags &amp;amp; InputTarget::FLAG_FOREGROUND) {
+            // If the touched window is paused then keep waiting.
+            if (touchedWindow.windowHandle-&amp;gt;getInfo()-&amp;gt;paused) {
+                injectionResult = handleTargetsNotReadyLocked(currentTime, entry,
+                        NULL, touchedWindow.windowHandle, nextWakeupTime,
+                        &amp;quot;Waiting because the touched window is paused.&amp;quot;);
+                goto Unresponsive;
+            }
+
+            // If the touched window is still working on previous events then keep waiting.
+            if (!isWindowReadyForMoreInputLocked(currentTime, touchedWindow.windowHandle, entry)) {
+                injectionResult = handleTargetsNotReadyLocked(currentTime, entry,
+                        NULL, touchedWindow.windowHandle, nextWakeupTime,
+                        &amp;quot;Waiting because the touched window has not finished &amp;quot;
+                        &amp;quot;processing the input events that were previously delivered to it.&amp;quot;);
+                goto Unresponsive;
+            }
+        }
+    }
+
+...
+    return injectionResult;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;判断窗口是否可以接收事件，否则就触发ANR&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bool InputDispatcher::isWindowReadyForMoreInputLocked(nsecs_t currentTime,
+        const sp&amp;lt;InputWindowHandle&amp;gt;&amp;amp; windowHandle, const EventEntry* eventEntry) {
+    ssize_t connectionIndex = getConnectionIndexLocked(windowHandle-&amp;gt;getInputChannel());
+    if (connectionIndex &amp;gt;= 0) {
+...
+        if (eventEntry-&amp;gt;type == EventEntry::TYPE_KEY) {
+            // If the event is a key event, then we must wait for all previous events to
+            // complete before delivering it because previous events may have the
+            // side-effect of transferring focus to a different window and we want to
+            // ensure that the following keys are sent to the new window.
+            //
+            // Suppose the user touches a button in a window then immediately presses &amp;quot;A&amp;quot;.
+            // If the button causes a pop-up window to appear then we want to ensure that
+            // the &amp;quot;A&amp;quot; key is delivered to the new pop-up window.  This is because users
+            // often anticipate pending UI changes when typing on a keyboard.
+            // To obtain this behavior, we must serialize key events with respect to all
+            // prior input events.
+            return connection-&amp;gt;outboundQueue.isEmpty()
+                    &amp;amp;&amp;amp; connection-&amp;gt;waitQueue.isEmpty();
+        }
+        // Touch events can always be sent to a window immediately because the user intended
+        // to touch whatever was visible at the time.  Even if focus changes or a new
+        // window appears moments later, the touch event was meant to be delivered to
+        // whatever window happened to be on screen at the time.
+        //
+        // Generic motion events, such as trackball or joystick events are a little trickier.
+        // Like key events, generic motion events are delivered to the focused window.
+        // Unlike key events, generic motion events don&#39;t tend to transfer focus to other
+        // windows and it is not important for them to be serialized.  So we prefer to deliver
+        // generic motion events as soon as possible to improve efficiency and reduce lag
+        // through batching.
+        //
+        // The one case where we pause input event delivery is when the wait queue is piling
+        // up with lots of events because the application is not responding.
+        // This condition ensures that ANRs are detected reliably.
+        if (!connection-&amp;gt;waitQueue.isEmpty()
+                &amp;amp;&amp;amp; currentTime &amp;gt;= connection-&amp;gt;waitQueue.head-&amp;gt;deliveryTime
+                        + STREAM_AHEAD_EVENT_TIMEOUT) {
+            return false;
+        }
+    }
+    return true;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;6anr&#34;&gt;6、ANR&lt;/h3&gt;
+&lt;p&gt;findTouchedWindowTargetsLocked函数中调用handleTargetsNotReadyLocked方法会执行，主要分如下三类&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;if (windowState != null) {
+    Slog.i(TAG_WM, &amp;quot;Input event dispatching timed out &amp;quot;
+            + &amp;quot;sending to &amp;quot; + windowState.mAttrs.getTitle()
+            + &amp;quot;.  Reason: &amp;quot; + reason);
+    // MIUI ADD:
+    reason = windowState.mAttrs.getTitle() + &amp;quot;, &amp;quot; + reason;
+} else if (activity != null) {
+    Slog.i(TAG_WM, &amp;quot;Input event dispatching timed out &amp;quot;
+            + &amp;quot;sending to application &amp;quot; + activity.stringName
+            + &amp;quot;.  Reason: &amp;quot; + reason);
+    // MIUI ADD:
+    reason = activity.stringName + &amp;quot;, &amp;quot; + reason;
+} else {
+    Slog.i(TAG_WM, &amp;quot;Input event dispatching timed out &amp;quot;
+            + &amp;quot;.  Reason: &amp;quot; + reason);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ANR的原因有如下类型&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/**
+ * Anr reason types:
+ * Input dispatching timed out (Waiting because the focused window has not finished processing the input events that were previously delivered to it.)
+ * Input dispatching timed out (Waiting because the touched window has not finished processing the input events that were previously delivered to it.)
+ * Input dispatching timed out (Waiting because no window has focus but there is a focused application that may eventually add a window when it finishes starting up.)
+ * Input dispatching timed out (Waiting to send non-key event because the touched window has not finished processing certain input events that were delivered to it over 500.0ms ago. Wait queue length: 6. Wait queue head age: 6152.1ms.)
+ * Input dispatching timed out (Waiting to send key event because the focused window has not finished processing all of the input events that were previously delivered to it. Outbound queue length: 0. Wait queue length: 6.)
+ * Input dispatching timed out (Waiting because the touched window&#39;s input channel is full. Outbound queue length: 1. Wait queue length: 52.)
+ * Input dispatching timed out (Waiting because the focused window&#39;s input channel is full. Outbound queue length: 1. Wait queue length: 52.)
+ * Input dispatching timed out (Waiting because the touched window&#39;s input channel is not registered with the input dispatcher. The window may be in the process of being removed.)
+ * Input dispatching timed out (Waiting because the focused window&#39;s input channel is not registered with the input dispatcher. The window may be in the process of being removed.)
+ * Input dispatching timed out (Waiting because the touched window is paused.)
+ * Input dispatching timed out (Waiting because the focused window is paused.)
+ * Input dispatching timed out (Waiting because the touched window&#39;s input connection is %s. The window may be in the process of being removed
+ * Input dispatching timed out (Waiting because the focused window&#39;s input connection is %s. The window may be in the process of being removed
+ * executing service
+ * Broadcast of Intent
+ * ContentProvider not responding
+ */
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ANR实例分析：&lt;/p&gt;
+&lt;p&gt;待续&lt;/p&gt;
 </description>
       
     </item>
@@ -4469,6 +4799,741 @@ public class MainActivity extends Activity
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;正是在这里执行了run方法的操作，因为直接调用Runable的run方法并不会创建一个线程，因此如果handler关联的是UI线程，在handler.post方法中进行UI操作是没问题的，同理不能在这里执行耗时操作。&lt;/p&gt;
 &lt;p&gt;以上就是自己对于Android消息处理机制的理解，第一次认真写一篇博客，花费了快一天的时间，希望能坚持下去。&lt;/p&gt;
+</description>
+      
+    </item>
+    
+    <item>
+      <title>多写一题是一题</title>
+      <link>https://xuanliangdev.github.io/post/%E5%A4%9A%E5%86%99%E4%B8%80%E9%A2%98%E6%98%AF%E4%B8%80%E9%A2%98/</link>
+      <pubDate>Sun, 19 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://xuanliangdev.github.io/post/%E5%A4%9A%E5%86%99%E4%B8%80%E9%A2%98%E6%98%AF%E4%B8%80%E9%A2%98/</guid>
+      
+        <description>&lt;h1 id=&#34;剑指offer&#34;&gt;剑指offer&lt;/h1&gt;
+&lt;h5 id=&#34;1在一个二维数组中每个一维数组的长度相同每一行都按照从左到右递增的顺序排序每一列都按照从上到下递增的顺序排序请完成一个函数输入这样的一个二维数组和一个整数判断数组中是否含有该整数&#34;&gt;1、在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public boolean Find(int target, int [][] array) {
+        if (array == null || array[0] == null 
+            || array.length &amp;lt;= 0 || array[0].length &amp;lt;= 0) {
+            return false;
+        }
+        int top = 0;
+        int right = array[0].length - 1;
+        while (right &amp;gt;= 0 &amp;amp;&amp;amp; top &amp;lt;= array.length - 1) {
+            if (array[top][right] == target) {
+                return true;
+            } else if (array[top][right] &amp;gt; target) {
+                right--;
+            } else {
+                top++;
+            }
+        }
+        return false;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;2请实现一个函数将一个字符串中的每个空格替换成20例如当字符串为we-are-happy则经过替换之后的字符串为we20are20happy&#34;&gt;2、请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public String replaceSpace(StringBuffer str) {
+        if (str == null || str.length() &amp;lt;= 0) {
+            return str.toString();
+        }
+    	int blankCount = 0;
+        for (int i = 0; i &amp;lt; str.length(); i++) {
+            if (str.charAt(i) == &#39; &#39;) {
+                blankCount++;
+            }
+        }
+        char[] newString = new char[str.length() + blankCount * 2];
+        int newStringIndex = newString.length - 1;
+        for (int i = str.length() - 1; i &amp;gt;= 0; i--) {
+            if (str.charAt(i) != &#39; &#39;) {
+                newString[newStringIndex--] = str.charAt(i);
+            } else {
+                newString[newStringIndex--] = &#39;0&#39;;
+                newString[newStringIndex--] = &#39;2&#39;;
+                newString[newStringIndex--] = &#39;%&#39;;
+            }
+        }
+        return new String(newString);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;3输入一个链表按链表从尾到头的顺序返回一个arraylist&#34;&gt;3、输入一个链表，按链表从尾到头的顺序返回一个ArrayList。&lt;/h5&gt;
+&lt;p&gt;解法1：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;import java.util.ArrayList;
+public class Solution {
+    public ArrayList&amp;lt;Integer&amp;gt; printListFromTailToHead(ListNode listNode) {
+        ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;();
+        while (listNode != null) {
+            res.add(0, listNode.val);
+            listNode = listNode.next;
+        }
+        return res;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;解法2：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;import java.util.ArrayList;
+public class Solution {
+    public ArrayList&amp;lt;Integer&amp;gt; printListFromTailToHead(ListNode listNode) {
+        ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;();
+        getListNodeVal(listNode, res);
+        return res;
+    }
+    
+    public void getListNodeVal(ListNode listNode, ArrayList&amp;lt;Integer&amp;gt; res) {
+        if (listNode == null) {
+            return;
+        }
+        getListNodeVal(listNode.next, res);
+        res.add(listNode.val);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;4输入某二叉树的前序遍历和中序遍历的结果请重建出该二叉树假设输入的前序遍历和中序遍历的结果中都不含重复的数字例如输入前序遍历序列12473568和中序遍历序列47215386则重建二叉树并返回&#34;&gt;4、输入某二叉树的前序遍历和中序遍历的结果，请重建出该二叉树。假设输入的前序遍历和中序遍历的结果中都不含重复的数字。例如输入前序遍历序列{1,2,4,7,3,5,6,8}和中序遍历序列{4,7,2,1,5,3,8,6}，则重建二叉树并返回。&lt;/h5&gt;
+&lt;p&gt;// TO DO:&lt;/p&gt;
+&lt;h5 id=&#34;5用两个栈来实现一个队列完成队列的push和pop操作-队列中的元素为int类型&#34;&gt;5、用两个栈来实现一个队列，完成队列的Push和Pop操作。 队列中的元素为int类型。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    Stack&amp;lt;Integer&amp;gt; stack1 = new Stack&amp;lt;Integer&amp;gt;();
+    Stack&amp;lt;Integer&amp;gt; stack2 = new Stack&amp;lt;Integer&amp;gt;();
+    
+    public void push(int node) {
+        stack1.push(node);
+    }
+    
+    public int pop() {
+        if (stack2.isEmpty()) {
+            while (!stack1.isEmpty()) {
+                stack2.push(stack1.pop());
+            }
+        }
+        return stack2.pop();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;6把一个数组最开始的若干个元素搬到数组的末尾我们称之为数组的旋转输入一个非递减排序的数组的一个旋转输出旋转数组的最小元素note给出的所有元素都大于0若数组大小为0请返回0&#34;&gt;6、把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。输入一个非递减排序的数组的一个旋转，输出旋转数组的最小元素。NOTE：给出的所有元素都大于0，若数组大小为0，请返回0。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;import java.util.ArrayList;
+public class Solution {
+    public int minNumberInRotateArray(int [] array) {
+        if (array == null || array.length == 0) {
+            return 0;
+        }
+        int left = 0;
+        int right = array.length - 1;
+        while(left &amp;lt; right) {
+            if (array[left] &amp;lt; array[right]) {
+                return array[left];
+            }
+            int mid = (left + right) &amp;gt;&amp;gt;&amp;gt; 1;
+            if (array[mid] &amp;gt; array[right]) {
+                left = mid + 1;
+            } else if (array[mid] &amp;lt; array[right]) {
+                right = mid;
+            } else {
+                right = right - 1;
+            }
+        }
+        return array[left];
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;7大家都知道斐波那契数列现在要求输入一个整数n请你输出斐波那契数列的第n项从0开始第0项为0第1项是1nleq-39n39&#34;&gt;7、大家都知道斐波那契数列，现在要求输入一个整数n，请你输出斐波那契数列的第n项（从0开始，第0项为0，第1项是1）。n\leq 39&lt;em&gt;n&lt;/em&gt;≤39&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public int Fibonacci(int n) {
+        if (n == 0 || n == 1) {
+            return n;
+        }
+        int[] a = new int[n + 1];
+        a[0] = 0;
+        a[1] = 1;
+        for (int i = 2; i &amp;lt;= n; i++) {
+            a[i] = a[i - 1] + a[i - 2];
+        }
+        return a[n];
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;8一只青蛙一次可以跳上1级台阶也可以跳上2级求该青蛙跳上一个n级的台阶总共有多少种跳法先后次序不同算不同的结果&#34;&gt;8、一只青蛙一次可以跳上1级台阶，也可以跳上2级。求该青蛙跳上一个n级的台阶总共有多少种跳法（先后次序不同算不同的结果）。&lt;/h5&gt;
+&lt;p&gt;递归&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public int JumpFloor(int target) {
+        if (target == 0 || target == 1 || target == 2) {
+            return target;
+        }
+        return JumpFloor(target - 1) + JumpFloor(target - 2);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;动态规划&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public int JumpFloor(int target) {
+        if (target == 0 || target == 1) {
+            return target;
+        }
+        int[] a = new int[target + 1];
+        a[1] = 1;
+        a[2] = 2;
+        for (int i = 3; i &amp;lt;= target; i++) {
+            a[i] = a[i - 1] + a[i - 2];
+        }
+        return a[target];
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;减少空间复杂度&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public int JumpFloor(int target) {
+        if (target == 1 || target == 2) {
+            return target;
+        }
+        int[] a = new int[3];
+        a[0] = 1;
+        a[1] = 2;
+        for (int i = 3; i &amp;lt;= target; i++) {
+            a[2] = a[0] + a[1];
+            a[0] = a[1];
+            a[1] = a[2];
+        }
+        return a[2];
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;9一只青蛙一次可以跳上1级台阶也可以跳上2级它也可以跳上n级求该青蛙跳上一个n级的台阶总共有多少种跳法&#34;&gt;9、一只青蛙一次可以跳上1级台阶，也可以跳上2级……它也可以跳上n级。求该青蛙跳上一个n级的台阶总共有多少种跳法。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public int JumpFloorII(int target) {
+        if (target &amp;lt;= 0) {
+            return 0;
+        }
+        if (target == 1) {
+            return 1;
+        }
+        return 2 * JumpFloorII(target - 1);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;10我们可以用21的小矩形横着或者竖着去覆盖更大的矩形请问用n个21的小矩形无重叠地覆盖一个2n的大矩形总共有多少种方法比如n3时23的矩形块有3种覆盖方法&#34;&gt;10、我们可以用2&lt;em&gt;1的小矩形横着或者竖着去覆盖更大的矩形。请问用n个2&lt;/em&gt;1的小矩形无重叠地覆盖一个2&lt;em&gt;n的大矩形，总共有多少种方法？比如n=3时，2&lt;/em&gt;3的矩形块有3种覆盖方法：&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public int rectCover(int target) {
+        if (target == 0 || target == 1) {
+            return target;
+        }
+        int[] a = new int[target + 1];
+        a[1] = 1;
+        a[2] = 2;
+        for (int i = 3; i &amp;lt;= target; i++) {
+            a[i] = a[i - 1] + a[i - 2];
+        }
+        return a[target];
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;11输入一个整数输出该数32位二进制表示中1的个数其中负数用补码表示&#34;&gt;11、输入一个整数，输出该数32位二进制表示中1的个数。其中负数用补码表示。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public int NumberOf1(int n) {
+        int count = 0;
+        while (n != 0) {
+            n &amp;amp;= (n - 1);
+            count++;
+        }
+        return count;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;12给定一个double类型的浮点数base和int类型的整数exponent求base的exponent次方保证base和exponent不同时为0&#34;&gt;12、给定一个double类型的浮点数base和int类型的整数exponent。求base的exponent次方。保证base和exponent不同时为0&lt;/h5&gt;
+&lt;p&gt;// TO DO:&lt;/p&gt;
+&lt;h5 id=&#34;13输入一个整数数组实现一个函数来调整该数组中数字的顺序使得所有的奇数位于数组的前半部分所有的偶数位于数组的后半部分并保证奇数和奇数偶数和偶数之间的相对位置不变&#34;&gt;13、输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有的奇数位于数组的前半部分，所有的偶数位于数组的后半部分，并保证奇数和奇数，偶数和偶数之间的相对位置不变。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;import java.util.ArrayList;
+public class Solution {
+    public void reOrderArray(int [] array) {
+        ArrayList&amp;lt;Integer&amp;gt; evenList = new ArrayList&amp;lt;&amp;gt;();
+        int oddIndex = -1;
+        for (int i = 0; i &amp;lt; array.length; i++) {
+            if (array[i] % 2 == 1) {
+                oddIndex++;
+                swap(array, i, oddIndex);
+            } else {
+                evenList.add(array[i]);
+            }
+        }
+        for (int i = oddIndex + 1, j = 0; i &amp;lt; array.length; i++) {
+            array[i] = evenList.get(j++);
+        }
+        
+    }
+    
+    public void swap(int[] array, int a, int b) {
+        if (a == b) {
+            return;
+        }
+        int temp = array[a];
+        array[a] = array[b];
+        array[b] = temp;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;14输入一个链表输出该链表中倒数第k个结点&#34;&gt;14、输入一个链表，输出该链表中倒数第k个结点。&lt;/h5&gt;
+&lt;p&gt;两遍扫描&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public ListNode FindKthToTail(ListNode head,int k) {
+        int nodeCount = 0;
+        ListNode scan = head;
+        while (scan != null) {
+            scan = scan.next;
+            nodeCount++;
+        }
+        if (nodeCount &amp;lt; k) {
+            return null;
+        }
+        scan = head;
+        for (int i = 0; i &amp;lt; nodeCount - k; i++) {
+            scan = scan.next;
+        }
+        return scan;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;快慢指针&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public ListNode FindKthToTail(ListNode head,int k) {
+        ListNode fast = head;
+        ListNode slow = head;
+        for (int i = 0; i &amp;lt; k; i++) {
+            if (fast == null) {
+                return null;
+            }
+            fast = fast.next;
+        }
+        while (fast != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;15输入一个链表反转链表后输出新链表的表头&#34;&gt;15、输入一个链表，反转链表后，输出新链表的表头。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public ListNode ReverseList(ListNode head) {
+        ListNode pre = null;
+        ListNode cur = head;
+        while (cur != null) {
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;16输入两个单调递增的链表输出两个链表合成后的链表当然我们需要合成后的链表满足单调不减规则&#34;&gt;16、输入两个单调递增的链表，输出两个链表合成后的链表，当然我们需要合成后的链表满足单调不减规则。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public ListNode Merge(ListNode list1,ListNode list2) {
+        ListNode dummy = new ListNode(0);
+        ListNode head = dummy;
+        while (list1 != null &amp;amp;&amp;amp; list2 != null) {
+            if (list1.val &amp;lt; list2.val) {
+                dummy.next = list1;
+                list1 = list1.next;
+            } else {
+                dummy.next = list2;
+                list2 = list2.next;
+            }
+            dummy = dummy.next;
+        }
+        if (list1 != null) {
+            dummy.next = list1;
+        }
+        if (list2 != null) {
+            dummy.next = list2;
+        }
+        return head.next;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;递归&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public ListNode Merge(ListNode list1,ListNode list2) {
+        if (list1 == null) {
+            return list2;
+        }
+        if (list2 == null) {
+            return list1;
+        }
+        if (list1.val &amp;lt; list2.val) {
+            list1.next = Merge(list1.next, list2);
+            return list1;
+        } else {
+            list2.next = Merge(list1, list2.next);
+            return list2;
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;17输入两棵二叉树ab判断b是不是a的子结构ps我们约定空树不是任意一个树的子结构&#34;&gt;17、输入两棵二叉树A，B，判断B是不是A的子结构。（ps：我们约定空树不是任意一个树的子结构）&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public boolean HasSubtree(TreeNode root1,TreeNode root2) {
+        if (root2 == null || root1 == null) return false;
+        return isSameTree(root1, root2) 
+            || HasSubtree(root1.left, root2) 
+            || HasSubtree(root1.right, root2);
+    }
+    
+    public boolean isSameTree(TreeNode t1, TreeNode t2) {
+        if (t1 == null) {
+            return t2 == null;
+        }
+        if (t2 == null) {
+            return true;
+        }
+        return (t1.val == t2.val) 
+            &amp;amp;&amp;amp; isSameTree(t1.left, t2.left) 
+            &amp;amp;&amp;amp; isSameTree(t1.right, t2.right);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;18操作给定的二叉树将其变换为源二叉树的镜像&#34;&gt;18、操作给定的二叉树，将其变换为源二叉树的镜像。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public void Mirror(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        Mirror(root.left);
+        Mirror(root.right);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;19输入一个矩阵按照从外向里以顺时针的顺序依次打印出每一个数字例如如果输入如下4-x-4矩阵-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-则依次打印出数字12348121615141395671110&#34;&gt;19、输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字，例如，如果输入如下4 X 4矩阵： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 则依次打印出数字1,2,3,4,8,12,16,15,14,13,9,5,6,7,11,10.&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;20定义栈的数据结构请在该类型中实现一个能够得到栈中所含最小元素的min函数时间复杂度应为o1&#34;&gt;20、定义栈的数据结构，请在该类型中实现一个能够得到栈中所含最小元素的min函数（时间复杂度应为O（1））。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;21输入两个整数序列第一个序列表示栈的压入顺序请判断第二个序列是否可能为该栈的弹出顺序假设压入栈的所有数字均不相等例如序列12345是某栈的压入顺序序列45321是该压栈序列对应的一个弹出序列但43512就不可能是该压栈序列的弹出序列注意这两个序列的长度是相等的&#34;&gt;21、输入两个整数序列，第一个序列表示栈的压入顺序，请判断第二个序列是否可能为该栈的弹出顺序。假设压入栈的所有数字均不相等。例如序列1,2,3,4,5是某栈的压入顺序，序列4,5,3,2,1是该压栈序列对应的一个弹出序列，但4,3,5,1,2就不可能是该压栈序列的弹出序列。（注意：这两个序列的长度是相等的）&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;import java.util.ArrayList;
+import java.util.ArrayDeque;
+public class Solution {
+    public boolean IsPopOrder(int [] pushA,int [] popA) {
+      ArrayDeque&amp;lt;Integer&amp;gt; stack = new ArrayDeque&amp;lt;&amp;gt;();
+        int j = 0;
+        for (int i : pushA) {
+            stack.push(i);
+            while (!stack.isEmpty() &amp;amp;&amp;amp; stack.peek() == popA[j]) {
+                stack.pop();
+                j++;
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;22从上往下打印出二叉树的每个节点同层节点从左至右打印&#34;&gt;22、从上往下打印出二叉树的每个节点，同层节点从左至右打印。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;import java.util.ArrayList;
+import java.util.ArrayDeque;
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+public class Solution {
+    public ArrayList&amp;lt;Integer&amp;gt; PrintFromTopToBottom(TreeNode root) {
+        ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;();
+        if (root == null) return res;
+        ArrayDeque&amp;lt;TreeNode&amp;gt; queue = new ArrayDeque&amp;lt;&amp;gt;();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            for (int i = 0; i &amp;lt; size; i++) {
+                TreeNode node = queue.poll();
+                res.add(node.val);
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+            }
+        }
+        return res;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;23输入一个整数数组判断该数组是不是某二叉搜索树的后序遍历的结果如果是则返回true否则返回false假设输入的数组的任意两个数字都互不相同&#34;&gt;23、输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历的结果。如果是则返回true,否则返回false。假设输入的数组的任意两个数字都互不相同。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;24输入一颗二叉树的根节点和一个整数按字典序打印出二叉树中结点值的和为输入整数的所有路径路径定义为从树的根结点开始往下一直到叶结点所经过的结点形成一条路径&#34;&gt;24、输入一颗二叉树的根节点和一个整数，按字典序打印出二叉树中结点值的和为输入整数的所有路径。路径定义为从树的根结点开始往下一直到叶结点所经过的结点形成一条路径。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;25输入一个复杂链表每个节点中有节点值以及两个指针一个指向下一个节点另一个特殊指针random指向一个随机节点请对此链表进行深拷贝并返回拷贝后的头结点注意输出结果中请不要返回参数中的节点引用否则判题程序会直接返回空&#34;&gt;25、输入一个复杂链表（每个节点中有节点值，以及两个指针，一个指向下一个节点，另一个特殊指针random指向一个随机节点），请对此链表进行深拷贝，并返回拷贝后的头结点。（注意，输出结果中请不要返回参数中的节点引用，否则判题程序会直接返回空）&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;26输入一棵二叉搜索树将该二叉搜索树转换成一个排序的双向链表要求不能创建任何新的结点只能调整树中结点指针的指向&#34;&gt;26、输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的双向链表。要求不能创建任何新的结点，只能调整树中结点指针的指向。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;27输入一个字符串按字典序打印出该字符串中字符的所有排列例如输入字符串abc则按字典序打印出由字符abc所能排列出来的所有字符串abcacbbacbcacab和cba&#34;&gt;27、输入一个字符串,按字典序打印出该字符串中字符的所有排列。例如输入字符串abc,则按字典序打印出由字符a,b,c所能排列出来的所有字符串abc,acb,bac,bca,cab和cba。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;28数组中有一个数字出现的次数超过数组长度的一半请找出这个数字例如输入一个长度为9的数组123222542由于数字2在数组中出现了5次超过数组长度的一半因此输出2如果不存在则输出0&#34;&gt;28、数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。例如输入一个长度为9的数组{1,2,3,2,2,2,5,4,2}。由于数字2在数组中出现了5次，超过数组长度的一半，因此输出2。如果不存在则输出0。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;29输入n个整数找出其中最小的k个数例如输入45162738这8个数字则最小的4个数字是1234&#34;&gt;29、输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;30输入一个整型数组数组里有正数也有负数数组中的一个或连续多个整数组成一个子数组求所有子数组的和的最大值要求时间复杂度为-on&#34;&gt;30、输入一个整型数组，数组里有正数也有负数。数组中的一个或连续多个整数组成一个子数组。求所有子数组的和的最大值。要求时间复杂度为 O(n).&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public int FindGreatestSumOfSubArray(int[] array) {
+        int max = 0;
+        int[] dp = new int[array.length];
+        max = dp[0] = array[0];
+        for (int i = 1; i &amp;lt; array.length; i++) {
+            dp[i] = array[i] + (dp[i - 1] &amp;gt; 0 ? dp[i - 1] : 0);
+            max = Math.max(max, dp[i]);
+        }
+        return max;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;31求出113的整数中1出现的次数并算出1001300的整数中1出现的次数为此他特别数了一下113中包含1的数字有110111213因此共出现6次但是对于后面问题他就没辙了acmer希望你们帮帮他并把问题更加普遍化可以很快的求出任意非负整数区间中1出现的次数从1-到-n-中1出现的次数&#34;&gt;31、求出1~13的整数中1出现的次数,并算出100~1300的整数中1出现的次数？为此他特别数了一下1~13中包含1的数字有1、10、11、12、13因此共出现6次,但是对于后面问题他就没辙了。ACMer希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;32输入一个正整数数组把数组里所有数字拼接起来排成一个数打印能拼接出的所有数字中最小的一个例如输入数组332321则打印出这三个数字能排成的最小数字为321323&#34;&gt;32、输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;33把只包含质因子23和5的数称作丑数ugly-number例如68都是丑数但14不是因为它包含质因子7-习惯上我们把1当做是第一个丑数求按从小到大的顺序的第n个丑数&#34;&gt;33、把只包含质因子2、3和5的数称作丑数（Ugly Number）。例如6、8都是丑数，但14不是，因为它包含质因子7。 习惯上我们把1当做是第一个丑数。求按从小到大的顺序的第N个丑数。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;34在一个字符串0字符串长度10000全部由字母组成中找到第一个只出现一次的字符并返回它的位置-如果没有则返回--1需要区分大小写从0开始计数&#34;&gt;34、在一个字符串(0&amp;lt;=字符串长度&amp;lt;=10000，全部由字母组成)中找到第一个只出现一次的字符,并返回它的位置, 如果没有则返回 -1（需要区分大小写）.（从0开始计数）&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;import java.util.HashMap;
+
+public class Solution {
+    public int FirstNotRepeatingChar(String str) {
+        HashMap&amp;lt;Character, Integer&amp;gt; map = new HashMap&amp;lt;&amp;gt;();
+        for (int i = 0; i &amp;lt; str.length(); i++) {
+            Character c = str.charAt(i);
+            if (map.containsKey(c)) {
+                map.put(c, map.get(c) + 1);
+            } else {
+                map.put(c, 1);
+            }
+        }
+        for (int i = 0; i &amp;lt; str.length(); i++) {
+            Character c = str.charAt(i);
+            if (map.containsKey(c)) {
+                if (map.get(c) == 1) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;35在数组中的两个数字如果前面一个数字大于后面的数字则这两个数字组成一个逆序对输入一个数组求出这个数组中的逆序对的总数p并将p对1000000007取模的结果输出-即输出p1000000007&#34;&gt;35、在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组,求出这个数组中的逆序对的总数P。并将P对1000000007取模的结果输出。 即输出P%1000000007&lt;/h5&gt;
+&lt;p&gt;对于50%50%的数据,size\leq 10^4&lt;em&gt;s&lt;strong&gt;i&lt;/strong&gt;z**e&lt;/em&gt;≤104
+对于75%75%的数据,size\leq 10^5&lt;em&gt;s&lt;strong&gt;i&lt;/strong&gt;z**e&lt;/em&gt;≤105
+对于100%100%的数据,size\leq 2&lt;em&gt;10^5&lt;/em&gt;s&lt;strong&gt;i&lt;/strong&gt;z**e*≤2∗105&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;36输入两个链表找出它们的第一个公共结点注意因为传入数据是链表所以错误测试数据的提示是用其他方式显示的保证传入数据是正确的&#34;&gt;36、输入两个链表，找出它们的第一个公共结点。（注意因为传入数据是链表，所以错误测试数据的提示是用其他方式显示的，保证传入数据是正确的）&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public ListNode FindFirstCommonNode(ListNode pHead1, ListNode pHead2) {
+        ListNode p1 = pHead1;
+        ListNode p2 = pHead2;
+         while (p1 != p2) {
+              p1 = p1 == null ? pHead2 : p1.next;
+              p2 = p2 == null ? pHead1 : p2.next;
+         }
+        return p1;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;37统计一个数字在升序数组中出现的次数&#34;&gt;37、统计一个数字在升序数组中出现的次数。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;38输入一棵二叉树求该树的深度从根结点到叶结点依次经过的结点含根叶结点形成树的一条路径最长路径的长度为树的深度&#34;&gt;38、输入一棵二叉树，求该树的深度。从根结点到叶结点依次经过的结点（含根、叶结点）形成树的一条路径，最长路径的长度为树的深度。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public int TreeDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return 1 + Math.max(TreeDepth(root.left), TreeDepth(root.right));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;39输入一棵二叉树判断该二叉树是否是平衡二叉树&#34;&gt;39、输入一棵二叉树，判断该二叉树是否是平衡二叉树。&lt;/h5&gt;
+&lt;p&gt;在这里，我们只需要考虑其平衡性，不需要考虑其是不是排序二叉树&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;平衡二叉树&lt;/strong&gt;（Balanced Binary Tree），具有以下性质：它是一棵空树或它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public boolean IsBalanced_Solution(TreeNode root) {
+        if (root == null) return true;
+        int left = getHeight(root.left);
+        int right = getHeight(root.right);
+        return Math.abs(left - right) &amp;lt; 2 
+            &amp;amp;&amp;amp; IsBalanced_Solution(root.left) 
+            &amp;amp;&amp;amp; IsBalanced_Solution(root.right);
+    }
+    
+    public int getHeight(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return 1 + Math.max(getHeight(root.left), getHeight(root.right));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;剪枝&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public boolean IsBalanced_Solution(TreeNode root) {
+        return getDepth(root) != -1;
+    }
+    
+    public int getDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int left = getDepth(root.left);
+        if (left == -1) {
+            return -1;
+        }
+        int right = getDepth(root.right);
+        if (right == -1) {
+            return -1;
+        }
+        return Math.abs(left - right) &amp;lt; 2 ? Math.max(left, right) + 1 : -1;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;40一个整型数组里除了两个数字之外其他的数字都出现了两次请写程序找出这两个只出现一次的数字&#34;&gt;40、一个整型数组里除了两个数字之外，其他的数字都出现了两次。请写程序找出这两个只出现一次的数字。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public void FindNumsAppearOnce(int [] array,int num1[] , int num2[]) {
+        if(array.length == 2){
+            num1[0] = array[0];
+            num2[0] = array[1];
+            return;
+        }
+        int or = 0;
+        for (int i = 0; i &amp;lt; array.length; i++) {
+            or ^= array[i];
+        }
+        
+        int index = 0;
+        while (((or &amp;amp; 1) == 0) &amp;amp;&amp;amp; index &amp;lt; 32) {
+            or &amp;gt;&amp;gt;= 1;
+            index++;
+        }
+        
+        for (int i = 0; i &amp;lt; array.length; i++) {
+            if (isMatch(array[i], index)) {
+                num1[0] ^= array[i];
+            } else {
+                num2[0] ^= array[i];
+            }
+        }
+    }
+    
+    public boolean isMatch(int num, int index) {
+        return ((num &amp;gt;&amp;gt;= index) &amp;amp; 1) == 1;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;41小明很喜欢数学有一天他在做数学作业时要求计算出916的和他马上就写出了正确答案是100但是他并不满足于此他在想究竟有多少种连续的正数序列的和为100至少包括两个数没多久他就得到另一组连续正数和为100的序列1819202122现在把问题交给你你能不能也很快的找出所有和为s的连续正数序列-good-luck&#34;&gt;41、小明很喜欢数学,有一天他在做数学作业时,要求计算出9~16的和,他马上就写出了正确答案是100。但是他并不满足于此,他在想究竟有多少种连续的正数序列的和为100(至少包括两个数)。没多久,他就得到另一组连续正数和为100的序列:18,19,20,21,22。现在把问题交给你,你能不能也很快的找出所有和为S的连续正数序列? Good Luck!&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;42输入一个递增排序的数组和一个数字s在数组中查找两个数使得他们的和正好是s如果有多对数字的和等于s输出两个数的乘积最小的&#34;&gt;42、输入一个递增排序的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;import java.util.ArrayList;
+public class Solution {
+    public ArrayList&amp;lt;Integer&amp;gt; FindNumbersWithSum(int [] array,int sum) {
+        ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;();
+        if (array == null || array.length == 0) return res; 
+        int l = 0;
+        int h = array.length - 1;
+        while (l &amp;lt;= h) {
+            if (array[l] + array[h] == sum) {
+                res.add(array[l]);
+                res.add(array[h]);
+                return res;
+            } else if (array[l] + array[h] &amp;gt; sum) {
+                h--;
+            } else {
+                l++;
+            }
+        }
+        return res;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;43汇编语言中有一种移位指令叫做循环左移rol现在有个简单的任务就是用字符串模拟这个指令的运算结果对于一个给定的字符序列s请你把其循环左移k位后的序列输出例如字符序列sabcxyzdef要求输出循环左移3位后的结果即xyzdefabc是不是很简单ok搞定它&#34;&gt;43、汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，就是用字符串模拟这个指令的运算结果。对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。例如，字符序列S=”abcXYZdef”,要求输出循环左移3位后的结果，即“XYZdefabc”。是不是很简单？OK，搞定它！&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+    public String LeftRotateString(String str,int n) {
+        if (str == null || str.length() == 0) return str;
+        if (n &amp;gt; str.length()) {
+            n %= str.length();
+        }
+        char[] array = str.toCharArray();
+        revert(array, 0, n - 1);
+        revert(array, n, array.length - 1);
+        revert(array, 0, array.length - 1);
+        return new String(array);
+        
+    }
+    
+    public void revert(char[] array, int l, int r) {
+        while (l &amp;lt; r) {
+            char t = array[l];
+            array[l++] = array[r];
+            array[r--] = t;
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;44牛客最近来了一个新员工fish每天早晨总是会拿着一本英文杂志写些句子在本子上同事cat对fish写的内容颇感兴趣有一天他向fish借来翻看但却读不懂它的意思例如student-a-am-i后来才意识到这家伙原来把句子单词的顺序翻转了正确的句子应该是i-am-a-studentcat对一一的翻转这些单词顺序可不在行你能帮助他么&#34;&gt;44、牛客最近来了一个新员工Fish，每天早晨总是会拿着一本英文杂志，写些句子在本子上。同事Cat对Fish写的内容颇感兴趣，有一天他向Fish借来翻看，但却读不懂它的意思。例如，“student. a am I”。后来才意识到，这家伙原来把句子单词的顺序翻转了，正确的句子应该是“I am a student.”。Cat对一一的翻转这些单词顺序可不在行，你能帮助他么？&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;45ll今天心情特别好因为他去买了一副扑克牌发现里面居然有2个大王2个小王一副牌原本是54张_他随机从中抽出了5张牌想测测自己的手气看看能不能抽到顺子如果抽到的话他决定去买体育彩票嘿嘿红心a黑桃3小王大王方片5oh-my-god不是顺子ll不高兴了他想了想决定大小-王可以看成任何数字并且a看作1j为11q为12k为13上面的5张牌就可以变成12345大小王分别看作2和4so-luckyll决定去买体育彩票啦-现在要求你使用这幅牌模拟上面的过程然后告诉我们ll的运气如何-如果牌能组成顺子就输出true否则就输出false为了方便起见你可以认为大小王是0&#34;&gt;45、LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有2个大王,2个小王(一副牌原本是54张^_^)&amp;hellip;他随机从中抽出了5张牌,想测测自己的手气,看看能不能抽到顺子,如果抽到的话,他决定去买体育彩票,嘿嘿！！“红心A,黑桃3,小王,大王,方片5”,“Oh My God!”不是顺子&amp;hellip;..LL不高兴了,他想了想,决定大\小 王可以看成任何数字,并且A看作1,J为11,Q为12,K为13。上面的5张牌就可以变成“1,2,3,4,5”(大小王分别看作2和4),“So Lucky!”。LL决定去买体育彩票啦。 现在,要求你使用这幅牌模拟上面的过程,然后告诉我们LL的运气如何， 如果牌能组成顺子就输出true，否则就输出false。为了方便起见,你可以认为大小王是0。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;46每年六一儿童节牛客都会准备一些小礼物去看望孤儿院的小朋友今年亦是如此hf作为牛客的资深元老自然也准备了一些小游戏其中有个游戏是这样的首先让小朋友们围成一个大圈然后他随机指定一个数m让编号为0的小朋友开始报数每次喊到m-1的那个小朋友要出列唱首歌然后可以在礼品箱中任意的挑选礼物并且不再回到圈中从他的下一个小朋友开始继续0m-1报数这样下去直到剩下最后一个小朋友可以不用表演并且拿到牛客名贵的名侦探柯南典藏版名额有限哦_请你试着想下哪个小朋友会得到这份礼品呢注小朋友的编号是从0到n-1如果没有小朋友请返回-1&#34;&gt;46、每年六一儿童节,牛客都会准备一些小礼物去看望孤儿院的小朋友,今年亦是如此。HF作为牛客的资深元老,自然也准备了一些小游戏。其中,有个游戏是这样的:首先,让小朋友们围成一个大圈。然后,他随机指定一个数m,让编号为0的小朋友开始报数。每次喊到m-1的那个小朋友要出列唱首歌,然后可以在礼品箱中任意的挑选礼物,并且不再回到圈中,从他的下一个小朋友开始,继续0&amp;hellip;m-1报数&amp;hellip;.这样下去&amp;hellip;.直到剩下最后一个小朋友,可以不用表演,并且拿到牛客名贵的“名侦探柯南”典藏版(名额有限哦!!^_^)。请你试着想下,哪个小朋友会得到这份礼品呢？(注：小朋友的编号是从0到n-1)如果没有小朋友，请返回-1&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;47求123n要求不能使用乘除法forwhileifelseswitchcase等关键字及条件判断语句abc&#34;&gt;47、求1+2+3+&amp;hellip;+n，要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A?B:C）。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;48写一个函数求两个整数之和要求在函数体内不得使用-四则运算符号&#34;&gt;48、写一个函数，求两个整数之和，要求在函数体内不得使用+、-、*、/四则运算符号。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;49将一个字符串转换成一个整数要求不能使用字符串转换整数的库函数-数值为0或者字符串不是一个合法的数值则返回0&#34;&gt;49、将一个字符串转换成一个整数，要求不能使用字符串转换整数的库函数。 数值为0或者字符串不是一个合法的数值则返回0&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;50在一个长度为n的数组里的所有数字都在0到n-1的范围内-数组中某些数字是重复的但不知道有几个数字是重复的也不知道每个数字重复几次请找出数组中第一个重复的数字-例如如果输入长度为7的数组2310253那么对应的输出是第一个重复的数字2&#34;&gt;50、在一个长度为n的数组里的所有数字都在0到n-1的范围内。 数组中某些数字是重复的，但不知道有几个数字是重复的。也不知道每个数字重复几次。请找出数组中第一个重复的数字。 例如，如果输入长度为7的数组{2,3,1,0,2,5,3}，那么对应的输出是第一个重复的数字2。&lt;/h5&gt;
+&lt;h5 id=&#34;返回描述&#34;&gt;返回描述：&lt;/h5&gt;
+&lt;p&gt;如果数组中有重复的数字，函数返回true，否则返回false。&lt;/p&gt;
+&lt;p&gt;如果数组中有重复的数字，把重复的数字放到参数duplication[0]中。（ps:duplication已经初始化，可以直接赋值使用。）&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;51给定一个数组a01n-1请构建一个数组b01n-1其中b中的元素bia0a1ai-1ai1an-1不能使用除法注意规定b0--a1--a2----an-1bn-1--a0--a1----an-2&#34;&gt;51、给定一个数组A[0,1,&amp;hellip;,n-1],请构建一个数组B[0,1,&amp;hellip;,n-1],其中B中的元素B[i]=A[0]&lt;em&gt;A[1]&lt;/em&gt;&amp;hellip;*A[i-1]&lt;em&gt;A[i+1]&lt;/em&gt;&amp;hellip;*A[n-1]。不能使用除法。（注意：规定B[0] = A[1] * A[2] * &amp;hellip; * A[n-1]，B[n-1] = A[0] * A[1] * &amp;hellip; * A[n-2];）&lt;/h5&gt;
+&lt;p&gt;对于A长度为1的情况，B无意义，故而无法构建，因此该情况不会存在。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;52请实现一个函数用来匹配包括和的正则表达式模式中的字符表示任意一个字符而表示它前面的字符可以出现任意次包含0次-在本题中匹配是指字符串的所有字符匹配整个模式例如字符串aaa与模式aa和abaca匹配但是与aaa和aba均不匹配&#34;&gt;52、请实现一个函数用来匹配包括&amp;rsquo;.&amp;lsquo;和&amp;rsquo;&lt;em&gt;&amp;lsquo;的正则表达式。模式中的字符&amp;rsquo;.&amp;lsquo;表示任意一个字符，而&amp;rsquo;&lt;/em&gt;&amp;lsquo;表示它前面的字符可以出现任意次（包含0次）。 在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串&amp;quot;aaa&amp;quot;与模式&amp;quot;a.a&amp;quot;和&amp;quot;ab&lt;em&gt;ac&lt;/em&gt;a&amp;quot;匹配，但是与&amp;quot;aa.a&amp;quot;和&amp;quot;ab*a&amp;quot;均不匹配&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;53请实现一个函数用来判断字符串是否表示数值包括整数和小数例如字符串1005e2-12331416和-1e-16都表示数值-但是12e1a314123-5和12e43都不是&#34;&gt;53、请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串&amp;quot;+100&amp;rdquo;,&amp;ldquo;5e2&amp;rdquo;,&amp;quot;-123&amp;rdquo;,&amp;ldquo;3.1416&amp;quot;和&amp;rdquo;-1E-16&amp;quot;都表示数值。 但是&amp;quot;12e&amp;rdquo;,&amp;ldquo;1a3.14&amp;rdquo;,&amp;ldquo;1.2.3&amp;rdquo;,&amp;ldquo;+-5&amp;quot;和&amp;quot;12e+4.3&amp;quot;都不是&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;54请实现一个函数用来找出字符流中第一个只出现一次的字符例如当从字符流中只读出前两个字符go时第一个只出现一次的字符是g当从该字符流中读出前六个字符google时第一个只出现一次的字符是l&#34;&gt;54、请实现一个函数用来找出字符流中第一个只出现一次的字符。例如，当从字符流中只读出前两个字符&amp;quot;go&amp;quot;时，第一个只出现一次的字符是&amp;quot;g&amp;rdquo;。当从该字符流中读出前六个字符“google&amp;quot;时，第一个只出现一次的字符是&amp;quot;l&amp;rdquo;。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;55给一个链表若其中包含环请找出该链表的环的入口结点否则输出null&#34;&gt;55、给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;public class Solution {
+
+    public ListNode EntryNodeOfLoop(ListNode pHead)
+    {
+        ListNode fast = pHead;
+        ListNode slow = pHead;
+        while (fast != null &amp;amp;&amp;amp; fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (fast == slow) {
+                fast = pHead;
+                while (fast != slow) {
+                    fast = fast.next;
+                    slow = slow.next;
+                }
+                return fast;
+            }
+        }
+        return null;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;56在一个排序的链表中存在重复的结点请删除该链表中重复的结点重复的结点不保留返回链表头指针-例如链表1-2-3-3-4-4-5-处理后为-1-2-5&#34;&gt;56、在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 例如，链表1-&amp;gt;2-&amp;gt;3-&amp;gt;3-&amp;gt;4-&amp;gt;4-&amp;gt;5 处理后为 1-&amp;gt;2-&amp;gt;5&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;57给定一个二叉树和其中的一个结点请找出中序遍历顺序的下一个结点并且返回注意树中的结点不仅包含左右子结点同时包含指向父结点的指针&#34;&gt;57、给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;58请实现一个函数用来判断一棵二叉树是不是对称的注意如果一个二叉树同此二叉树的镜像是同样的定义其为对称的&#34;&gt;58、请实现一个函数，用来判断一棵二叉树是不是对称的。注意，如果一个二叉树同此二叉树的镜像是同样的，定义其为对称的。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;59请实现一个函数按照之字形打印二叉树即第一行按照从左到右的顺序打印第二层按照从右至左的顺序打印第三行按照从左到右的顺序打印其他行以此类推&#34;&gt;59、请实现一个函数按照之字形打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右至左的顺序打印，第三行按照从左到右的顺序打印，其他行以此类推。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;60从上到下按层打印二叉树同一层结点从左至右输出每一层输出一行&#34;&gt;60、从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;61请实现两个函数分别用来序列化和反序列化二叉树&#34;&gt;61、请实现两个函数，分别用来序列化和反序列化二叉树&lt;/h5&gt;
+&lt;p&gt;二叉树的序列化是指：把一棵二叉树按照某种遍历方式的结果以某种格式保存为字符串，从而使得内存中建立起来的二叉树可以持久保存。序列化可以基于先序、中序、后序、层序的二叉树遍历方式来进行修改，序列化的结果是一个字符串，序列化时通过 某种符号表示空节点（#），以 ！ 表示一个结点值的结束（value!）。&lt;/p&gt;
+&lt;p&gt;二叉树的反序列化是指：根据某种遍历顺序得到的序列化字符串结果str，重构二叉树。&lt;/p&gt;
+&lt;p&gt;例如，我们可以把一个只有根节点为1的二叉树序列化为&amp;quot;1,&amp;quot;，然后通过自己的函数来解析回这个二叉树&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;62给定一棵二叉搜索树请找出其中的第k小的treenode结点&#34;&gt;62、给定一棵二叉搜索树，请找出其中的第k小的TreeNode结点。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;63如何得到一个数据流中的中位数如果从数据流中读出奇数个数值那么中位数就是所有数值排序之后位于中间的数值如果从数据流中读出偶数个数值那么中位数就是所有数值排序之后中间两个数的平均值我们使用insert方法读取数据流使用getmedian方法获取当前读取数据的中位数&#34;&gt;63、如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。我们使用Insert()方法读取数据流，使用GetMedian()方法获取当前读取数据的中位数。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;64给定一个数组和滑动窗口的大小找出所有滑动窗口里数值的最大值例如如果输入数组23426251及滑动窗口的大小3那么一共存在6个滑动窗口他们的最大值分别为446665-针对数组23426251的滑动窗口有以下6个-23426251-23426251-23426251-23426251-23426251-23426251&#34;&gt;64、给定一个数组和滑动窗口的大小，找出所有滑动窗口里数值的最大值。例如，如果输入数组{2,3,4,2,6,2,5,1}及滑动窗口的大小3，那么一共存在6个滑动窗口，他们的最大值分别为{4,4,6,6,6,5}； 针对数组{2,3,4,2,6,2,5,1}的滑动窗口有以下6个： {[2,3,4],2,6,2,5,1}， {2,[3,4,2],6,2,5,1}， {2,3,[4,2,6],2,5,1}， {2,3,4,[2,6,2],5,1}， {2,3,4,2,[6,2,5],1}， {2,3,4,2,6,[2,5,1]}。&lt;/h5&gt;
+&lt;p&gt;窗口大于数组长度的时候，返回空&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;65请设计一个函数用来判断在一个矩阵中是否存在一条包含某字符串所有字符的路径路径可以从矩阵中的任意一个格子开始每一步可以在矩阵中向左向右向上向下移动一个格子如果一条路径经过了矩阵中的某一个格子则该路径不能再进入该格子-例如-beginbmatrix-a--b--c-e--s--f--c--s--a--d--e-e-endbmatrixquadasabfdcceese-矩阵中包含一条字符串bcced的路径但是矩阵中不包含abcb路径因为字符串的第一个字符b占据了矩阵中的第一行第二个格子之后路径不能再次进入该格子&#34;&gt;65、请设计一个函数，用来判断在一个矩阵中是否存在一条包含某字符串所有字符的路径。路径可以从矩阵中的任意一个格子开始，每一步可以在矩阵中向左，向右，向上，向下移动一个格子。如果一条路径经过了矩阵中的某一个格子，则该路径不能再进入该格子。 例如 \begin{bmatrix} a &amp;amp; b &amp;amp; c &amp;amp;e \ s &amp;amp; f &amp;amp; c &amp;amp; s \ a &amp;amp; d &amp;amp; e&amp;amp; e\ \end{bmatrix}\quad⎣⎡&lt;em&gt;a&lt;strong&gt;s&lt;/strong&gt;a&lt;strong&gt;b&lt;/strong&gt;f&lt;strong&gt;d&lt;/strong&gt;c&lt;strong&gt;c&lt;/strong&gt;e&lt;strong&gt;e&lt;/strong&gt;s**e&lt;/em&gt;⎦⎤ 矩阵中包含一条字符串&amp;quot;bcced&amp;quot;的路径，但是矩阵中不包含&amp;quot;abcb&amp;quot;路径，因为字符串的第一个字符b占据了矩阵中的第一行第二个格子之后，路径不能再次进入该格子。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;66地上有一个m行和n列的方格一个机器人从坐标00的格子开始移动每一次只能向左右上下四个方向移动一格但是不能进入行坐标和列坐标的数位之和大于k的格子-例如当k为18时机器人能够进入方格3537因为3537--18但是它不能进入方格3538因为3538--19请问该机器人能够达到多少个格子&#34;&gt;66、地上有一个m行和n列的方格。一个机器人从坐标0,0的格子开始移动，每一次只能向左，右，上，下四个方向移动一格，但是不能进入行坐标和列坐标的数位之和大于k的格子。 例如，当k为18时，机器人能够进入方格（35,37），因为3+5+3+7 = 18。但是，它不能进入方格（35,38），因为3+5+3+8 = 19。请问该机器人能够达到多少个格子？&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h5 id=&#34;67给你一根长度为n的绳子请把绳子剪成整数长的m段mn都是整数n1并且m1mn每段绳子的长度记为k1km请问k1xxkm可能的最大乘积是多少例如当绳子的长度是8时我们把它剪成长度分别为233的三段此时得到的最大乘积是18&#34;&gt;67、给你一根长度为n的绳子，请把绳子剪成整数长的m段（m、n都是整数，n&amp;gt;1并且m&amp;gt;1，m&amp;lt;=n），每段绳子的长度记为k[1],&amp;hellip;,k[m]。请问k[1]x&amp;hellip;xk[m]可能的最大乘积是多少？例如，当绳子的长度是8时，我们把它剪成长度分别为2、3、3的三段，此时得到的最大乘积是18。&lt;/h5&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h1 id=&#34;leetcode&#34;&gt;leetcode&lt;/h1&gt;
+&lt;h3 id=&#34;1数组&#34;&gt;1、数组&lt;/h3&gt;
+&lt;h3 id=&#34;2链表&#34;&gt;2、链表&lt;/h3&gt;
+&lt;h3 id=&#34;3栈&#34;&gt;3、栈&lt;/h3&gt;
+&lt;h3 id=&#34;4队列&#34;&gt;4、队列&lt;/h3&gt;
+&lt;h3 id=&#34;5二叉树&#34;&gt;5、二叉树&lt;/h3&gt;
 </description>
       
     </item>
